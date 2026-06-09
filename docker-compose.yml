@@ -89,5 +89,12 @@ services:
         volumes:
             - ./backend/framework/uploaded_files:/app/uploads
 
+    new-chat-app:
+        build:
+            context: ./frontend/new-chat-app
+            dockerfile: Dockerfile
+        ports:
+            - 7007:7007
+
 volumes:
     redis_data:
