@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTS Interface</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #logo { margin: 20px auto; width: 150px; }
+        #input-section { margin: 20px; }
+        .error { color: red; }
+        .processing { color: blue; }
+        #audio-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+        #audio-player {
+            display: none; 
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" id="logo"> <!-- Place your logo file in the same directory -->
+    <!-- <img src="logo.png" alt="Logo" id="logo"> Place your logo file in the same directory -->
+    <h2>Text-to-Speech Interface</h2>
+
+    <div id="input-section">
+        <label>Model Type:</label>
+        <input type="radio" name="speaker" value="single" required> Single Speaker
+        <input type="radio" name="speaker" value="multi" required>Multi-speaker<br><br>
+
+        <label>Voice:</label>
+        <input type="radio" name="voice" value="male" required> Male
+        <input type="radio" name="voice" value="female" required> Female<br><br>
+
+        <label>Input Type:</label>
+        <select id="input-type" required>
+            <option value="">Select Type</option>
+            <option value="sinhala">Sinhala</option>
+            <option value="romanized">Romanized</option>
+        </select><br><br>
+
+        <label>Text Input:</label>
+        <textarea id="input-text" rows="4" cols="50" placeholder="Enter text here"></textarea><br><br>
+
+        <button onclick="generateAudio()">Generate Audio</button>
+        <p id="error-message" class="error"></p>
+        <p id="processing-message" class="processing" style="display: none;">Processing...</p>
+    </div>
+
+    <div id="audio-container">
+        <audio id="audio-player" controls></audio>
+    </div>
+
+    <script>
+        function generateAudio() {
+    const speakerType = document.querySelector('input[name="speaker"]:checked');
+    const voice = document.querySelector('input[name="voice"]:checked');
+    const inputType = document.getElementById("input-type").value;
+    const inputText = document.getElementById("input-text").value.trim();
+    const errorMessage = document.getElementById("error-message");
+
+    // Clear previous error messages
+    errorMessage.textContent = "";
+
+    // Validation
+    if (!speakerType || !voice || !inputType) {
+        errorMessage.textContent = "Please select all options.";
+        return;
+    }
+    if (!inputText) {
+        errorMessage.textContent = "Please enter text.";
+        return;
+    }
+
+    // Show a "Processing..." message
+    errorMessage.textContent = "Processing...";
+    const audioPlayer = document.getElementById("audio-player");
+    audioPlayer.style.display = "none"; // Hide the audio player while processing
+
+    // Call the backend API to generate audio
+    fetch("http://127.0.0.1:5002/generate-audio", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            speakerType: speakerType.value,
+            voice: voice.value,
+            inputType: inputType,
+            inputText: inputText
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.audioUrl) {
+            // Append a unique query parameter to the audio URL to avoid caching
+            const uniqueUrl = `${data.audioUrl}?t=${Date.now()}`;
+            audioPlayer.src = uniqueUrl;
+            audioPlayer.style.display = "block"; // Show the audio player
+            errorMessage.textContent = ""; // Clear the processing message
+        }
+    })
+    .catch(error => {
+        errorMessage.textContent = "Error generating audio.";
+    });
+    }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!-- <body> -->
+<h1 class="center-heading">ඔබේම චැට්බෝට් එකක් සාදාගන්න</h1>
+
+<div class="upload-container" id="upload-section">
+    <h2>ඔබගේ ලේඛනය උඩුගත කරන්න</h2>
+    <form id="upload-form">
+        <input type="file" id="file-input" accept=".pdf, .txt">
+        <button type="button" id="upload-btn" onclick="uploadFile()">උඩුගත කරන්න</button>
+    </form>
+    <div id="progress-wrapper" class="hidden" style="margin-top: 10px;">
+        <div id="upload-progress" class="progress-bar">0%</div>
+    </div>
+    <div id="analyzing-indicator" class="hidden analyzing">
+        <div class="dots">
+            <span>.</span><span>.</span><span>.</span>
+        </div>
+        <p>ලේඛනය විශ්ලේෂණය කරමින් පවතී...</p>
+    </div>
+    <script src="../script.js"></script>
+</div>
+
+<div id="chatbot-container" class="hidden">
+    <div class="chat-container">
+        <div class="chat-display" id="chat-display"></div>
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="ඔබේ ප්‍රශ්නය ටයිප් කරන්න" onkeydown="if(event.key === 'Enter') sendMessage()">
+            <button id="microphone-button" class="voice-button" onclick="voiceInput(this)">🎙</button>
+            <button onclick="sendMessage()" class="send-button"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+    <script src="../script.js"></script>
+</div>
+
+<!-- </body> -->

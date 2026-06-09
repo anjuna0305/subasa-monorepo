@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Recorder and Transcriber</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+    <style>
+        /*body {*/
+        /*    font-family: Arial, sans-serif;*/
+        /*    max-width: 800px;*/
+        /*    margin: 0 auto;*/
+        /*    padding: 20px;*/
+        /*    background-color: #f5f5f5;*/
+        /*}*/
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        /*.container {*/
+        /*    background-color: white;*/
+        /*    padding: 20px;*/
+        /*    border-radius: 8px;*/
+        /*    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);*/
+        /*}*/
+        #logo { margin: 20px auto; width: 150px; }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #recordButton {
+            background-color: #dc3545;
+            color: white;
+        }
+        #recordButton.recording {
+            background-color: #28a745;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .transcription {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            min-height: 100px;
+        }
+        #timer {
+            font-size: 18px;
+            margin-left: 10px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+<img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" id="logo">
+    <div class="container">
+        <h2>Automatic Speech Recognition</h2>
+        <br>
+        <label>Model:</label>
+        <select id="input-type">
+            <option value="">Select model</option>
+            <option value="whisper">Whisper</option>
+            <option value="wav">Wav2Vec</option>
+        </select> <br><br><br>
+<!--        <div class="controls">-->
+            <button id="recordButton">Start Recording</button>
+            <span id="timer">00:00</span>
+<!--        </div>-->
+        <div class="status" id="status"></div>
+        <div class="transcription">
+            <h3>Transcription:</h3>
+            <p id="transcriptionText">Transcription...</p>
+        </div>
+    </div>
+
+<script>
+    let isRecording = false;
+    let mediaRecorder;
+    let audioChunks = [];
+    let startTime;
+    let timerInterval;
+
+    const recordButton = document.getElementById('recordButton');
+    const status = document.getElementById('status');
+    const timer = document.getElementById('timer');
+    const transcriptionText = document.getElementById('transcriptionText');
+    const inputType = document.getElementById("input-type");
+
+    function updateTimer() {
+        const now = Date.now();
+        const diff = now - startTime;
+        const seconds = Math.floor(diff / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const displaySeconds = (seconds % 60).toString().padStart(2, '0');
+        const displayMinutes = minutes.toString().padStart(2, '0');
+        timer.textContent = `${displayMinutes}:${displaySeconds}`;
+    }
+
+    async function startRecording() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' }); // Changed to 'audio/webm'
+            audioChunks = [];
+
+            mediaRecorder.ondataavailable = (event) => {
+                audioChunks.push(event.data);
+            };
+
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunks, {type: 'audio/webm'});
+                const processedBlob = await reencodeAudio(audioBlob); // Re-encode audio to control properties
+
+                const selectedInputType = inputType.value;
+
+                if (selectedInputType === "wav") {
+                    await sendAudioToServer_wav(processedBlob);
+                }
+                else if (selectedInputType === "whisper") {
+                    await sendAudioToServer_whisper(processedBlob);
+                }
+                // if (inputType_wav) {
+                //
+                //     await sendAudioToServer_wav(processedBlob);
+                // }
+                // else if (inputType_whisper) {
+                //     await sendAudioToServer_whisper(processedBlob);
+                // }
+                //     await sendAudioToServer(processedBlob);
+
+            };
+
+            mediaRecorder.start();
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 1000);
+
+            recordButton.textContent = 'Stop Recording';
+            recordButton.classList.add('recording');
+            status.textContent = 'Recording in progress...';
+            isRecording = true;
+        } catch (err) {
+            console.error('Error accessing microphone:', err);
+            status.textContent = 'Error: Could not access microphone';
+        }
+    }
+
+    function stopRecording() {
+        mediaRecorder.stop();
+        mediaRecorder.stream.getTracks().forEach(track => track.stop());
+        clearInterval(timerInterval);
+
+        recordButton.textContent = 'Start Recording';
+        recordButton.classList.remove('recording');
+        status.textContent = 'Processing audio...';
+        isRecording = false;
+    }
+
+    async function reencodeAudio(blob) {
+        // Use AudioContext to modify audio properties
+        const audioContext = new AudioContext({ sampleRate: 22050 }); // Set sample rate to 22.05 kHz
+        const arrayBuffer = await blob.arrayBuffer();
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+        // Create a new buffer source
+        const offlineContext = new OfflineAudioContext(
+            audioBuffer.numberOfChannels,
+            audioBuffer.length,
+            audioContext.sampleRate
+        );
+        const bufferSource = offlineContext.createBufferSource();
+        bufferSource.buffer = audioBuffer;
+        bufferSource.connect(offlineContext.destination);
+        bufferSource.start(0);
+
+        const renderedBuffer = await offlineContext.startRendering();
+
+        // Encode the reprocessed audio buffer into a Blob
+        const wavBlob = await encodeToWav(renderedBuffer, audioBuffer.sampleRate);
+        return wavBlob;
+    }
+
+    async function encodeToWav(audioBuffer, sampleRate) {
+        // Encode audio buffer to WAV format
+        const numOfChannels = audioBuffer.numberOfChannels;
+        const length = audioBuffer.length * numOfChannels * 2 + 44;
+        const buffer = new ArrayBuffer(length);
+        const view = new DataView(buffer);
+
+        // WAV header
+        const writeString = (offset, string) => {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        };
+
+        writeString(0, 'RIFF');
+        view.setUint32(4, length - 8, true);
+        writeString(8, 'WAVE');
+        writeString(12, 'fmt ');
+        view.setUint32(16, 16, true); // PCM format
+        view.setUint16(20, 1, true);
+        view.setUint16(22, numOfChannels, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * 2 * numOfChannels, true); // Byte rate
+        view.setUint16(32, numOfChannels * 2, true);
+        view.setUint16(34, 16, true); // Bits per sample
+        writeString(36, 'data');
+        view.setUint32(40, length - 44, true);
+
+        // Audio data
+        let offset = 44;
+        for (let channel = 0; channel < numOfChannels; channel++) {
+            const data = audioBuffer.getChannelData(channel);
+            for (let i = 0; i < data.length; i++) {
+                const sample = Math.max(-1, Math.min(1, data[i]));
+                view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+                offset += 2;
+            }
+        }
+
+        return new Blob([buffer], { type: 'audio/wav' });
+    }
+
+    async function sendAudioToServer_wav(audioBlob) {
+        const formData = new FormData();
+        formData.append('audio', audioBlob, 'sin_01_00007.wav');
+
+        try {
+            const response = await axios.post('http://127.0.0.1:5000/transcribe', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+
+            transcriptionText.textContent = response.data.transcription;
+            status.textContent = 'Transcription complete!';
+        } catch (err) {
+            console.error('Error sending audio to server:', err.response ? err.response.data : err);
+            status.textContent = 'Error: Could not process audio';
+            transcriptionText.textContent = 'Error occurred during transcription.';
+        }
+    }
+
+    async function sendAudioToServer_whisper(audioBlob) {
+        const formData = new FormData();
+        formData.append('audio', audioBlob, 'sin_01_00007.wav');
+
+        try {
+            const response = await axios.post('http://127.0.0.1:5000/transcribe_whisper', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+
+            transcriptionText.textContent = response.data.transcription;
+            status.textContent = 'Transcription complete!';
+        } catch (err) {
+            console.error('Error sending audio to server:', err.response ? err.response.data : err);
+            status.textContent = 'Error: Could not process audio';
+            transcriptionText.textContent = 'Error occurred during transcription.';
+        }
+    }
+
+    recordButton.addEventListener('click', () => {
+        if (!isRecording) {
+            startRecording();
+        } else {
+            stopRecording();
+        }
+    });
+
+</script>
+</body>
+</html>

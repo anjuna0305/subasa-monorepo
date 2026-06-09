@@ -1,0 +1,131 @@
+/* Universal reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Body styling */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+}
+
+/* Chat container styling */
+.chat-container {
+    width: 400px;
+    max-width: 90%;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Chat header styling */
+.chat-header {
+    background-color: #007bff;
+    color: #ffffff;
+    padding: 10px;
+    text-align: center;
+    border-radius: 5px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+/* Chat display area */
+.chat-display {
+    height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+}
+
+.chat-display::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-display::-webkit-scrollbar-thumb {
+    background-color: #007bff;
+    border-radius: 10px;
+}
+
+/* Input container styling */
+.input-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#user-input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    outline: none;
+    font-size: 14px;
+    transition: box-shadow 0.3s ease;
+}
+
+#user-input:focus {
+    box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Send button styling */
+.send-button {
+    padding: 12px;
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.send-button:hover {
+    background-color: #0056b3;
+}
+
+/* Message styling */
+.message {
+    padding: 10px;
+    border-radius: 10px;
+    margin: 5px 0;
+    max-width: 70%;
+    line-height: 1.5;
+    animation: fadeIn 0.3s ease;
+}
+
+.user-message {
+    background-color: #007bff;
+    color: white;
+    align-self: flex-end;
+}
+
+.bot-message {
+    background-color: #f1f1f1;
+    color: #333;
+    align-self: flex-start;
+}
+
+/* Animation for new messages */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,0 +1,93 @@
+services:
+    redis:
+        image: redis:7-alpine
+        container_name: redis
+        restart: unless-stopped
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis_data:/data
+    asr-be:
+        build:
+            context: ./backend/ASR
+            dockerfile: Dockerfile
+        container_name: asr-be
+        restart: unless-stopped
+        ports:
+            - "7000:6000"
+        volumes:
+            - $HOME/.cache/huggingface:/root/.cache/huggingface
+    chatbot-be:
+        build:
+            context: ./backend/chatbot
+            dockerfile: Dockerfile
+        container_name: chatbot-be
+        restart: unless-stopped
+        ports:
+            - "7001:6001"
+        volumes:
+            - $HOME/.cache/huggingface:/root/.cache/huggingface
+    chatbot-mod:
+        build:
+            context: ./backend/chatbot-modified
+            dockerfile: Dockerfile
+        container_name: chatbot-mod
+        restart: unless-stopped
+        ports:
+            - "7006:7006"
+        volumes:
+            - $HOME/.cache/huggingface:/root/.cache/huggingface
+            - ./backend/framework/uploaded_files/chatbot_files:/usr/src/app/uploaded_files
+        environment:
+            REDIS_HOST: redis
+        depends_on:
+            - redis
+    framework-be:
+        build:
+            context: ./backend/framework
+            dockerfile: Dockerfile
+        container_name: framework-be
+        restart: unless-stopped
+        ports:
+            - "7003:6003"
+        volumes:
+            - ./backend/framework/uploaded_files:/usr/src/app/uploaded_files
+            - $HOME/.cache/huggingface:/root/.cache/huggingface
+    tts-be:
+        build:
+            context: ./backend/TTS
+            dockerfile: Dockerfile
+        container_name: tts-be
+        restart: unless-stopped
+        ports:
+            - "7002:6002"
+        volumes:
+            - ./backend/TTS/output:/usr/src/app/output
+            - $HOME/.cache/huggingface:/root/.cache/huggingface
+    voicebot-frontend:
+        build:
+            context: ./frontend/voicebot
+            dockerfile: Dockerfile
+        container_name: voicebot-frontend
+        restart: unless-stopped
+        ports:
+            - "7005:7005"
+
+    api-gateway:
+        build:
+            context: ./backend/api-gateway
+            dockerfile: Dockerfile
+        container_name: api-gateway
+        restart: unless-stopped
+        ports:
+            - "7010:7010"
+        network_mode: host
+        environment:
+            DATABASE_URL: ${DATABASE_URL}
+            UPLOAD_BASE_DIR: /app/uploads
+            JWT_SECRET: ${JWT_SECRET}
+        volumes:
+            - ./backend/framework/uploaded_files:/app/uploads
+
+volumes:
+    redis_data:

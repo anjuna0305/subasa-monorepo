@@ -1,0 +1,31 @@
+<!-- <body> -->
+    <h1 class="center-heading">🎙️ පෙළ කථනය</h1>
+           
+    <div id="TTS-container" >
+        <div id="TTS-card" style=" text-align: center;">
+            <label style="font-weight: bold;">හඬ:</label>
+            <input type="radio" name="voice" value="male" required> 👨 පිරිමි
+            <input type="radio" name="voice" value="female" required> 👩 ගැහැණු<br><br>
+    
+            <label style="font-weight: bold;">ආදාන ආකාරය:</label>
+            <select id="TTS-input-type" required>
+                <option value="">ආකාරය තෝරන්න</option>
+                <option value="sinhala">🇱🇰 සිංහල අක්ෂර</option>
+                <option value="romanized">🔤 රෝමානු අක්ෂර</option>
+            </select><br><br>
+    
+            <!-- <label style="font-weight: bold;">Text Input:</label><br> -->
+            <textarea id="TTS-input-text" rows="10" placeholder="ඔබේ සිංහල පෙළ මෙහි ටයිප් කරන්න.." ></textarea><br><br>
+    
+            <button onclick="generateAudio()" id="TTS-generate-button">කථනයට හරවන්න</button>
+            
+            <p id="TTS-error-message" class="TTS-error"></p>
+            <p id="TTS-processing-message" class="TTS-processing">⏳ සැකසෙමින්...</p>
+    
+            <div id="TTS-audio-container" style="margin-top: 20px;margin-left: 30%;">
+                <audio id="TTS-audio-player" controls ></audio>
+            </div>
+        </div>
+    </div>
+    
+<!-- </body> -->

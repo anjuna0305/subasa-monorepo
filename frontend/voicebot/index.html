@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>VocSi</title>
+        <link rel="stylesheet" href="styles.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        />
+    </head>
+    <body>
+        <!-- <img src="logo.png" class="logo" alt="Logo"> -->
+        <div class="all-content">
+            <div id="logo">
+                <img src="static/logo.png" class="logo" alt="Logo" />
+            </div>
+            <div class="sidebar">
+                <button class="menu-toggle">☰</button>
+
+                <ul>
+                    <li data-page="chatbot" class="active">
+                        <div>
+                            <i class="fa-solid fa-robot"></i>
+                            <span> චැට්බොට්</span>
+                        </div>
+                    </li>
+                    <li data-page="document" class="bottom">
+                        <div>
+                            <i class="fa-solid fa-brain" aria-hidden="true"></i>
+                            <span> ඔබේම චැට්බොට් එකක් සාදාගන්න </span>
+                        </div>
+                    </li>
+                    <li data-page="speech">
+                        <div>
+                            <i class="fa fa-microphone" aria-hidden="true"></i>
+                            <span> කථන පෙළ (ASR)</span>
+                        </div>
+                    </li>
+                    <li data-page="tts">
+                        <div>
+                            <i class="fa fa-volume-up" aria-hidden="true"></i>
+                            <span> පෙළ කථනය (TTS)</span>
+                        </div>
+                    </li>
+                    <li data-page="settings" class="bottom">
+                        <div>
+                            <i class="fa fa-cog" aria-hidden="true"></i>
+                            <span> සැකසුම් </span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div id="main-content">
+                <h2>Welcome</h2>
+                <p>Select an option from the menu.</p>
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+        <script src="pages/settings.js"></script>
+    </body>
+</html>
