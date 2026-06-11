@@ -28,6 +28,10 @@ import PeopleIcon from "@mui/icons-material/People";
 import { Service } from "@/types/service";
 import { isAdmin, isOrgAdmin } from "@/utils/auth";
 import { useAuth } from "@/hooks/useAuth";
+import { useOrganiztion } from "@/hooks/organiztion/useOrganization";
+import { Avatar, Typography } from "@mui/material";
+import { useUser } from "@/hooks/user/user";
+import { toUpperCase } from "zod";
 
 const drawerWidth = 240;
 
@@ -107,7 +111,7 @@ export default function SideBar({ services }: SideBarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const pathname = location.pathname;
-  const { role, logout, isAuthenticated } = useAuth();
+  const { role, logout, isAuthenticated, organization_uuid } = useAuth();
 
   const open = isAdmin(role) || isOrgAdmin(role) ? true : !collapsed;
 
@@ -120,6 +124,9 @@ export default function SideBar({ services }: SideBarProps) {
     return pathname.startsWith(path);
   };
 
+  const { data: org } = useOrganiztion(organization_uuid || "");
+  const { data: user } = useUser();
+
   return (
     <Box sx={{ display: "flex" }}>
       <Drawer variant="permanent" open={open}>
@@ -127,14 +134,21 @@ export default function SideBar({ services }: SideBarProps) {
           <DrawerHeader>
             <Box
               sx={{
+                gap:2,
                 width: "100%",
                 px: 2,
                 display: "flex",
                 alignItems: "center",
               }}
             >
-              <Box sx={{ fontWeight: "bold", fontSize: "1.1rem" }}>
-                Subasa Admin
+              <Avatar sx={{ width: 48, height: 48 }}>{user?.name[0].toUpperCase()}</Avatar>
+              <Box>
+                <Typography variant="h6">
+                  {role}
+                </Typography>
+                <Typography variant="body2" gutterBottom>
+                  {/* {org?.name} */}
+                </Typography>
               </Box>
             </Box>
           </DrawerHeader>

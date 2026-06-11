@@ -43,6 +43,7 @@ export const API_ENDPOINTS = {
     `${API_BASE_URL}/users/${id}/organization`,
   USER_BLOCK: (id: string) => `${API_BASE_URL}/users/${id}/block`,
   USER_UNBLOCK: (id: string) => `${API_BASE_URL}/users/${id}/unblock`,
+  GET_ME: `${API_BASE_URL}/users/me`,
 
   ASR_TRANSCRIBE: `${API_BASE_URL}/voc-si/api/asr/transcribe`,
   TTS_GENERATE: `${API_BASE_URL}/voc-si/api/tts/voicebot-generate-audio`,

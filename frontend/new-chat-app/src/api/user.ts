@@ -47,3 +47,8 @@ export async function unblockUser(userId: string): Promise<User> {
   const res = await axiosInstance.put(API_ENDPOINTS.USER_UNBLOCK(userId));
   return res.data;
 }
+
+export async function getUserMe(): Promise<User> {
+  const res = await axiosInstance.get(API_ENDPOINTS.GET_ME)
+  return res.data;
+}

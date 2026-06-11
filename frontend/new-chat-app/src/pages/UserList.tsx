@@ -20,6 +20,7 @@ import {
   IconButton,
   Stack,
   Chip,
+  Divider,
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import SearchIcon from "@mui/icons-material/Search";
@@ -172,6 +173,8 @@ export default function UserListPage() {
             </ColorBgIconButton>
           )}
 
+          <Divider orientation="vertical" flexItem />
+
           <FormControl size="small" sx={{ minWidth: 160 }}>
             <InputLabel>Sort by</InputLabel>
             <Select
@@ -205,9 +208,7 @@ export default function UserListPage() {
               value={activeFilter}
               label="Status"
               onChange={(e) => {
-                setActiveFilter(
-                  e.target.value as "" | "true" | "false",
-                );
+                setActiveFilter(e.target.value as "" | "true" | "false");
                 setPage(0);
               }}
             >

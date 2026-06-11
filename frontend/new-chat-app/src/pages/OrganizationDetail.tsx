@@ -13,11 +13,11 @@ import ColorBgIconButton from "@/components/ColorBgIconButton";
 import AdminGuard from "@/components/AdminGuard";
 import { Organization } from "@/types/organizations";
 import { useAlert } from "@/hooks/useAlert";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  fetchOrganizationById,
   toggleOrganizationActive,
 } from "@/api/organization";
+import { useOrganiztion } from "@/hooks/organiztion/useOrganization";
 
 export default function OrganizationDetailPage() {
   const navigate = useNavigate();
@@ -26,11 +26,7 @@ export default function OrganizationDetailPage() {
   const { addAlert } = useAlert();
   const queryClient = useQueryClient();
 
-  const { data: org, isLoading } = useQuery<Organization>({
-    queryKey: ["organization", orgId],
-    queryFn: () => fetchOrganizationById(orgId),
-    enabled: !!orgId,
-  });
+  const { data: org, isLoading } = useOrganiztion(orgId)
 
   const toggleMutation = useMutation({
     mutationFn: toggleOrganizationActive,
