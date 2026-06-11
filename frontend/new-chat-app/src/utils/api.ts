@@ -39,8 +39,7 @@ export const API_ENDPOINTS = {
 
   USER_LIST: `${API_BASE_URL}/users`,
   USER_DETAIL: (id: string) => `${API_BASE_URL}/users/${id}`,
-  USER_CHANGE_ORG: (id: string) =>
-    `${API_BASE_URL}/users/${id}/organization`,
+  USER_CHANGE_ORG: (id: string) => `${API_BASE_URL}/users/${id}/organization`,
   USER_BLOCK: (id: string) => `${API_BASE_URL}/users/${id}/block`,
   USER_UNBLOCK: (id: string) => `${API_BASE_URL}/users/${id}/unblock`,
   GET_ME: `${API_BASE_URL}/users/me`,
