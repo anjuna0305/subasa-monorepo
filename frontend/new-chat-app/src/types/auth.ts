@@ -13,6 +13,20 @@ export type RegisterRequest = {
 export type LoginResponse = {
   access_token: string;
   token_type: "bearer";
-  organization_uuid: string;
+  organization_uuid: string | null;
   role: string;
+  is_new_user: boolean;
+};
+
+export type GoogleLoginRequest = {
+  code: string;
+  redirect_uri: string;
+};
+
+export type GoogleLoginResponse = {
+  access_token: string;
+  token_type: "bearer";
+  organization_uuid: string | null;
+  role: string;
+  is_new_user: boolean;
 };

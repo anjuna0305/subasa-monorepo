@@ -93,6 +93,19 @@ class UserLogin(BaseModel):
     password: str
 
 
+class GoogleLoginRequest(BaseModel):
+    code: str
+    redirect_uri: str | None = None
+
+
+class GoogleLoginOut(BaseModel):
+    access_token: str
+    organization_uuid: str | None
+    token_type: str = "bearer"
+    role: UserRole
+    is_new_user: bool
+
+
 class TokenOut(BaseModel):
     access_token: str
     organization_uuid: str

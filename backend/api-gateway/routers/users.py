@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
 import jwt
+from authlib.integrations.httpx_client import AsyncOAuth2Client
 from fastapi import APIRouter, Depends, HTTPException, Query
 from passlib.context import CryptContext
 from sqlalchemy import func, or_, select
@@ -9,11 +10,19 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.sql.operators import and_
 
 from auth import AdminOrOrgAdminUser, AdminUser, AnyUser, CurrentUser
-from config import JWT_EXPIRE_MINUTES, JWT_SECRET
+from config import (
+    GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET,
+    GOOGLE_REDIRECT_URI,
+    JWT_EXPIRE_MINUTES,
+    JWT_SECRET,
+)
 from database import get_db
 from models import Organization, User, UserRole
 from schemas import (
     AssignOrgToUser,
+    GoogleLoginOut,
+    GoogleLoginRequest,
     TokenOut,
     UserCreate,
     UserListOut,
@@ -47,6 +56,122 @@ async def _get_user_by_uuid(db: AsyncSession, user_uuid: str) -> User | None:
     )
     return result.scalar_one_or_none()
 
+@router.get("/login-with-google", response_model=GoogleLoginOut)
+async def login_with_google(
+    payload: GoogleLoginRequest, db: AsyncSession = Depends(get_db)
+):
+    redirect_uri = payload.redirect_uri or GOOGLE_REDIRECT_URI
+    oauth = AsyncOAuth2Client(
+        GOOGLE_CLIENT_ID,
+        GOOGLE_CLIENT_SECRET,
+        redirect_uri=redirect_uri,
+    )
+    try:
+        token = await oauth.fetch_token(
+            "https://oauth2.googleapis.com/token",
+            code=payload.code,
+            grant_type="authorization_code",
+        )
+    except Exception:
+        raise HTTPException(
+            status_code=401,
+            detail=[
+                {"field": "code", "message": "Failed to exchange authorization code with Google."}
+            ],
+        )
+
+    access_token = token.get("access_token")
+    if not access_token:
+        raise HTTPException(
+            status_code=401,
+            detail=[
+                {"field": "code", "message": "No access token received from Google."}
+            ],
+        )
+
+    async with AsyncOAuth2Client(token=token) as client:
+        resp = await client.get("https://openidconnect.googleapis.com/v1/userinfo")
+    if resp.status_code != 200:
+        raise HTTPException(
+            status_code=502,
+            detail=[
+                {"field": "code", "message": "Failed to fetch user info from Google."}
+            ],
+        )
+
+    google_user = resp.json()
+    google_id = google_user.get("sub")
+    email = google_user.get("email")
+    name = google_user.get("name", "")
+    avatar_url = google_user.get("picture")
+
+    if not google_id or not email:
+        raise HTTPException(
+            status_code=502,
+            detail=[
+                {"field": "code", "message": "Incomplete user info from Google."}
+            ],
+        )
+
+    user = await db.scalar(
+        select(User).options(selectinload(User.organization)).where(User.google_id == google_id)
+    )
+
+    is_new_user = False
+
+    if not user:
+        user = await db.scalar(
+            select(User).options(selectinload(User.organization)).where(User.email == email)
+        )
+        if user:
+            user.google_id = google_id
+            if avatar_url:
+                user.avatar_url = avatar_url
+        else:
+            is_new_user = True
+            user = User(
+                name=name or email.split("@")[0],
+                email=email,
+                hashed_password=None,
+                google_id=google_id,
+                avatar_url=avatar_url,
+                role=UserRole.general_user,
+                organization_id=None,
+            )
+            db.add(user)
+
+    if not user.is_active:
+        raise HTTPException(
+            status_code=403,
+            detail=[{"field": "user", "message": "Account is blocked."}],
+        )
+
+    await db.commit()
+    await db.refresh(user)
+    result = await db.execute(
+        select(User).options(selectinload(User.organization)).where(User.id == user.id)
+    )
+    user = result.scalar_one()
+
+    expires = datetime.now(timezone.utc) + timedelta(minutes=JWT_EXPIRE_MINUTES)
+    jwt_token = jwt.encode(
+        {
+            "sub": str(user.uuid),
+            "email": user.email,
+            "role": user.role.value,
+            "organization_uuid": str(user.organization.uuid) if user.organization else None,
+            "exp": expires,
+        },
+        JWT_SECRET,
+        algorithm="HS256",
+    )
+
+    return GoogleLoginOut(
+        access_token=jwt_token,
+        organization_uuid=str(user.organization.uuid) if user.organization else None,
+        role=user.role,
+        is_new_user=is_new_user,
+    )
 
 @router.post("/register", response_model=UserOut, status_code=201)
 async def register(payload: UserCreate, db: AsyncSession = Depends(get_db)):
