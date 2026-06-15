@@ -28,7 +28,7 @@ def upgrade() -> None:
     if "hero_image" not in columns:
         op.add_column('custom_chatbots', sa.Column('hero_image', sa.String(length=200), nullable=True))
     
-    if "hero_image" in columns:
+    if "hero_image_path" in columns:
         op.drop_column('custom_chatbots', 'hero_image_path')
     # ### end Alembic commands ###
 
