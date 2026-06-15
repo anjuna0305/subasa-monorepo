@@ -11,6 +11,7 @@ from typing import Sequence, Union
 import sqlalchemy as sa
 
 from alembic import op
+from safe_ops import safe_alter_enum
 
 # revision identifiers, used by Alembic.
 revision: str = "3b3296a26e23"
@@ -20,17 +21,16 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    """Upgrade schema."""
-    op.execute(
-        "ALTER TABLE users MODIFY COLUMN role "
-        "ENUM('admin','general_user','organization_user','organization_admin') NOT NULL"
+    safe_alter_enum(
+        'users', 'role',
+        new_values=['organization_user', 'organization_admin'],
+        existing_values=['admin', 'general_user'],
     )
-    pass
 
 
 def downgrade() -> None:
-    """Downgrade schema."""
-    op.execute(
-        "ALTER TABLE users MODIFY COLUMN role ENUM('admin','general_user') NOT NULL"
+    safe_alter_enum(
+        'users', 'role',
+        new_values=['admin', 'general_user'],
+        existing_values=['admin', 'general_user', 'organization_user', 'organization_admin'],
     )
-    pass
