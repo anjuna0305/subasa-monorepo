@@ -62,14 +62,14 @@ async def register(payload: UserCreate, db: AsyncSession = Depends(get_db)):
             detail=[{"field": "name", "message": "User name already exists."}],
         )
 
-    org = await db.scalar(
-        select(Organization).where(Organization.uuid == payload.organization_uuid)
-    )
-    if not org:
-        raise HTTPException(
-            status_code=404,
-            detail=[{"field": "organization_uuid", "message": "Organization not found"}],
-        )
+    # org = await db.scalar(
+    #     select(Organization).where(Organization.uuid == payload.organization_uuid)
+    # )
+    # if not org:
+    #     raise HTTPException(
+    #         status_code=404,
+    #         detail=[{"field": "organization_uuid", "message": "Organization not found"}],
+    #     )
 
     hashed = pwd_context.hash(payload.password)
     user = User(
@@ -77,7 +77,6 @@ async def register(payload: UserCreate, db: AsyncSession = Depends(get_db)):
         email=payload.email,
         hashed_password=hashed,
         role=UserRole.general_user,
-        organization_id=org.id,
     )
     db.add(user)
     await db.commit()
