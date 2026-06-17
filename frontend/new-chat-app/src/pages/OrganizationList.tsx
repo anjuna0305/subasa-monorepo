@@ -59,7 +59,7 @@ export default function OrganizationsPage() {
       setDialogOpen(false);
       setForm(INITIAL_FORM);
       setErrors({});
-      navigate(`organizations/${data.uuid}`);
+      navigate(`${data.uuid}`);
     },
   });
 
