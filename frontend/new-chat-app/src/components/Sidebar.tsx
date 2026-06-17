@@ -124,7 +124,7 @@ export default function SideBar({ services }: SideBarProps) {
     return pathname.startsWith(path);
   };
 
-  const { data: org } = useOrganiztion(organization_uuid || "");
+  // const { data: org } = useOrganiztion(organization_uuid || "");
   const { data: user } = useUser();
 
   return (
@@ -134,18 +134,18 @@ export default function SideBar({ services }: SideBarProps) {
           <DrawerHeader>
             <Box
               sx={{
-                gap:2,
+                gap: 2,
                 width: "100%",
                 px: 2,
                 display: "flex",
                 alignItems: "center",
               }}
             >
-              <Avatar sx={{ width: 48, height: 48 }}>{user?.name[0].toUpperCase()}</Avatar>
+              <Avatar sx={{ width: 48, height: 48 }}>
+                {user?.name[0].toUpperCase()}
+              </Avatar>
               <Box>
-                <Typography variant="h6">
-                  {role}
-                </Typography>
+                <Typography variant="h6">{role}</Typography>
                 <Typography variant="body2" gutterBottom>
                   {/* {org?.name} */}
                 </Typography>
