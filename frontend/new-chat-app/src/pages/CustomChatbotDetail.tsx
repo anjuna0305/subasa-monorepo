@@ -234,7 +234,7 @@ export default function CustomChatbotDetailPage() {
                   URL Path
                 </Typography>
                 <Typography>
-                  <Link to={`p/${chatbot.url_path}`}>
+                  <Link to={`/p/${chatbot.url_path}`}>
                     /p/{chatbot.url_path}
                   </Link>
                 </Typography>
