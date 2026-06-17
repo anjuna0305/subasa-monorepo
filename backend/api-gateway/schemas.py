@@ -95,7 +95,7 @@ class UserLogin(BaseModel):
 
 class TokenOut(BaseModel):
     access_token: str
-    organization_uuid: str
+    organization_uuid: str | None
     token_type: str = "bearer"
     role: UserRole
 
