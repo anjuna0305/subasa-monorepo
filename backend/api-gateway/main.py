@@ -5,6 +5,7 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException, RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from database import engine
 from models import Base
@@ -42,6 +43,13 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Subasa API Example", lifespan=lifespan)
+
+Instrumentator().instrument(app).expose(app, endpoint="/metrics")
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
 
 
 @app.exception_handler(RequestValidationError)

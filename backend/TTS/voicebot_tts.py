@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel
 from huggingface_hub import hf_hub_download, login
 from TTS.api import TTS
@@ -9,6 +10,8 @@ from text.cleaners import sinhala_cleaners
 import uvicorn
 
 app = FastAPI()
+
+Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
 # Enable CORS
 app.add_middleware(
@@ -112,6 +115,11 @@ def generate_audio(request_data: AudioRequest):
 @app.get("/")
 def index():
     return {"message": "Welcome to the FastAPI TTS Service"}
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=6002)

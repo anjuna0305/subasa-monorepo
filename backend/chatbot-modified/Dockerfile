@@ -7,7 +7,7 @@ RUN pip install --upgrade pip && pip install --timeout=120 -r requirements.txt
 
 COPY . .
 
-EXPOSE 6001
+EXPOSE 7006
 
 CMD ["python3", "chatbot_api.py"]
 

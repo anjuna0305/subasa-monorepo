@@ -1,0 +1,47 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets:
+          - localhost:9090
+
+  - job_name: backend-services
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - asr-be:6000
+          - chatbot-be:6001
+          - tts-be:6002
+          - framework-be:6003
+          - chatbot-mod:7006
+          - host.docker.internal:7010
+        labels:
+          service: api-gateway
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: "asr-be:6000"
+        target_label: service
+        replacement: asr
+      - source_labels: [__address__]
+        regex: "chatbot-be:6001"
+        target_label: service
+        replacement: chatbot
+      - source_labels: [__address__]
+        regex: "tts-be:6002"
+        target_label: service
+        replacement: tts
+      - source_labels: [__address__]
+        regex: "framework-be:6003"
+        target_label: service
+        replacement: framework
+      - source_labels: [__address__]
+        regex: "chatbot-mod:7006"
+        target_label: service
+        replacement: chatbot-modified
+      - source_labels: [__address__]
+        regex: "host.docker.internal:7010"
+        target_label: service
+        replacement: api-gateway
