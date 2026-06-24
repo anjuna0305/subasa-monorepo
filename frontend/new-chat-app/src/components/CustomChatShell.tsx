@@ -41,7 +41,10 @@ const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
   const response = await axiosInstance.post<{ transcription: string }>(
     API_ENDPOINTS.ASR_TRANSCRIBE,
     formData,
-    { withCredentials: false },
+    {
+     withCredentials: false ,
+    headers: { "Content-Type": "multipart/form-data"},
+    }
   );
   return response.data.transcription;
 };
