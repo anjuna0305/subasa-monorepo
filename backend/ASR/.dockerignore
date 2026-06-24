@@ -1,0 +1,16 @@
+__pycache__
+*.pyc
+*.pyo
+.git
+.env
+.env.example
+*.log
+venv/
+.venv/
+dist/
+build/
+audio.wav
+req2.txt
+models/
+*.wav
+*.mp3

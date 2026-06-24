@@ -1,0 +1,9 @@
+.git
+*.log
+node_modules/
+dist/
+.env
+.env.example
+.env.production
+.opencode/
+.vscode/
