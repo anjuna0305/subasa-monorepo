@@ -112,6 +112,42 @@ def generate_audio(request_data: AudioRequest):
         print(f"Internal Server Error: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
+# generate audio and return audio
+@app.post("/generate")
+def generate_audio(request_data: AudioRequest):
+    try:
+        text = request_data.text.strip()
+        speaker = request_data.speaker.lower()
+        speaker_type = request_data.speaker_type.lower()
+        voice = request_data.voice.lower()
+        input_type = request_data.input_type.lower()
+
+        if not text:
+            raise HTTPException(status_code=400, detail="Text is required")
+        if speaker_type not in ["single", "multi"] or voice not in ["male", "female"]:
+            raise HTTPException(status_code=400, detail="Invalid speaker type or voice")
+
+        preprocessed_text = preprocess_text(text)
+        model_key = f"{speaker_type}_{voice}_{input_type}"
+        model = models.get(model_key)
+
+        if not model:
+            raise HTTPException(status_code=404, detail=f"No model found for key: {model_key}")
+
+        result = (
+            model.tts(text=preprocessed_text)
+            if speaker_type == "single"
+            else model.tts(text=preprocessed_text, speaker=speaker)
+        )
+
+        return JSONResponse(content={"audioUrl": result})
+
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        print(f"Internal Server Error: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
 @app.get("/")
 def index():
     return {"message": "Welcome to the FastAPI TTS Service"}
