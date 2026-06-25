@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel
@@ -8,6 +8,8 @@ from TTS.api import TTS
 import os
 from text.cleaners import sinhala_cleaners
 import uvicorn
+import io
+import soudfile as sf
 
 app = FastAPI()
 
@@ -140,7 +142,13 @@ def generate_audio(request_data: AudioRequest):
             else model.tts(text=preprocessed_text, speaker=speaker)
         )
 
-        return JSONResponse(content={"audioUrl": result})
+        buffer = io.BytesIO()
+        sf.write(buffer, result, samplerate=22050, format="WAV")
+        buffer.seek(0)
+
+        return StreamingResponse(buffer, media_type="audio/wav")
+
+        # return JSONResponse(content={"audioUrl": result})
 
     except HTTPException as e:
         raise e
