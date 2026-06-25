@@ -9,7 +9,7 @@ import os
 from text.cleaners import sinhala_cleaners
 import uvicorn
 import io
-import soudfile as sf
+import soundfile as sf
 
 app = FastAPI()
 
