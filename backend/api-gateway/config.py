@@ -12,6 +12,9 @@ IMAGE_UPLOAD_DIR = os.environ.get(
 FILE_UPLOAD_DIR = os.environ.get(
     "UPLOAD_DIR", os.path.join(os.path.dirname(__file__), "uploads", "chatbot_files")
 )
+TTS_FILE_DIR = os.environ.get(
+    "FILE_STORE_DIR", os.path.join(os.path.dirname(__file__), "fileStore", "tts")
+)
 CUSTOM_CHATBOT_SERVICE_URL = os.environ.get(
     "CUSTOM_CHATBOT_SERVICE_URL", "http://localhost:7006/chat"
 )
