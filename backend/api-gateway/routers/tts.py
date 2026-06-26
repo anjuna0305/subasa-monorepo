@@ -36,9 +36,6 @@ async def generate_tts_audio(payload: TtsGenerateRequest, request: Request):
         async for chunk in upstream_resp.aiter_bytes():
             await f.write(chunk)
 
-    data = upstream_resp.json()
-    original_audio_url = data.get("audioUrl", "")
-
     host = request.headers.get("host", "localhost:8000")
     scheme = request.url.scheme
     proxy_audio_url = f"{scheme}://{host}/tts/audio/{file_name}"
