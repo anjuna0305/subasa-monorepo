@@ -5,6 +5,7 @@ export const WS_BASE_URL =
 
 export const API_ENDPOINTS = {
   LOGIN: `${API_BASE_URL}/users/login`,
+  GOOGLE_AUTH: `${API_BASE_URL}/users/auth/google`,
   REGISTER: `${API_BASE_URL}/users/register`,
   GOOGLE_LOGIN: `${API_BASE_URL}/users/login-with-google`,
   CHATBOT_CHAT: `${API_BASE_URL}/voc-si/api/chatbot/chat`,

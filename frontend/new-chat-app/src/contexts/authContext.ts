@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { LoginRequest, GoogleLoginRequest } from "@/types/auth";
+import { LoginRequest, GoogleLoginRequest, LoginResponse } from "@/types/auth";
 
 export type AuthState = {
   accessToken: string | null;
@@ -10,6 +10,7 @@ export type AuthState = {
 };
 
 export type AuthContextType = AuthState & {
+  updateAuthStates: (data: LoginResponse) => void;
   login: (credentials: LoginRequest) => Promise<void>;
   loginWithGoogle: (params: GoogleLoginRequest) => Promise<boolean>;
   logout: () => void;

@@ -5,6 +5,7 @@ import { Outlet } from "react-router";
 import { useEffect } from "react";
 import { registerAlertHandler } from "./api/alertService";
 import { useAlert } from "./hooks/useAlert";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export default function RootLayout() {
   const { addAlert } = useAlert();
@@ -15,10 +16,12 @@ export default function RootLayout() {
 
   return (
     <ThemeRegistry>
-      <AuthProvider>
-        <Outlet />
-        <GlobalAlert />
-      </AuthProvider>
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+        <AuthProvider>
+          <Outlet />
+          <GlobalAlert />
+        </AuthProvider>
+      </GoogleOAuthProvider>
     </ThemeRegistry>
   );
 }

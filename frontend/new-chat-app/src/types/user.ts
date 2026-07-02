@@ -7,6 +7,7 @@ export type User = {
   is_active: boolean;
   organization_uuid: string | null;
   organization_name: string;
+  avatar_url: string | null;
 };
 
 export type UsersResponse = {

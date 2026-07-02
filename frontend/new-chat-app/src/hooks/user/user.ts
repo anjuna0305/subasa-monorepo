@@ -1,9 +1,9 @@
 import { getUserMe } from "@/api/user";
-import { Organization } from "@/types/organizations";
+import { User } from "@/types/user";
 import { useQuery } from "@tanstack/react-query";
 
 export function useUser() {
-  return useQuery<Organization>({
+  return useQuery<User>({
     queryKey: ["user"],
     queryFn: () => getUserMe(),
   });

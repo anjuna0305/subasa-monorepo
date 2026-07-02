@@ -1,5 +1,10 @@
 import React, { useCallback, useMemo } from "react";
-import { LoginRequest, GoogleLoginRequest, GoogleLoginResponse } from "@/types/auth";
+import {
+  LoginRequest,
+  GoogleLoginRequest,
+  GoogleLoginResponse,
+  LoginResponse,
+} from "@/types/auth";
 import { API_ENDPOINTS } from "@/utils/api";
 import axiosInstance from "@/api/axios";
 import { AuthContext, AuthState } from "./authContext";
@@ -36,17 +41,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [authState, setAuthState] =
     React.useState<AuthState>(getInitialAuthState);
 
-  const login = useCallback(async (credentials: LoginRequest) => {
-    const response = await axiosInstance.post<GoogleLoginResponse>(
-      API_ENDPOINTS.LOGIN,
-      credentials,
-    );
-
-    const data = response.data;
-
+  const updateAuthStates = useCallback(async (data: LoginResponse) => {
     localStorage.setItem(STORAGE_KEY_TOKEN, data.access_token);
     localStorage.setItem(STORAGE_KEY_ROLE, data.role);
-    localStorage.setItem(STORAGE_ORGANIZATION_UUID, data.organization_uuid ?? "");
+    localStorage.setItem(
+      STORAGE_ORGANIZATION_UUID,
+      data.organization_uuid ?? "",
+    );
     localStorage.setItem(STORAGE_IS_NEW_USER, String(data.is_new_user));
 
     setAuthState({
@@ -58,6 +59,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const login = useCallback(
+    async (credentials: LoginRequest) => {
+      const response = await axiosInstance.post<LoginResponse>(
+        API_ENDPOINTS.LOGIN,
+        credentials,
+      );
+
+      const data = response.data;
+
+      updateAuthStates(data);
+    },
+    [updateAuthStates],
+  );
+
   const loginWithGoogle = useCallback(
     async (params: GoogleLoginRequest): Promise<boolean> => {
       const response = await axiosInstance.post<GoogleLoginResponse>(
@@ -67,22 +82,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const data = response.data;
 
-      localStorage.setItem(STORAGE_KEY_TOKEN, data.access_token);
-      localStorage.setItem(STORAGE_KEY_ROLE, data.role);
-      localStorage.setItem(STORAGE_ORGANIZATION_UUID, data.organization_uuid ?? "");
-      localStorage.setItem(STORAGE_IS_NEW_USER, String(data.is_new_user));
-
-      setAuthState({
-        accessToken: data.access_token,
-        role: data.role,
-        organization_uuid: data.organization_uuid,
-        isAuthenticated: true,
-        isNewUser: data.is_new_user,
-      });
+      updateAuthStates(data);
 
       return data.is_new_user;
     },
-    [],
+    [updateAuthStates],
   );
 
   const logout = useCallback(() => {
@@ -101,8 +105,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ ...authState, login, loginWithGoogle, logout }),
-    [authState, login, loginWithGoogle, logout],
+    () => ({ ...authState, updateAuthStates, login, loginWithGoogle, logout }),
+    [authState, updateAuthStates, login, loginWithGoogle, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
