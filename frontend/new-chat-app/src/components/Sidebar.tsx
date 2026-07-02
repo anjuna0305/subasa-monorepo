@@ -141,7 +141,7 @@ export default function SideBar({ services }: SideBarProps) {
                 alignItems: "center",
               }}
             >
-              <Avatar src={user.avatar_url} sx={{ width: 48, height: 48 }}>
+              <Avatar src={user?.avatar_url ? user.avatar_url : ""} sx={{ width: 48, height: 48 }}>
                 {user?.name[0].toUpperCase()}
               </Avatar>
               <Box>
