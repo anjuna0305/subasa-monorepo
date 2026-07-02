@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from prometheus_fastapi_instrumentator import Instrumentator
 from langchain_community.document_loaders import TextLoader, PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
@@ -17,6 +18,8 @@ import traceback
 load_dotenv()
 
 app = FastAPI()
+
+Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
 # CORS setup
 app.add_middleware(
@@ -124,6 +127,12 @@ async def chat(request: ChatRequest):
     except Exception as e:
         traceback.print_exc()  # Print the stack trace to the console
         raise HTTPException(status_code=500, detail=f"ඉල්ලීම සැකසීමේ දෝෂයකි: {str(e)}")
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
 
 if __name__ == "__main__":
     import uvicorn

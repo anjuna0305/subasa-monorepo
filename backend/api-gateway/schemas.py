@@ -8,7 +8,7 @@ from pydantic import BaseModel, EmailStr, field_validator
 class UserCreate(BaseModel):
     name: str
     email: EmailStr
-    organization_uuid: str
+    # organization_uuid: str
     password: str
     role: UserRole = UserRole.general_user
 

@@ -7,7 +7,9 @@ export const fetchOrganizations = async (): Promise<Organization[]> => {
   return res.data;
 };
 
-export const fetchOrganizationById = async (id: string): Promise<Organization> => {
+export const fetchOrganizationById = async (
+  id: string,
+): Promise<Organization> => {
   const res = await axiosInstance.get(API_ENDPOINTS.ORGANIZATION_DETAIL(id));
   return res.data;
 };
@@ -22,11 +24,13 @@ export const toggleOrganizationActive = async ({
   const path = isActive
     ? API_ENDPOINTS.ORGANIZATION_DEACTIVATE(id)
     : API_ENDPOINTS.ORGANIZATION_ACTIVATE(id);
-  const res = await axiosInstance.put(path);
+  const res = await axiosInstance.post(path);
   return res.data;
 };
 
-export const createOrganization = async (name: string): Promise<Organization> => {
+export const createOrganization = async (
+  name: string,
+): Promise<Organization> => {
   const res = await axiosInstance.post(API_ENDPOINTS.ORGANIZATION_LIST, {
     name,
     is_active: false,

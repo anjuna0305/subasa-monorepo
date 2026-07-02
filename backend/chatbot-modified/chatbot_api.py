@@ -6,6 +6,7 @@ import redis
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from prometheus_fastapi_instrumentator import Instrumentator
 from langchain.chains import RetrievalQA
 from langchain.prompts import ChatPromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -25,6 +26,8 @@ UPLOAD_DIR = os.environ.get("UPLOAD_DIR", "/usr/src/app/uploaded_files")
 redis_client = redis.Redis(host=redis_host, port=redis_port, db=0)
 
 app = FastAPI()
+
+Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
 app.add_middleware(
     CORSMiddleware,
@@ -99,6 +102,11 @@ async def chat(chat_request: ChatRequest) -> ChatResponse:
 
     result = retrieval_chain({"query": chat_request.message})
     return ChatResponse(response=result["result"], retrieval_key=key)
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
 
 
 if __name__ == "__main__":

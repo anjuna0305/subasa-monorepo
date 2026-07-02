@@ -17,7 +17,7 @@ FILE_UPLOAD_DIR = os.environ.get(
     "UPLOAD_DIR", os.path.join(os.path.dirname(__file__), "uploads", "chatbot_files")
 )
 CUSTOM_CHATBOT_SERVICE_URL = os.environ.get(
-    "CUSTOM_CHATBOT_SERVICE_URL", "http://localhost:6002/chat"
+    "CUSTOM_CHATBOT_SERVICE_URL", "http://localhost:7006/chat"
 )
 TTS_SERVICE_URL = os.environ.get("TTS_SERVICE_URL", "http://localhost:6001")
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")

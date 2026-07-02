@@ -7,3 +7,6 @@ venv/
 .venv/
 dist/
 build/
+uploaded_files/
+*.pdf
+*.docx

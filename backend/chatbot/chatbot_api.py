@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from prometheus_fastapi_instrumentator import Instrumentator
 from langchain.chains import LLMChain, RetrievalQA
 from langchain.prompts import ChatPromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -17,6 +18,8 @@ load_dotenv()
 groq_api_key = os.getenv("GROQ_API_KEY")
 
 app = FastAPI()
+
+Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
 # CORS configuration (same as Flask version)
 app.add_middleware(
@@ -73,6 +76,11 @@ async def chat(chat_request: ChatRequest) -> ChatResponse:
 
     response = retrieval_chain({"query": chat_request.message})
     return ChatResponse(response=response["result"])
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
 
 
 if __name__ == "__main__":

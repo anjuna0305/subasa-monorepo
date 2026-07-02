@@ -46,8 +46,8 @@ export const API_ENDPOINTS = {
   USER_UNBLOCK: (id: string) => `${API_BASE_URL}/users/${id}/unblock`,
   GET_ME: `${API_BASE_URL}/users/me`,
 
-  ASR_TRANSCRIBE: `${API_BASE_URL}/voc-si/api/asr/transcribe`,
-  TTS_GENERATE: `${API_BASE_URL}/voc-si/api/tts/voicebot-generate-audio`,
+  ASR_TRANSCRIBE: `https://subasa.lk/voc-si/api/asr/transcribe`,
+  TTS_GENERATE: `https://subasa.lk/voc-si/api/tts/voicebot-generate-audio`,
 };
 
 export function parseErrorMessage(

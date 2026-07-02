@@ -102,7 +102,7 @@ async def get_all_organizations(db: AsyncSession = Depends(get_db)):
     return [_build_org_out(org) for org in orgs]
 
 
-@router.put("/activate/{org_uuid}", response_model=OrganizationOut)
+@router.post("/activate/{org_uuid}", response_model=OrganizationOut)
 async def activate_organization(org_uuid: str, db: AsyncSession = Depends(get_db)):
     org = await db.scalar(select(Organization).where(Organization.uuid == org_uuid))
     if not org:
@@ -117,7 +117,7 @@ async def activate_organization(org_uuid: str, db: AsyncSession = Depends(get_db
     return _build_org_out(org)
 
 
-@router.put("/deactivate/{org_uuid}", response_model=OrganizationOut)
+@router.post("/deactivate/{org_uuid}", response_model=OrganizationOut)
 async def deactivate_organization(org_uuid: str, db: AsyncSession = Depends(get_db)):
     org = await db.scalar(select(Organization).where(Organization.uuid == org_uuid))
     if not org:

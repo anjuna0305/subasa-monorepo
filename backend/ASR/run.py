@@ -8,12 +8,15 @@ import uvicorn
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from prometheus_fastapi_instrumentator import Instrumentator
 from postprocessing.post_processing import process_sentence
 from Wav2Vec_bert import model_bert, processor_bert
 from Wav2Vec_model import model_wav, processor_wav
 from Whisper_model import model_whisper, processor_whisper
 
 app = FastAPI()
+
+Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
 # Enable CORS
 app.add_middleware(
@@ -97,6 +100,11 @@ async def process_audio_whisper(file: UploadFile = File(...)):
 @app.get("/")
 async def root():
     return {"status": "server running"}
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
 
 
 if __name__ == "__main__":

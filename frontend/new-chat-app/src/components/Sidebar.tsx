@@ -124,7 +124,7 @@ export default function SideBar({ services }: SideBarProps) {
     return pathname.startsWith(path);
   };
 
-  const { data: org } = useOrganiztion(organization_uuid || "");
+  // const { data: org } = useOrganiztion(organization_uuid || "");
   const { data: user } = useUser();
 
   return (

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import {
   Box,
   Typography,
@@ -234,17 +234,9 @@ export default function CustomChatbotDetailPage() {
                   URL Path
                 </Typography>
                 <Typography>
-                  <a
-                    href={`/p/${chatbot.url_path}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      color: "inherit",
-                      textDecoration: "none",
-                    }}
-                  >
+                  <Link to={`/p/${chatbot.url_path}`}>
                     /p/{chatbot.url_path}
-                  </a>
+                  </Link>
                 </Typography>
               </Box>
               <Box>
