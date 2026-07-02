@@ -1,27 +1,34 @@
 from datetime import datetime, timedelta, timezone
 
 import jwt
-from fastapi import APIRouter, Depends, HTTPException, Query
-from passlib.context import CryptContext
-from sqlalchemy import func, or_, select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
-from sqlalchemy.sql.operators import and_
-
-from auth import AdminOrOrgAdminUser, AdminUser, AnyUser, CurrentUser
-from config import JWT_EXPIRE_MINUTES, JWT_SECRET
+from auth import AdminOrOrgAdminUser, AnyUser
+from config import (
+    GOOGLE_CLIENT_ID,
+    JWT_EXPIRE_MINUTES,
+    JWT_SECRET,
+)
 from database import get_db
+from fastapi import APIRouter, Depends, HTTPException, Query
+from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token
 from models import Organization, User, UserRole
+from passlib.context import CryptContext
 from schemas import (
     AssignOrgToUser,
+    GoogleAuthRequest,
+    GoogleUserCreate,
     TokenOut,
     UserCreate,
-    UserListOut,
     UserListItemOut,
+    UserListOut,
     UserLogin,
     UserOut,
     UserUpdate,
 )
+from sqlalchemy import func, or_, select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+from sqlalchemy.sql.operators import and_
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
@@ -38,14 +45,55 @@ def _build_user_out(user: User) -> UserOut:
         is_active=user.is_active,
         organization_uuid=user.organization.uuid if user.organization else None,
         organization_name=user.organization.name if user.organization else None,
+        avatar_url=user.avatar_url or None,
     )
 
 
 async def _get_user_by_uuid(db: AsyncSession, user_uuid: str) -> User | None:
     result = await db.execute(
-        select(User).options(selectinload(User.organization)).where(User.uuid == user_uuid)
+        select(User)
+        .options(selectinload(User.organization))
+        .where(User.uuid == user_uuid)
     )
     return result.scalar_one_or_none()
+
+
+@router.post("/auth/google")
+async def google_login(payload: GoogleAuthRequest, db: AsyncSession = Depends(get_db)):
+    try:
+        idinfo = id_token.verify_oauth2_token(
+            payload.id_token,
+            google_requests.Request(),
+            GOOGLE_CLIENT_ID,
+        )
+    except ValueError:
+        raise HTTPException(status_code=401, detail="Invalid Google token")
+
+    email = idinfo["email"]
+    email_verified = idinfo.get("email_verified", False)
+    name = idinfo.get("name")
+    google_sub = idinfo["sub"]  # stable Google user ID
+    avatar_url = idinfo.get("picture")
+
+    if not email_verified:
+        raise HTTPException(status_code=401, detail="Google email not verified")
+
+    # --- plug into your existing user/auth logic here ---
+    result = await db.execute(
+        select(User).options(selectinload(User.organization)).where(User.email == email)
+    )
+    user = result.scalar_one_or_none()
+    if not user:
+        createGoogleUserPayload = GoogleUserCreate(
+            name=name or "Google User",
+            email=email,
+            role=UserRole.general_user,
+            google_id=google_sub,
+            avatar_url=avatar_url or "",
+        )
+        user = await registerGoogleUser(createGoogleUserPayload, db)
+
+    return tokenOutResponse(user)
 
 
 @router.post("/register", response_model=UserOut, status_code=201)
@@ -62,14 +110,16 @@ async def register(payload: UserCreate, db: AsyncSession = Depends(get_db)):
             detail=[{"field": "name", "message": "User name already exists."}],
         )
 
-    # org = await db.scalar(
-    #     select(Organization).where(Organization.uuid == payload.organization_uuid)
-    # )
-    # if not org:
-    #     raise HTTPException(
-    #         status_code=404,
-    #         detail=[{"field": "organization_uuid", "message": "Organization not found"}],
-    #     )
+    org = await db.scalar(
+        select(Organization).where(Organization.uuid == payload.organization_uuid)
+    )
+    if not org:
+        raise HTTPException(
+            status_code=404,
+            detail=[
+                {"field": "organization_uuid", "message": "Organization not found"}
+            ],
+        )
 
     hashed = pwd_context.hash(payload.password)
     user = User(
@@ -88,9 +138,38 @@ async def register(payload: UserCreate, db: AsyncSession = Depends(get_db)):
     return _build_user_out(user)
 
 
+async def registerGoogleUser(payload: GoogleUserCreate, db: AsyncSession) -> User:
+    print(payload.name)
+    if await db.scalar(select(User).where(User.email == payload.email)):
+        raise HTTPException(
+            status_code=409,
+            detail=[{"field": "email", "message": "User email already exists."}],
+        )
+
+    user = User(
+        name=payload.name,
+        email=payload.email,
+        hashed_password=None,
+        role=UserRole.general_user,
+        google_id=payload.google_id,
+        avatar_url=payload.avatar_url,
+    )
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    result = await db.execute(
+        select(User).options(selectinload(User.organization)).where(User.id == user.id)
+    )
+    return result.scalar_one()
+
+
 @router.post("/login", response_model=TokenOut)
 async def login(payload: UserLogin, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(User).options(selectinload(User.organization)).where(User.email == payload.email))
+    result = await db.execute(
+        select(User)
+        .options(selectinload(User.organization))
+        .where(User.email == payload.email)
+    )
     user = result.scalar_one_or_none()
     if not user:
         raise HTTPException(
@@ -104,20 +183,33 @@ async def login(payload: UserLogin, db: AsyncSession = Depends(get_db)):
             detail=[{"field": "password", "message": "Incorrect password."}],
         )
 
+    return tokenOutResponse(user)
+
+
+def tokenGenerator(user: User) -> str:
     expires = datetime.now(timezone.utc) + timedelta(minutes=JWT_EXPIRE_MINUTES)
     token = jwt.encode(
         {
             "sub": str(user.uuid),
             "email": user.email,
             "role": user.role.value,
-            "organization_uuid": str(user.organization.uuid) if user.organization else None,
+            "organization_uuid": str(user.organization.uuid)
+            if user.organization
+            else None,
             "exp": expires,
         },
         JWT_SECRET,
         algorithm="HS256",
     )
+    return token
+
+
+def tokenOutResponse(user: User) -> TokenOut:
+    token = tokenGenerator(user)
     organization_uuid = str(user.organization.uuid) if user.organization else None
-    return TokenOut(access_token=token, role=user.role, organization_uuid=organization_uuid)
+    return TokenOut(
+        access_token=token, role=user.role, organization_uuid=organization_uuid
+    )
 
 
 @router.put("/{user_uuid}", response_model=UserOut)
@@ -153,7 +245,9 @@ async def update_user(
     if not org:
         raise HTTPException(
             status_code=404,
-            detail=[{"field": "organization_uuid", "message": "Organization not found."}],
+            detail=[
+                {"field": "organization_uuid", "message": "Organization not found."}
+            ],
         )
 
     user.name = payload.name
@@ -173,7 +267,9 @@ async def update_user(
 @router.get("/me", response_model=UserOut)
 async def get_me(current_user: AnyUser, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
-        select(User).options(selectinload(User.organization)).where(User.uuid == current_user.uuid)
+        select(User)
+        .options(selectinload(User.organization))
+        .where(User.uuid == current_user.uuid)
     )
     user = result.scalar_one_or_none()
     if not user:
@@ -227,7 +323,12 @@ async def get_users(
         if organization_uuid is not None:
             raise HTTPException(
                 status_code=422,
-                detail=[{"field": "organization_uuid", "message": "org_admin cannot specify organization_uuid filter."}],
+                detail=[
+                    {
+                        "field": "organization_uuid",
+                        "message": "org_admin cannot specify organization_uuid filter.",
+                    }
+                ],
             )
         effective_org_uuid = current_user.organization_uuid
 
@@ -236,7 +337,9 @@ async def get_users(
 
     org_id = None
     if effective_org_uuid is not None:
-        org = await db.scalar(select(Organization).where(Organization.uuid == effective_org_uuid))
+        org = await db.scalar(
+            select(Organization).where(Organization.uuid == effective_org_uuid)
+        )
         if org:
             org_id = org.id
 
@@ -314,10 +417,17 @@ async def block_user(
         )
 
     if current_user.role == UserRole.organization_admin:
-        if (user.organization.uuid if user.organization else None) != current_user.organization_uuid:
+        if (
+            user.organization.uuid if user.organization else None
+        ) != current_user.organization_uuid:
             raise HTTPException(
                 status_code=403,
-                detail=[{"field": "role", "message": "Cannot block users outside your organization."}],
+                detail=[
+                    {
+                        "field": "role",
+                        "message": "Cannot block users outside your organization.",
+                    }
+                ],
             )
 
     user.is_active = False
@@ -353,27 +463,46 @@ async def unblock_user(
     if target.role == UserRole.admin:
         raise HTTPException(
             status_code=403,
-            detail=[{"field": "role", "message": "Organization admins cannot block system admins."}],
+            detail=[
+                {
+                    "field": "role",
+                    "message": "Organization admins cannot block system admins.",
+                }
+            ],
         )
 
     if target.role == UserRole.organization_admin:
         raise HTTPException(
             status_code=403,
-            detail=[{"field": "role", "message": "Organization admins cannot block organization admins. To do that please contact a system admin."}],
+            detail=[
+                {
+                    "field": "role",
+                    "message": "Organization admins cannot block organization admins. To do that please contact a system admin.",
+                }
+            ],
         )
 
     if current_user.role == UserRole.organization_admin:
-        if (target.organization.uuid if target.organization else None) != current_user.organization_uuid:
+        if (
+            target.organization.uuid if target.organization else None
+        ) != current_user.organization_uuid:
             raise HTTPException(
                 status_code=403,
-                detail=[{"field": "role", "message": "Cannot unblock users outside your organization."}],
+                detail=[
+                    {
+                        "field": "role",
+                        "message": "Cannot unblock users outside your organization.",
+                    }
+                ],
             )
 
     target.is_active = True
     await db.commit()
     await db.refresh(target)
     result = await db.execute(
-        select(User).options(selectinload(User.organization)).where(User.id == target.id)
+        select(User)
+        .options(selectinload(User.organization))
+        .where(User.id == target.id)
     )
     target = result.scalar_one()
     return _build_user_out(target)

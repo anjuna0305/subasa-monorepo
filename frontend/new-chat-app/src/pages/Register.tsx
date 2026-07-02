@@ -1,4 +1,4 @@
-import { Box, TextField, Typography } from "@mui/material";
+import { Box, Divider, TextField, Typography } from "@mui/material";
 import ColorBgButton from "@/components/ColorBgButton";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,6 +8,8 @@ import { RegisterRequest } from "@/types/auth";
 import { API_ENDPOINTS } from "@/utils/api";
 import { useAlert } from "@/hooks/useAlert";
 import axiosInstance from "@/api/axios";
+import { GoogleLogin } from "@react-oauth/google";
+import { useGoogleAuthHandler } from "@/hooks/useGoogleAuthHandler";
 
 const registerSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -20,6 +22,7 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 export default function RegisterPage() {
   const navigate = useNavigate();
   const { addAlert } = useAlert();
+  const { handleGoogleSuccess } = useGoogleAuthHandler();
 
   const {
     register,
@@ -39,6 +42,10 @@ export default function RegisterPage() {
     } catch {
       // Error alert handled by axios interceptor
     }
+  };
+
+  const handleError = () => {
+    addAlert("error", "Login failed. Please try again.");
   };
 
   return (
@@ -72,7 +79,6 @@ export default function RegisterPage() {
                 helperText={errors.name?.message}
                 {...register("name")}
               />
-
               <TextField
                 fullWidth
                 type="email"
@@ -81,7 +87,6 @@ export default function RegisterPage() {
                 helperText={errors.email?.message}
                 {...register("email")}
               />
-
               <TextField
                 fullWidth
                 type="password"
@@ -90,7 +95,6 @@ export default function RegisterPage() {
                 helperText={errors.password?.message}
                 {...register("password")}
               />
-
               <ColorBgButton
                 type="submit"
                 disabled={isSubmitting}
@@ -98,6 +102,12 @@ export default function RegisterPage() {
               >
                 {isSubmitting ? "Creating account..." : "Sign up"}
               </ColorBgButton>
+              <Divider sx={{ my: 1 }}>or</Divider>
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleError}
+              />
+              ;
             </Box>
           </form>
         </Box>

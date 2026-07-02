@@ -141,7 +141,7 @@ export default function SideBar({ services }: SideBarProps) {
                 alignItems: "center",
               }}
             >
-              <Avatar sx={{ width: 48, height: 48 }}>
+              <Avatar src={user.avatar_url} sx={{ width: 48, height: 48 }}>
                 {user?.name[0].toUpperCase()}
               </Avatar>
               <Box>
@@ -162,9 +162,15 @@ export default function SideBar({ services }: SideBarProps) {
                 alignItems: "center",
               }}
             >
-              <Box sx={{ fontWeight: "bold", fontSize: "1.1rem" }}>
+              <Avatar
+                src={user?.avatar_url ? user.avatar_url : ""}
+                sx={{ width: 48, height: 48 }}
+              >
+                {user?.name[0].toUpperCase()}
+              </Avatar>
+              {/*<Box sx={{ fontWeight: "bold", fontSize: "1.1rem" }}>
                 General user
-              </Box>
+              </Box>*/}
             </Box>
             {open ? (
               <IconButton onClick={handleToggle}>

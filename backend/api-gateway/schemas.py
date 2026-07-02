@@ -1,9 +1,8 @@
 from datetime import datetime
 from typing import List
 
-from pydantic import BaseModel, EmailStr, field_validator
-
 from models import ResponseType, TaskStatus, UserRole
+from pydantic import BaseModel, EmailStr, field_validator
 
 
 class UserCreate(BaseModel):
@@ -38,6 +37,23 @@ class UserCreate(BaseModel):
         return v
 
 
+class GoogleUserCreate(BaseModel):
+    name: str
+    email: EmailStr
+    role: UserRole = UserRole.general_user
+    google_id: str
+    avatar_url: str
+
+    @field_validator("name")
+    @classmethod
+    def name_must_not_be_empty(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("name cannot be empty")
+        if len(v) > 100:
+            raise ValueError("name must be at most 100 characters")
+        return v.strip()
+
+
 class UserUpdate(BaseModel):
     name: str
     email: EmailStr
@@ -63,6 +79,7 @@ class UserOut(BaseModel):
     is_active: bool
     organization_uuid: str | None
     organization_name: str | None = None
+    avatar_url: str | None = None
 
     model_config = {"from_attributes": True}
 
@@ -91,6 +108,23 @@ class UserListOut(BaseModel):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+
+
+class GoogleAuthRequest(BaseModel):
+    id_token: str
+
+
+class GoogleLoginRequest(BaseModel):
+    code: str
+    redirect_uri: str | None = None
+
+
+class GoogleLoginOut(BaseModel):
+    access_token: str
+    organization_uuid: str | None
+    token_type: str = "bearer"
+    role: UserRole
+    is_new_user: bool
 
 
 class TokenOut(BaseModel):

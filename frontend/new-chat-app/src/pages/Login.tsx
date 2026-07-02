@@ -1,4 +1,4 @@
-import { Box, TextField, Typography } from "@mui/material";
+import { Box, Divider, TextField, Typography } from "@mui/material";
 import ColorBgButton from "@/components/ColorBgButton";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,6 +7,8 @@ import { useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { useAlert } from "@/hooks/useAlert";
+import { GoogleLogin } from "@react-oauth/google";
+import { useGoogleAuthHandler } from "@/hooks/useGoogleAuthHandler";
 
 const loginSchema = z.object({
   email: z.email("Enter a valid email address"),
@@ -22,6 +24,7 @@ export default function LoginPage() {
   const { addAlert } = useAlert();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const location = useLocation();
+  const { handleGoogleSuccess } = useGoogleAuthHandler();
 
   console.log("pathname: ", location.pathname);
   console.log("search: ", location.search);
@@ -104,6 +107,15 @@ export default function LoginPage() {
               >
                 {isSubmitting ? "Signing in..." : "Sign in"}
               </ColorBgButton>
+
+              <Divider sx={{ my: 1 }}>or</Divider>
+
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => {
+                  console.log("Login Failed");
+                }}
+              />
             </Box>
           </form>
         </Box>

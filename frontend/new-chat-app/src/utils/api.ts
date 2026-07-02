@@ -5,7 +5,9 @@ export const WS_BASE_URL =
 
 export const API_ENDPOINTS = {
   LOGIN: `${API_BASE_URL}/users/login`,
+  GOOGLE_AUTH: `${API_BASE_URL}/users/auth/google`,
   REGISTER: `${API_BASE_URL}/users/register`,
+  GOOGLE_LOGIN: `${API_BASE_URL}/users/login-with-google`,
   CHATBOT_CHAT: `${API_BASE_URL}/voc-si/api/chatbot/chat`,
   FRAMEWORK_UPLOAD: `${API_BASE_URL}/voc-si/api/framework/upload`,
   ASR_WS: WS_BASE_URL,
@@ -64,4 +66,24 @@ export function parseErrorMessage(
     }
   }
   return fallbackMessage;
+}
+
+export function getGoogleRedirectUri(): string {
+  const override = import.meta.env.VITE_GOOGLE_REDIRECT_URI;
+  if (override) return override;
+  const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+  return `${window.location.origin}${basePath}/auth/callback`;
+}
+
+export function getGoogleAuthUrl(): string {
+  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const redirectUri = getGoogleRedirectUri();
+  const params = new URLSearchParams({
+    client_id: clientId,
+    redirect_uri: redirectUri,
+    response_type: "code",
+    scope: "openid email profile",
+    access_type: "offline",
+  });
+  return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
 }

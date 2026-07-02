@@ -23,7 +23,7 @@ build/
 
 *.egg-info/
 .eggs/
-venv/
+*venv/
 .venv/
 
 backend/framework/uploaded_files/
