@@ -137,6 +137,10 @@ async def stream_audio_whisper(file: UploadFile = File(...)):
     def event_stream():
         transcription = ""
         for token in streamer:
+            # The streamer fires once per generated token but only yields text
+            # at word boundaries, so most steps produce an empty string.
+            if not token:
+                continue
             transcription += token
             yield f"data: {json.dumps({'delta': token}, ensure_ascii=False)}\n\n"
         thread.join()
