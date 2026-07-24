@@ -9,6 +9,9 @@ import os
 from text.cleaners import sinhala_cleaners
 import uvicorn
 import io
+import re
+import struct
+import numpy as np
 import soundfile as sf
 
 app = FastAPI()
@@ -71,6 +74,81 @@ def preprocess_text(input_text: str):
         return sinhala_cleaners(input_text)
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Text preprocessing failed: {e}")
+
+SENTENCE_END = re.compile(r"(?<=[.!?෴])\s+")
+
+
+def split_sentences(text: str):
+    parts = [part.strip() for part in SENTENCE_END.split(text.strip())]
+    return [part for part in parts if part]
+
+
+def wav_stream_header(sample_rate: int, channels: int = 1, bits: int = 16):
+    byte_rate = sample_rate * channels * bits // 8
+    block_align = channels * bits // 8
+    return b"".join([
+        b"RIFF", struct.pack("<I", 0xFFFFFFFF), b"WAVE",
+        b"fmt ", struct.pack(
+            "<IHHIIHH", 16, 1, channels, sample_rate, byte_rate, block_align, bits
+        ),
+        b"data", struct.pack("<I", 0xFFFFFFFF),
+    ])
+
+
+def to_pcm16(audio):
+    wav = np.asarray(audio, dtype=np.float32)
+    return (np.clip(wav, -1.0, 1.0) * 32767).astype("<i2").tobytes()
+
+
+# Generate audio, streamed sentence by sentence
+@app.post("/generate/stream")
+def stream_audio(request_data: AudioRequest):
+    text = request_data.text.strip()
+    speaker = request_data.speaker.lower()
+    speaker_type = request_data.speaker_type.lower()
+    voice = request_data.voice.lower()
+    input_type = request_data.input_type.lower()
+
+    if not text:
+        raise HTTPException(status_code=400, detail="Text is required")
+    if speaker_type not in ["single", "multi"] or voice not in ["male", "female"]:
+        raise HTTPException(status_code=400, detail="Invalid speaker type or voice")
+
+    model_key = f"{speaker_type}_{voice}_{input_type}"
+    model = models.get(model_key)
+    if not model:
+        raise HTTPException(status_code=404, detail=f"No model found for key: {model_key}")
+
+    sentences = split_sentences(text)
+    if not sentences:
+        raise HTTPException(status_code=400, detail="Text is required")
+
+    sample_rate = getattr(model.synthesizer, "output_sample_rate", 22050)
+
+    def audio_stream():
+        yield wav_stream_header(sample_rate)
+        for sentence in sentences:
+            try:
+                cleaned = preprocess_text(sentence)
+                result = (
+                    model.tts(text=cleaned)
+                    if speaker_type == "single"
+                    else model.tts(text=cleaned, speaker=speaker)
+                )
+                yield to_pcm16(result)
+            except Exception as e:
+                print(f"Streaming synthesis failed on {sentence!r}: {e}")
+                return
+
+    return StreamingResponse(
+        audio_stream(),
+        media_type="audio/wav",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
 
 # Serve audio files
 @app.get("/output/{filename}")
