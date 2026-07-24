@@ -47,7 +47,7 @@ export const API_ENDPOINTS = {
   GET_ME: `${API_BASE_URL}/users/me`,
 
   ASR_TRANSCRIBE: `https://subasa.lk/voc-si/api/asr/transcribe`,
-  TTS_GENERATE: `https://subasa.lk/voc-si/api/tts/voicebot-generate-audio`,
+  TTS_STREAM: `https://subasa.lk/voc-si/api/tts/generate/stream`,
 };
 
 export function parseErrorMessage(

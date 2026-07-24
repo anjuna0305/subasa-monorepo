@@ -49,20 +49,17 @@ const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
   return response.data.transcription;
 };
 
-const fetchTtsAudioUrl = async (text: string): Promise<string> => {
-  const payload = {
+// The stream is a plain GET, so the URL alone is enough for an <audio>
+// element. Synthesis now starts when playback does, rather than up front.
+const buildTtsStreamUrl = (text: string): string => {
+  const params = new URLSearchParams({
     text: text.trim(),
     speaker: "mettananda",
     speaker_type: "single",
     voice: "male",
     input_type: "sinhala",
-  };
-  const response = await axiosInstance.post<{ audioUrl: string }>(
-    API_ENDPOINTS.TTS_GENERATE,
-    payload,
-    { withCredentials: false },
-  );
-  return `${API_ENDPOINTS.TTS_GENERATE.replace("/voicebot-generate-audio", "")}${response.data.audioUrl}?t=${Date.now()}`;
+  });
+  return `${API_ENDPOINTS.TTS_STREAM}?${params.toString()}`;
 };
 
 export default function CustomChatShell({ chatbotData, heroImageUrl }: Props) {
@@ -126,20 +123,12 @@ export default function CustomChatShell({ chatbotData, heroImageUrl }: Props) {
         //   },
         // ]);
 
-        try {
-          const audioUrl = await fetchTtsAudioUrl(botResponse);
-          setMessages((prev) =>
-            prev.map((m) =>
-              m.id === botMsgId ? { ...m, audioUrl, audioLoading: false } : m,
-            ),
-          );
-        } catch {
-          setMessages((prev) =>
-            prev.map((m) =>
-              m.id === botMsgId ? { ...m, audioLoading: false } : m,
-            ),
-          );
-        }
+        const audioUrl = buildTtsStreamUrl(botResponse);
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === botMsgId ? { ...m, audioUrl, audioLoading: false } : m,
+          ),
+        );
       } catch (err) {
         console.error(err);
       } finally {

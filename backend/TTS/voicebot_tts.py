@@ -101,13 +101,14 @@ def to_pcm16(audio):
 
 
 # Generate audio, streamed sentence by sentence
-@app.post("/generate/stream")
-def stream_audio(request_data: AudioRequest):
-    text = request_data.text.strip()
-    speaker = request_data.speaker.lower()
-    speaker_type = request_data.speaker_type.lower()
-    voice = request_data.voice.lower()
-    input_type = request_data.input_type.lower()
+def build_audio_stream(
+    text: str, speaker: str, speaker_type: str, voice: str, input_type: str
+):
+    text = text.strip()
+    speaker = speaker.lower()
+    speaker_type = speaker_type.lower()
+    voice = voice.lower()
+    input_type = input_type.lower()
 
     if not text:
         raise HTTPException(status_code=400, detail="Text is required")
@@ -148,6 +149,30 @@ def stream_audio(request_data: AudioRequest):
             "X-Accel-Buffering": "no",
         },
     )
+
+
+@app.post("/generate/stream")
+def stream_audio(request_data: AudioRequest):
+    return build_audio_stream(
+        request_data.text,
+        request_data.speaker,
+        request_data.speaker_type,
+        request_data.voice,
+        request_data.input_type,
+    )
+
+
+# GET variant so the URL can be handed straight to an <audio> element, which
+# only issues GET and cannot carry a request body.
+@app.get("/generate/stream")
+def stream_audio_get(
+    text: str,
+    speaker: str = "oshadi",
+    speaker_type: str = "multi",
+    voice: str = "female",
+    input_type: str = "sinhala",
+):
+    return build_audio_stream(text, speaker, speaker_type, voice, input_type)
 
 
 # Serve audio files
