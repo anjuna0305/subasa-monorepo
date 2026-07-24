@@ -6,7 +6,7 @@ from schemas import TtsGenerateRequest, TtsGenerateResponse
 import uuid
 import os
 import aiofiles
-from config import TTS_FILE_DIR
+from config import TTS_FILE_DIR, PUBLIC_BASE_URL
 
 router = APIRouter(prefix="/tts", tags=["tts"])
 
@@ -36,9 +36,12 @@ async def generate_tts_audio(payload: TtsGenerateRequest, request: Request):
         async for chunk in upstream_resp.aiter_bytes():
             await f.write(chunk)
 
-    host = request.headers.get("host", "localhost:8000")
-    scheme = request.url.scheme
-    proxy_audio_url = f"{scheme}://{host}/tts/audio/{file_name}"
+    if PUBLIC_BASE_URL:
+        base_url = PUBLIC_BASE_URL.rstrip("/")
+    else:
+        host = request.headers.get("host", "localhost:7010")
+        base_url = f"{request.url.scheme}://{host}"
+    proxy_audio_url = f"{base_url}/tts/output/{file_name}"
 
     return TtsGenerateResponse(audioUrl=proxy_audio_url)
 

@@ -49,9 +49,8 @@ const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
   return response.data.transcription;
 };
 
-// Register the text, then hand the short playback URL to an <audio> element.
-// Synthesis starts when playback does, rather than up front.
-const fetchTtsStreamUrl = async (text: string): Promise<string> => {
+// The gateway synthesizes, stores the wav, and returns an absolute URL for it.
+const fetchTtsAudioUrl = async (text: string): Promise<string> => {
   const payload = {
     text: text.trim(),
     speaker: "mettananda",
@@ -59,12 +58,11 @@ const fetchTtsStreamUrl = async (text: string): Promise<string> => {
     voice: "male",
     input_type: "sinhala",
   };
-  const response = await axiosInstance.post<{ id: string }>(
-    API_ENDPOINTS.TTS_PREPARE,
+  const response = await axiosInstance.post<{ audioUrl: string }>(
+    API_ENDPOINTS.TTS_GENERATE,
     payload,
-    { withCredentials: false },
   );
-  return API_ENDPOINTS.TTS_STREAM_BY_ID(response.data.id);
+  return response.data.audioUrl;
 };
 
 export default function CustomChatShell({ chatbotData, heroImageUrl }: Props) {
@@ -129,7 +127,7 @@ export default function CustomChatShell({ chatbotData, heroImageUrl }: Props) {
         // ]);
 
         try {
-          const audioUrl = await fetchTtsStreamUrl(botResponse);
+          const audioUrl = await fetchTtsAudioUrl(botResponse);
           setMessages((prev) =>
             prev.map((m) =>
               m.id === botMsgId ? { ...m, audioUrl, audioLoading: false } : m,

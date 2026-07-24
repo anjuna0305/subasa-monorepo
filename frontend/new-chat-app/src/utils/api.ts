@@ -47,10 +47,7 @@ export const API_ENDPOINTS = {
   GET_ME: `${API_BASE_URL}/users/me`,
 
   ASR_TRANSCRIBE: `https://subasa.lk/voc-si/api/asr/transcribe`,
-  TTS_STREAM: `https://subasa.lk/voc-si/api/tts/generate/stream`,
-  TTS_PREPARE: `https://subasa.lk/voc-si/api/tts/generate/prepare`,
-  TTS_STREAM_BY_ID: (id: string) =>
-    `https://subasa.lk/voc-si/api/tts/generate/stream/${id}`,
+  TTS_GENERATE: `${API_BASE_URL}/tts/generate`,
 };
 
 export function parseErrorMessage(
