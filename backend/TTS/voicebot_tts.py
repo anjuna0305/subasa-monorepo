@@ -11,6 +11,9 @@ import uvicorn
 import io
 import re
 import struct
+import time
+import uuid
+from threading import Lock
 import numpy as np
 import soundfile as sf
 
@@ -100,6 +103,43 @@ def to_pcm16(audio):
     return (np.clip(wav, -1.0, 1.0) * 32767).astype("<i2").tobytes()
 
 
+# Pending stream requests, keyed by a short id so the audio URL stays small and
+# keeps message text out of access logs. Held in process rather than Redis:
+# tts-be runs as a single container and entries live for minutes at most.
+# Scaling past one replica would need shared storage instead.
+PENDING_TTL_SECONDS = 600
+pending_requests: dict = {}
+pending_lock = Lock()
+
+
+def put_pending(payload: AudioRequest) -> str:
+    stream_id = uuid.uuid4().hex[:12]
+    now = time.time()
+    with pending_lock:
+        expired = [
+            key
+            for key, (_, created) in pending_requests.items()
+            if now - created > PENDING_TTL_SECONDS
+        ]
+        for key in expired:
+            del pending_requests[key]
+        pending_requests[stream_id] = (payload, now)
+    return stream_id
+
+
+def get_pending(stream_id: str) -> AudioRequest:
+    with pending_lock:
+        entry = pending_requests.get(stream_id)
+        if entry and time.time() - entry[1] > PENDING_TTL_SECONDS:
+            del pending_requests[stream_id]
+            entry = None
+    if not entry:
+        raise HTTPException(status_code=404, detail="Unknown or expired stream id")
+    # Deliberately not consumed on read, so replaying a message works until the
+    # entry expires.
+    return entry[0]
+
+
 # Generate audio, streamed sentence by sentence
 def build_audio_stream(
     text: str, speaker: str, speaker_type: str, voice: str, input_type: str
@@ -173,6 +213,28 @@ def stream_audio_get(
     input_type: str = "sinhala",
 ):
     return build_audio_stream(text, speaker, speaker_type, voice, input_type)
+
+
+# Two-step handoff: the text is posted once, then played back by id. Avoids the
+# URL length ceiling on long Sinhala replies, where each character costs nine
+# characters once percent-encoded.
+@app.post("/generate/prepare")
+def prepare_stream(request_data: AudioRequest):
+    if not request_data.text.strip():
+        raise HTTPException(status_code=400, detail="Text is required")
+    return JSONResponse(content={"id": put_pending(request_data)})
+
+
+@app.get("/generate/stream/{stream_id}")
+def stream_audio_by_id(stream_id: str):
+    payload = get_pending(stream_id)
+    return build_audio_stream(
+        payload.text,
+        payload.speaker,
+        payload.speaker_type,
+        payload.voice,
+        payload.input_type,
+    )
 
 
 # Serve audio files
