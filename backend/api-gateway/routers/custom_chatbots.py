@@ -8,7 +8,7 @@ from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from auth import AdminUser, AnyUser
+from auth import AdminUser, AnyUser, OptionalUser
 from config import CUSTOM_CHATBOT_SERVICE_URL, FILE_UPLOAD_DIR, IMAGE_UPLOAD_DIR
 from database import get_db
 from models import CustomChatbot, Organization, User, UserRole
@@ -49,6 +49,7 @@ def _build_chatbot_out(chatbot: CustomChatbot) -> CustomChatbotOut:
 
 @router.post("/api/{url_path}", response_model=CustomChatbotMessageResponse)
 async def chat_with_custom_chatbot(
+    current_user: OptionalUser,
     url_path: str,
     payload: CustomChatbotMessageRequest,
     db: AsyncSession = Depends(get_db),
@@ -67,6 +68,33 @@ async def chat_with_custom_chatbot(
         raise HTTPException(
             status_code=503,
             detail=[{"field": "url_path", "message": "Chatbot is unpublished"}],
+        )
+
+    if current_user is None and not custom_chatbot.is_public:
+        raise HTTPException(
+            status_code=401,
+            detail=[
+                {
+                    "field": "Chatbot",
+                    "message": "Chatbot is not available for the public use.",
+                }
+            ],
+        )
+
+    if (
+        current_user is not None
+        and custom_chatbot.organization_id
+        and (custom_chatbot.organization.uuid if custom_chatbot.organization else None)
+        != current_user.organization_uuid
+    ):
+        raise HTTPException(
+            status_code=403,
+            detail=[
+                {
+                    "field": "url_path",
+                    "message": "Chatbot belongs to another organization.",
+                }
+            ],
         )
 
     from routers._http import get_http_client
@@ -94,7 +122,7 @@ async def chat_with_custom_chatbot(
 
 @router.post("/api/private/{url_path}", response_model=CustomChatbotMessageResponse)
 async def chat_with_private_custom_chatbot(
-    current_user: AnyUser,
+    current_user: OptionalUser,
     url_path: str,
     payload: CustomChatbotMessageRequest,
     db: AsyncSession = Depends(get_db),
@@ -116,7 +144,9 @@ async def chat_with_private_custom_chatbot(
         )
 
     user = await db.scalar(
-        select(User).options(selectinload(User.organization)).where(User.uuid == current_user.uuid)
+        select(User)
+        .options(selectinload(User.organization))
+        .where(User.uuid == current_user.uuid)
     )
     if (
         current_user.role != UserRole.admin
@@ -193,7 +223,10 @@ async def create_custom_chatbot(
 
     if existing:
         raise HTTPException(
-            status_code=409, detail=[{"field": "chatbot_name", "message": "Chatbot name already exists"}]
+            status_code=409,
+            detail=[
+                {"field": "chatbot_name", "message": "Chatbot name already exists"}
+            ],
         )
 
     existing_url = await db.scalar(
@@ -204,7 +237,8 @@ async def create_custom_chatbot(
 
     if existing_url:
         raise HTTPException(
-            status_code=409, detail=[{"field": "url_path", "message": "URL path already exists"}]
+            status_code=409,
+            detail=[{"field": "url_path", "message": "URL path already exists"}],
         )
 
     org = None
@@ -215,7 +249,9 @@ async def create_custom_chatbot(
         if not org:
             raise HTTPException(
                 status_code=404,
-                detail=[{"field": "organization_uuid", "message": "Organization not found."}],
+                detail=[
+                    {"field": "organization_uuid", "message": "Organization not found."}
+                ],
             )
 
     custom_chatbot = CustomChatbot(
@@ -234,7 +270,9 @@ async def create_custom_chatbot(
     await db.refresh(custom_chatbot)
 
     result = await db.execute(
-        select(CustomChatbot).options(selectinload(CustomChatbot.organization)).where(CustomChatbot.id == custom_chatbot.id)
+        select(CustomChatbot)
+        .options(selectinload(CustomChatbot.organization))
+        .where(CustomChatbot.id == custom_chatbot.id)
     )
     custom_chatbot = result.scalar_one()
     return _build_chatbot_out(custom_chatbot)
@@ -246,7 +284,9 @@ async def get_custom_chatbot(
     db: AsyncSession = Depends(get_db),
 ):
     chatbot = await db.scalar(
-        select(CustomChatbot).options(selectinload(CustomChatbot.organization)).where(CustomChatbot.uuid == chatbot_uuid)
+        select(CustomChatbot)
+        .options(selectinload(CustomChatbot.organization))
+        .where(CustomChatbot.uuid == chatbot_uuid)
     )
     if not chatbot:
         raise HTTPException(
@@ -262,7 +302,9 @@ async def get_chabot_by_url_path(
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
-        select(CustomChatbot).options(selectinload(CustomChatbot.organization)).where(CustomChatbot.url_path == url_path)
+        select(CustomChatbot)
+        .options(selectinload(CustomChatbot.organization))
+        .where(CustomChatbot.url_path == url_path)
     )
     custom_chatbot = result.scalar_one_or_none()
     if not custom_chatbot:
@@ -280,15 +322,21 @@ async def get_chabot_by_organization_uuid(
     organization_uuid: str,
     db: AsyncSession = Depends(get_db),
 ):
-    org = await db.scalar(select(Organization).where(Organization.uuid == organization_uuid))
+    org = await db.scalar(
+        select(Organization).where(Organization.uuid == organization_uuid)
+    )
     if not org:
         raise HTTPException(
             status_code=404,
-            detail=[{"field": "organization_uuid", "message": "Organization not found."}],
+            detail=[
+                {"field": "organization_uuid", "message": "Organization not found."}
+            ],
         )
 
     result = await db.execute(
-        select(CustomChatbot).options(selectinload(CustomChatbot.organization)).where(CustomChatbot.organization_id == org.id)
+        select(CustomChatbot)
+        .options(selectinload(CustomChatbot.organization))
+        .where(CustomChatbot.organization_id == org.id)
     )
     chatbots = result.scalars().all()
     return [_build_chatbot_out(cb) for cb in chatbots]
@@ -310,7 +358,12 @@ async def list_custom_chatbot(
     if sort_by not in ("chatbot_name", "created_at"):
         raise HTTPException(
             status_code=422,
-            detail=[{"field": "sort_by", "message": "Must be 'chatbot_name' or 'created_at'."}],
+            detail=[
+                {
+                    "field": "sort_by",
+                    "message": "Must be 'chatbot_name' or 'created_at'.",
+                }
+            ],
         )
     if sort_order not in ("asc", "desc"):
         raise HTTPException(
@@ -319,11 +372,15 @@ async def list_custom_chatbot(
         )
 
     if organization_uuid is not None:
-        org = await db.scalar(select(Organization).where(Organization.uuid == organization_uuid))
+        org = await db.scalar(
+            select(Organization).where(Organization.uuid == organization_uuid)
+        )
         if not org:
             raise HTTPException(
                 status_code=404,
-                detail=[{"field": "organization_uuid", "message": "Organization not found."}],
+                detail=[
+                    {"field": "organization_uuid", "message": "Organization not found."}
+                ],
             )
 
     query = select(CustomChatbot).options(selectinload(CustomChatbot.organization))
@@ -340,7 +397,11 @@ async def list_custom_chatbot(
     count_query = select(func.count()).select_from(query.subquery())
     total = (await db.execute(count_query)).scalar_one()
 
-    sort_column = CustomChatbot.chatbot_name if sort_by == "chatbot_name" else CustomChatbot.created_at
+    sort_column = (
+        CustomChatbot.chatbot_name
+        if sort_by == "chatbot_name"
+        else CustomChatbot.created_at
+    )
     order_func = desc(sort_column) if sort_order == "desc" else sort_column.asc()
     query = query.order_by(order_func)
 
@@ -364,7 +425,9 @@ async def list_custom_chatbot(
 @router.post("/publish/{chatbot_uuid}", response_model=CustomChatbotOut)
 async def publish_chatbot(chatbot_uuid: str, db: AsyncSession = Depends(get_db)):
     chatbot = await db.scalar(
-        select(CustomChatbot).options(selectinload(CustomChatbot.organization)).where(CustomChatbot.uuid == chatbot_uuid)
+        select(CustomChatbot)
+        .options(selectinload(CustomChatbot.organization))
+        .where(CustomChatbot.uuid == chatbot_uuid)
     )
     if not chatbot:
         raise HTTPException(
@@ -376,7 +439,9 @@ async def publish_chatbot(chatbot_uuid: str, db: AsyncSession = Depends(get_db))
     await db.commit()
     await db.refresh(chatbot)
     result = await db.execute(
-        select(CustomChatbot).options(selectinload(CustomChatbot.organization)).where(CustomChatbot.id == chatbot.id)
+        select(CustomChatbot)
+        .options(selectinload(CustomChatbot.organization))
+        .where(CustomChatbot.id == chatbot.id)
     )
     chatbot = result.scalar_one()
     return _build_chatbot_out(chatbot)
@@ -385,7 +450,9 @@ async def publish_chatbot(chatbot_uuid: str, db: AsyncSession = Depends(get_db))
 @router.post("/unpublish/{chatbot_uuid}", response_model=CustomChatbotOut)
 async def unpublish_chatbot(chatbot_uuid: str, db: AsyncSession = Depends(get_db)):
     chatbot = await db.scalar(
-        select(CustomChatbot).options(selectinload(CustomChatbot.organization)).where(CustomChatbot.uuid == chatbot_uuid)
+        select(CustomChatbot)
+        .options(selectinload(CustomChatbot.organization))
+        .where(CustomChatbot.uuid == chatbot_uuid)
     )
     if not chatbot:
         raise HTTPException(
@@ -397,7 +464,9 @@ async def unpublish_chatbot(chatbot_uuid: str, db: AsyncSession = Depends(get_db
     await db.commit()
     await db.refresh(chatbot)
     result = await db.execute(
-        select(CustomChatbot).options(selectinload(CustomChatbot.organization)).where(CustomChatbot.id == chatbot.id)
+        select(CustomChatbot)
+        .options(selectinload(CustomChatbot.organization))
+        .where(CustomChatbot.id == chatbot.id)
     )
     chatbot = result.scalar_one()
     return _build_chatbot_out(chatbot)
@@ -406,7 +475,9 @@ async def unpublish_chatbot(chatbot_uuid: str, db: AsyncSession = Depends(get_db
 @router.post("/make-public/{chatbot_uuid}", response_model=CustomChatbotOut)
 async def make_chatbot_public(chatbot_uuid: str, db: AsyncSession = Depends(get_db)):
     chatbot = await db.scalar(
-        select(CustomChatbot).options(selectinload(CustomChatbot.organization)).where(CustomChatbot.uuid == chatbot_uuid)
+        select(CustomChatbot)
+        .options(selectinload(CustomChatbot.organization))
+        .where(CustomChatbot.uuid == chatbot_uuid)
     )
     if not chatbot:
         raise HTTPException(
@@ -418,7 +489,9 @@ async def make_chatbot_public(chatbot_uuid: str, db: AsyncSession = Depends(get_
     await db.commit()
     await db.refresh(chatbot)
     result = await db.execute(
-        select(CustomChatbot).options(selectinload(CustomChatbot.organization)).where(CustomChatbot.id == chatbot.id)
+        select(CustomChatbot)
+        .options(selectinload(CustomChatbot.organization))
+        .where(CustomChatbot.id == chatbot.id)
     )
     chatbot = result.scalar_one()
     return _build_chatbot_out(chatbot)
@@ -427,7 +500,9 @@ async def make_chatbot_public(chatbot_uuid: str, db: AsyncSession = Depends(get_
 @router.post("/make-private/{chatbot_uuid}", response_model=CustomChatbotOut)
 async def make_chatbot_private(chatbot_uuid: str, db: AsyncSession = Depends(get_db)):
     chatbot = await db.scalar(
-        select(CustomChatbot).options(selectinload(CustomChatbot.organization)).where(CustomChatbot.uuid == chatbot_uuid)
+        select(CustomChatbot)
+        .options(selectinload(CustomChatbot.organization))
+        .where(CustomChatbot.uuid == chatbot_uuid)
     )
     if not chatbot:
         raise HTTPException(
@@ -439,7 +514,9 @@ async def make_chatbot_private(chatbot_uuid: str, db: AsyncSession = Depends(get
     await db.commit()
     await db.refresh(chatbot)
     result = await db.execute(
-        select(CustomChatbot).options(selectinload(CustomChatbot.organization)).where(CustomChatbot.id == chatbot.id)
+        select(CustomChatbot)
+        .options(selectinload(CustomChatbot.organization))
+        .where(CustomChatbot.id == chatbot.id)
     )
     chatbot = result.scalar_one()
     return _build_chatbot_out(chatbot)
@@ -452,7 +529,9 @@ async def upload_chatbot_image(
     db: AsyncSession = Depends(get_db),
 ):
     chatbot = await db.scalar(
-        select(CustomChatbot).options(selectinload(CustomChatbot.organization)).where(CustomChatbot.uuid == chatbot_uuid)
+        select(CustomChatbot)
+        .options(selectinload(CustomChatbot.organization))
+        .where(CustomChatbot.uuid == chatbot_uuid)
     )
     if not chatbot:
         raise HTTPException(
@@ -480,7 +559,9 @@ async def upload_chatbot_image(
     await db.commit()
     await db.refresh(chatbot)
     result = await db.execute(
-        select(CustomChatbot).options(selectinload(CustomChatbot.organization)).where(CustomChatbot.id == chatbot.id)
+        select(CustomChatbot)
+        .options(selectinload(CustomChatbot.organization))
+        .where(CustomChatbot.id == chatbot.id)
     )
     chatbot = result.scalar_one()
     return _build_chatbot_out(chatbot)
@@ -512,7 +593,9 @@ async def upload_chatbot_file(
     db: AsyncSession = Depends(get_db),
 ):
     chatbot = await db.scalar(
-        select(CustomChatbot).options(selectinload(CustomChatbot.organization)).where(CustomChatbot.uuid == chatbot_uuid)
+        select(CustomChatbot)
+        .options(selectinload(CustomChatbot.organization))
+        .where(CustomChatbot.uuid == chatbot_uuid)
     )
     if not chatbot:
         raise HTTPException(
@@ -540,7 +623,9 @@ async def upload_chatbot_file(
     await db.commit()
     await db.refresh(chatbot)
     result = await db.execute(
-        select(CustomChatbot).options(selectinload(CustomChatbot.organization)).where(CustomChatbot.id == chatbot.id)
+        select(CustomChatbot)
+        .options(selectinload(CustomChatbot.organization))
+        .where(CustomChatbot.id == chatbot.id)
     )
     chatbot = result.scalar_one()
     return _build_chatbot_out(chatbot)

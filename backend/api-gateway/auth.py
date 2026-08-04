@@ -45,6 +45,17 @@ async def get_current_user(
     )
 
 
+async def get_optional_user(
+    token: Annotated[str | None, Depends(oauth2_scheme)],
+) -> CurrentUser | None:
+    if not token:
+        return None
+    try:
+        return await get_current_user(token)
+    except HTTPException:
+        return None
+
+
 def require_role(*allowed_roles: UserRole):
     async def _guard(
         current_user: Annotated[CurrentUser, Depends(get_current_user)],
@@ -69,3 +80,4 @@ OrgAdminUser = Annotated[CurrentUser, Depends(require_role(UserRole.organization
 AdminOrOrgAdminUser = Annotated[CurrentUser, Depends(require_role(UserRole.admin, UserRole.organization_admin))]
 GeneralUser = Annotated[CurrentUser, Depends(require_role(UserRole.general_user))]
 AnyUser = Annotated[CurrentUser, Depends(get_current_user)]
+OptionalUser = Annotated[CurrentUser | None, Depends(get_optional_user)]
