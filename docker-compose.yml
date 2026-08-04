@@ -88,6 +88,9 @@ services:
             DATABASE_URL: ${DATABASE_URL}
             UPLOAD_BASE_DIR: /app/uploads
             JWT_SECRET: ${JWT_SECRET}
+            TTS_SERVICE_URL: http://localhost:7002
+            FILE_STORE_DIR: /app/uploads/tts
+            PUBLIC_BASE_URL: ${PUBLIC_BASE_URL}
         volumes:
             - ./backend/framework/uploaded_files:/app/uploads
 

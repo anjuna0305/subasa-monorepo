@@ -1,4 +1,6 @@
+import json
 from io import BytesIO
+from threading import Thread
 
 import librosa
 import numpy as np
@@ -7,8 +9,9 @@ import torch
 import uvicorn
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from prometheus_fastapi_instrumentator import Instrumentator
+from transformers import TextIteratorStreamer
 from postprocessing.post_processing import process_sentence
 from Wav2Vec_bert import model_bert, processor_bert
 from Wav2Vec_model import model_wav, processor_wav
@@ -57,6 +60,17 @@ def transcribe_audio_whisper(audio, sample_rate=16000):
     return processor_whisper.batch_decode(logits, skip_special_tokens=True)[0].strip()
 
 
+def generate_whisper(input_features, streamer, errors):
+    try:
+        with torch.no_grad():
+            model_whisper.generate(input_features, streamer=streamer)
+    except Exception as e:
+        errors.append(e)
+        # generate() ends the streamer itself on success; on failure the
+        # consumer would block forever without this.
+        streamer.end()
+
+
 def process_audio_file(file: UploadFile):
     audio_data, samplerate = sf.read(BytesIO(file.file.read()))
     if samplerate != 16000:
@@ -95,6 +109,57 @@ async def process_audio_whisper(file: UploadFile = File(...)):
         return JSONResponse(content={"transcription": transcription})
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/transcribe/whisper/stream")
+async def stream_audio_whisper(file: UploadFile = File(...)):
+    # Decoding failures here happen before any bytes are sent, so they can
+    # still surface as a normal error response rather than a stream event.
+    try:
+        audio_data = process_audio_file(file)
+        input_features = processor_whisper(
+            audio_data, sampling_rate=16000, return_tensors="pt"
+        ).input_features
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    streamer = TextIteratorStreamer(
+        processor_whisper.tokenizer, skip_special_tokens=True
+    )
+    errors = []
+    thread = Thread(
+        target=generate_whisper,
+        args=(input_features, streamer, errors),
+        daemon=True,
+    )
+    thread.start()
+
+    def event_stream():
+        transcription = ""
+        for token in streamer:
+            # The streamer fires once per generated token but only yields text
+            # at word boundaries, so most steps produce an empty string.
+            if not token:
+                continue
+            transcription += token
+            yield f"data: {json.dumps({'delta': token}, ensure_ascii=False)}\n\n"
+        thread.join()
+        if errors:
+            payload = {"error": str(errors[0])}
+        else:
+            payload = {"transcription": transcription.strip(), "done": True}
+        yield f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
+
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            # nginx buffers proxied responses by default, which would hold the
+            # whole stream back until generation finishes.
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 @app.get("/")

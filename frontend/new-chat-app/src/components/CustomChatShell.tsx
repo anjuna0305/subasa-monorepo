@@ -49,6 +49,7 @@ const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
   return response.data.transcription;
 };
 
+// The gateway synthesizes, stores the wav, and returns an absolute URL for it.
 const fetchTtsAudioUrl = async (text: string): Promise<string> => {
   const payload = {
     text: text.trim(),
@@ -60,9 +61,8 @@ const fetchTtsAudioUrl = async (text: string): Promise<string> => {
   const response = await axiosInstance.post<{ audioUrl: string }>(
     API_ENDPOINTS.TTS_GENERATE,
     payload,
-    { withCredentials: false },
   );
-  return `${API_ENDPOINTS.TTS_GENERATE.replace("/voicebot-generate-audio", "")}${response.data.audioUrl}?t=${Date.now()}`;
+  return response.data.audioUrl;
 };
 
 export default function CustomChatShell({ chatbotData, heroImageUrl }: Props) {

@@ -9,6 +9,12 @@ import os
 from text.cleaners import sinhala_cleaners
 import uvicorn
 import io
+import re
+import struct
+import time
+import uuid
+from threading import Lock
+import numpy as np
 import soundfile as sf
 
 app = FastAPI()
@@ -71,6 +77,165 @@ def preprocess_text(input_text: str):
         return sinhala_cleaners(input_text)
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Text preprocessing failed: {e}")
+
+SENTENCE_END = re.compile(r"(?<=[.!?෴])\s+")
+
+
+def split_sentences(text: str):
+    parts = [part.strip() for part in SENTENCE_END.split(text.strip())]
+    return [part for part in parts if part]
+
+
+def wav_stream_header(sample_rate: int, channels: int = 1, bits: int = 16):
+    byte_rate = sample_rate * channels * bits // 8
+    block_align = channels * bits // 8
+    return b"".join([
+        b"RIFF", struct.pack("<I", 0xFFFFFFFF), b"WAVE",
+        b"fmt ", struct.pack(
+            "<IHHIIHH", 16, 1, channels, sample_rate, byte_rate, block_align, bits
+        ),
+        b"data", struct.pack("<I", 0xFFFFFFFF),
+    ])
+
+
+def to_pcm16(audio):
+    wav = np.asarray(audio, dtype=np.float32)
+    return (np.clip(wav, -1.0, 1.0) * 32767).astype("<i2").tobytes()
+
+
+# Pending stream requests, keyed by a short id so the audio URL stays small and
+# keeps message text out of access logs. Held in process rather than Redis:
+# tts-be runs as a single container and entries live for minutes at most.
+# Scaling past one replica would need shared storage instead.
+PENDING_TTL_SECONDS = 600
+pending_requests: dict = {}
+pending_lock = Lock()
+
+
+def put_pending(payload: AudioRequest) -> str:
+    stream_id = uuid.uuid4().hex[:12]
+    now = time.time()
+    with pending_lock:
+        expired = [
+            key
+            for key, (_, created) in pending_requests.items()
+            if now - created > PENDING_TTL_SECONDS
+        ]
+        for key in expired:
+            del pending_requests[key]
+        pending_requests[stream_id] = (payload, now)
+    return stream_id
+
+
+def get_pending(stream_id: str) -> AudioRequest:
+    with pending_lock:
+        entry = pending_requests.get(stream_id)
+        if entry and time.time() - entry[1] > PENDING_TTL_SECONDS:
+            del pending_requests[stream_id]
+            entry = None
+    if not entry:
+        raise HTTPException(status_code=404, detail="Unknown or expired stream id")
+    # Deliberately not consumed on read, so replaying a message works until the
+    # entry expires.
+    return entry[0]
+
+
+# Generate audio, streamed sentence by sentence
+def build_audio_stream(
+    text: str, speaker: str, speaker_type: str, voice: str, input_type: str
+):
+    text = text.strip()
+    speaker = speaker.lower()
+    speaker_type = speaker_type.lower()
+    voice = voice.lower()
+    input_type = input_type.lower()
+
+    if not text:
+        raise HTTPException(status_code=400, detail="Text is required")
+    if speaker_type not in ["single", "multi"] or voice not in ["male", "female"]:
+        raise HTTPException(status_code=400, detail="Invalid speaker type or voice")
+
+    model_key = f"{speaker_type}_{voice}_{input_type}"
+    model = models.get(model_key)
+    if not model:
+        raise HTTPException(status_code=404, detail=f"No model found for key: {model_key}")
+
+    sentences = split_sentences(text)
+    if not sentences:
+        raise HTTPException(status_code=400, detail="Text is required")
+
+    sample_rate = getattr(model.synthesizer, "output_sample_rate", 22050)
+
+    def audio_stream():
+        yield wav_stream_header(sample_rate)
+        for sentence in sentences:
+            try:
+                cleaned = preprocess_text(sentence)
+                result = (
+                    model.tts(text=cleaned)
+                    if speaker_type == "single"
+                    else model.tts(text=cleaned, speaker=speaker)
+                )
+                yield to_pcm16(result)
+            except Exception as e:
+                print(f"Streaming synthesis failed on {sentence!r}: {e}")
+                return
+
+    return StreamingResponse(
+        audio_stream(),
+        media_type="audio/wav",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
+
+@app.post("/generate/stream")
+def stream_audio(request_data: AudioRequest):
+    return build_audio_stream(
+        request_data.text,
+        request_data.speaker,
+        request_data.speaker_type,
+        request_data.voice,
+        request_data.input_type,
+    )
+
+
+# GET variant so the URL can be handed straight to an <audio> element, which
+# only issues GET and cannot carry a request body.
+@app.get("/generate/stream")
+def stream_audio_get(
+    text: str,
+    speaker: str = "oshadi",
+    speaker_type: str = "multi",
+    voice: str = "female",
+    input_type: str = "sinhala",
+):
+    return build_audio_stream(text, speaker, speaker_type, voice, input_type)
+
+
+# Two-step handoff: the text is posted once, then played back by id. Avoids the
+# URL length ceiling on long Sinhala replies, where each character costs nine
+# characters once percent-encoded.
+@app.post("/generate/prepare")
+def prepare_stream(request_data: AudioRequest):
+    if not request_data.text.strip():
+        raise HTTPException(status_code=400, detail="Text is required")
+    return JSONResponse(content={"id": put_pending(request_data)})
+
+
+@app.get("/generate/stream/{stream_id}")
+def stream_audio_by_id(stream_id: str):
+    payload = get_pending(stream_id)
+    return build_audio_stream(
+        payload.text,
+        payload.speaker,
+        payload.speaker_type,
+        payload.voice,
+        payload.input_type,
+    )
+
 
 # Serve audio files
 @app.get("/output/{filename}")
