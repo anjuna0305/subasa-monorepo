@@ -1,4 +1,6 @@
 import json
+import os
+import tempfile
 from io import BytesIO
 from threading import Thread
 
@@ -72,7 +74,18 @@ def generate_whisper(input_features, streamer, errors):
 
 
 def process_audio_file(file: UploadFile):
-    audio_data, samplerate = sf.read(BytesIO(file.file.read()))
+    raw = file.file.read()
+    try:
+        audio_data, samplerate = sf.read(BytesIO(raw))
+    except Exception:
+        # Mobile clients record AAC in an mp4/3gp container, which libsndfile
+        # cannot open. librosa falls back to audioread, whose ffmpeg backend
+        # needs a real path rather than a file object.
+        suffix = os.path.splitext(file.filename or "")[1] or ".m4a"
+        with tempfile.NamedTemporaryFile(suffix=suffix) as tmp:
+            tmp.write(raw)
+            tmp.flush()
+            audio_data, samplerate = librosa.load(tmp.name, sr=16000, mono=True)
     if samplerate != 16000:
         audio_data = librosa.resample(audio_data, orig_sr=samplerate, target_sr=16000)
     if len(audio_data.shape) > 1:

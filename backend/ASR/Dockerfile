@@ -13,6 +13,11 @@ COPY . .
 # ---- runtime stage ----
 FROM python:3.10 AS runtime
 
+# libsndfile only reads wav/flac/ogg; mobile clients upload AAC in an mp4
+# container, which librosa decodes through audioread's ffmpeg backend.
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /usr/src/app
 
 COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
