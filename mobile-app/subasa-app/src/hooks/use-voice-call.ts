@@ -7,7 +7,7 @@ import {
 } from 'expo-audio';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { generateTts, sendMessage, transcribe } from '@/lib/api';
+import { sendMessage, synthesize, transcribe } from '@/lib/api';
 import { VoiceTuning } from '@/lib/config';
 import {
   createSilenceDetector,
@@ -184,7 +184,7 @@ export function useVoiceCall(urlPath: string) {
 
     let audioUrl: string | null = null;
     try {
-      audioUrl = await generateTts(reply);
+      audioUrl = await synthesize(reply);
     } catch {
       // The reply is already in the transcript, so a synthesis failure costs the caller
       // the audio for this turn but should not drop the call.

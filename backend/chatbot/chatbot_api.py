@@ -70,7 +70,7 @@ retrieval_chain = RetrievalQA.from_chain_type(
 
 
 @app.post("/chat")
-async def chat(chat_request: ChatRequest) -> ChatResponse:
+def chat(chat_request: ChatRequest) -> ChatResponse:
     if not chat_request.message:
         raise HTTPException(status_code=400, detail="No message provided")
 

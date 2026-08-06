@@ -38,7 +38,7 @@ retriever_cache = {}
 retrieval_chain_cache = {}
 
 @app.post("/upload")
-async def upload_file(file: UploadFile = File(...)):
+def upload_file(file: UploadFile = File(...)):
     """
     Handle file upload, use appropriate loader for .txt or .pdf, and initialize retriever and chatbot.
     """
@@ -49,7 +49,7 @@ async def upload_file(file: UploadFile = File(...)):
     try:
         # Save file locally
         with open(file_path, "wb") as f:
-            f.write(await file.read())
+            f.write(file.file.read())
 
         # Select the appropriate loader
         if file.filename.endswith(".txt"):
@@ -83,7 +83,7 @@ class ChatRequest(BaseModel):
     message: str
 
 @app.post("/chat")
-async def chat(request: ChatRequest):
+def chat(request: ChatRequest):
     """
     Handle user queries and return responses from the chatbot.
     """

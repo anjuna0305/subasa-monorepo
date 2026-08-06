@@ -94,7 +94,7 @@ def process_audio_file(file: UploadFile):
 
 
 @app.post("/transcribe")
-async def process_audio_bert(file: UploadFile = File(...)):
+def process_audio_bert(file: UploadFile = File(...)):
     try:
         audio_data = process_audio_file(file)
         transcription = transcribe_audio_bert(audio_data)
@@ -105,7 +105,7 @@ async def process_audio_bert(file: UploadFile = File(...)):
 
 
 @app.post("/transcribe/wav")
-async def process_audio_wav(file: UploadFile = File(...)):
+def process_audio_wav(file: UploadFile = File(...)):
     try:
         audio_data = process_audio_file(file)
         transcription = transcribe_audio_wav(audio_data)
@@ -115,7 +115,7 @@ async def process_audio_wav(file: UploadFile = File(...)):
 
 
 @app.post("/transcribe/whisper")
-async def process_audio_whisper(file: UploadFile = File(...)):
+def process_audio_whisper(file: UploadFile = File(...)):
     try:
         audio_data = process_audio_file(file)
         transcription = transcribe_audio_whisper(audio_data)
@@ -125,7 +125,7 @@ async def process_audio_whisper(file: UploadFile = File(...)):
 
 
 @app.post("/transcribe/whisper/stream")
-async def stream_audio_whisper(file: UploadFile = File(...)):
+def stream_audio_whisper(file: UploadFile = File(...)):
     # Decoding failures here happen before any bytes are sent, so they can
     # still surface as a normal error response rather than a stream event.
     try:

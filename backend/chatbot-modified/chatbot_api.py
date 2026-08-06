@@ -85,7 +85,7 @@ def get_or_create_vectorstore(retrieval_key: Optional[str], file_path: str):
 
 
 @app.post("/chat")
-async def chat(chat_request: ChatRequest) -> ChatResponse:
+def chat(chat_request: ChatRequest) -> ChatResponse:
     if not chat_request.message:
         raise HTTPException(status_code=400, detail="No message provided")
 

@@ -1,4 +1,10 @@
-import { API_BASE_URL, ASR_TRANSCRIBE_URL, RequestTimeouts, TTS_VOICE } from '@/lib/config';
+import {
+  API_BASE_URL,
+  ASR_TRANSCRIBE_URL,
+  RequestTimeouts,
+  TTS_STREAMING,
+  TTS_VOICE,
+} from '@/lib/config';
 
 export type Chatbot = {
   uuid: string;
@@ -69,17 +75,40 @@ async function request<T>(url: string, init: RequestInit & { timeoutMs?: number 
   return body as T;
 }
 
+/** Host (with port) the API base points at, e.g. `subasa.lk` or `192.168.1.10:7010`. */
+const API_BASE_HOST = (/^https?:\/\/([^/]+)/i.exec(API_BASE_URL)?.[1] ?? '').toLowerCase();
+
+/** Path the gateway is served under, e.g. `/voc-si/api/api-gateway`. Empty at the root. */
+const API_BASE_PATH = API_BASE_URL.replace(/^https?:\/\/[^/]+/i, '');
+
+function isUnderBasePath(path: string): boolean {
+  return !API_BASE_PATH || path === API_BASE_PATH || path.startsWith(`${API_BASE_PATH}/`);
+}
+
+/** Drops the gateway's own prefix so re-anchoring can't end up doubling it. */
+function stripBasePath(path: string): string {
+  if (!API_BASE_PATH || !isUnderBasePath(path)) return path;
+  return path.slice(API_BASE_PATH.length);
+}
+
 /**
  * The gateway builds absolute media URLs from `PUBLIC_BASE_URL` or the request's Host
- * header. A loopback host resolves to the phone itself, so re-anchor those on the API base.
+ * header, which leaves two ways for the URL to come back unreachable from a phone: a
+ * loopback host resolves to the phone itself, and a Host header carries no path, so a
+ * gateway deployed under a prefix hands back URLs that are missing it. Re-anchoring the
+ * path onto `API_BASE_URL` fixes both. Foreign hosts are left alone — only a URL already
+ * pointing at the gateway's own host can be one of ours that lost its prefix.
  */
 function reanchorMediaUrl(url: string): string {
-  if (url.startsWith('/')) return `${API_BASE_URL}${url}`;
+  if (url.startsWith('/')) return `${API_BASE_URL}${stripBasePath(url)}`;
   const match = /^https?:\/\/([^/]+)(\/.*)?$/i.exec(url);
   if (!match) return url;
   const [, host, path = ''] = match;
   const hostname = host.split(':')[0];
   if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0') {
+    return `${API_BASE_URL}${stripBasePath(path)}`;
+  }
+  if (host.toLowerCase() === API_BASE_HOST && !isUnderBasePath(path)) {
     return `${API_BASE_URL}${path}`;
   }
   return url;
@@ -137,6 +166,7 @@ export async function sendMessage(urlPath: string, message: string): Promise<str
   return (body.response ?? '').trim();
 }
 
+/** Waits for the whole reply to synthesize, then returns a URL to the finished file. */
 export async function generateTts(text: string): Promise<string> {
   const body = await request<{ audioUrl?: string }>(`${API_BASE_URL}/tts/generate`, {
     method: 'POST',
@@ -147,4 +177,23 @@ export async function generateTts(text: string): Promise<string> {
 
   if (!body.audioUrl) throw new ApiError('The speech service returned no audio.', 502);
   return reanchorMediaUrl(body.audioUrl);
+}
+
+/**
+ * Returns immediately with a URL that streams the audio as it is synthesized, so playback
+ * starts after the first sentence rather than after the whole reply.
+ */
+export async function prepareTtsStream(text: string): Promise<string> {
+  const body = await request<{ streamUrl?: string }>(`${API_BASE_URL}/tts/prepare`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...TTS_VOICE, text }),
+  });
+
+  if (!body.streamUrl) throw new ApiError('The speech service returned no audio.', 502);
+  return reanchorMediaUrl(body.streamUrl);
+}
+
+export async function synthesize(text: string): Promise<string> {
+  return TTS_STREAMING ? prepareTtsStream(text) : generateTts(text);
 }

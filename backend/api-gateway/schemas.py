@@ -389,3 +389,7 @@ class TtsGenerateRequest(BaseModel):
 
 class TtsGenerateResponse(BaseModel):
     audioUrl: str
+
+
+class TtsStreamResponse(BaseModel):
+    streamUrl: str

@@ -23,7 +23,9 @@ export default function IndexScreen() {
         </ThemedText>
         <ThemedView type="backgroundElement" style={styles.block}>
           <ThemedText type="code">EXPO_PUBLIC_CHATBOT_PATH=your-chatbot-url-path</ThemedText>
-          <ThemedText type="code">EXPO_PUBLIC_API_BASE_URL=http://192.168.1.10:7010</ThemedText>
+          <ThemedText type="code">
+            EXPO_PUBLIC_API_BASE_URL=https://subasa.lk/voc-si/api/api-gateway
+          </ThemedText>
         </ThemedView>
         <ThemedText type="small" themeColor="textSecondary">
           Copy .env.example to .env to get started.

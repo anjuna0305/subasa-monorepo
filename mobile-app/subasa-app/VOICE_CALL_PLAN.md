@@ -20,8 +20,9 @@ the exact sequence and payload shapes.
 | Hero image | `GET /custom-chatbots/images/{image_name}` | none | — | image bytes |
 | Transcribe | `POST https://subasa.lk/voc-si/api/asr/transcribe` | none | multipart, field `file` | `{ "transcription": "…" }` |
 | Reply | `POST /custom-chatbots/api/{url_path}` | none (bot must be published) | `{ "message": "…" }` | `{ "response": "…" }` |
-| Speak | `POST /tts/generate` | none | `{text, speaker, speaker_type, voice, input_type}` | `{ "audioUrl": "https://…/tts/output/x.wav" }` |
-| Fetch audio | `GET /tts/output/{file_name}` | none | — | wav bytes |
+| Speak | `POST /tts/prepare` | none | `{text, speaker, speaker_type, voice, input_type}` | `{ "streamUrl": "https://…/tts/stream/{id}.wav" }` |
+| Play audio | `GET /tts/stream/{id}.wav` | none | — | wav bytes, streamed sentence by sentence |
+| Speak (fallback) | `POST /tts/generate` → `GET /tts/output/{file_name}` | none | same payload | `{ "audioUrl": … }`, whole file |
 
 TTS defaults, matching the web client:
 
@@ -184,12 +185,15 @@ only thing that changes — the provider keeps its interface and starts hydratin
 
 ## 5. Turn latency
 
-ASR → LLM → TTS run strictly in sequence, so every turn costs the sum of all three plus the
-wav download. That is inherent to the current endpoints.
+ASR → LLM → TTS run in sequence, so a turn costs roughly the sum of all three.
 
-If it feels sluggish on device, the cheap improvement is splitting the reply on sentence
-boundaries, calling `/tts/generate` per sentence, and starting playback on the first clip
-while the rest synthesize. Worth measuring before building — deferred to phase 4.
+The TTS leg is no longer paid in full: the app calls `/tts/prepare` and plays
+`/tts/stream/{id}.wav`, which the TTS service synthesizes sentence by sentence, so audio
+starts after the first sentence instead of after the whole reply. `EXPO_PUBLIC_TTS_STREAMING=false`
+switches back to the file-based route if a device's player struggles with a chunked wav.
+
+The LLM leg is the remaining serial cost. `chatbot-modified` does not stream its Groq
+response; streaming it and forwarding sentences into TTS as they land is the next real win.
 
 A streaming path exists but isn't usable as-is: `POST /transcribe/whisper/stream` is SSE,
 which React Native's `fetch` doesn't stream, and `frontend/new-chat-app/src/utils/voiceStream.ts`

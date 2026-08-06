@@ -27,6 +27,13 @@ export const TTS_VOICE = {
   input_type: 'sinhala',
 } as const;
 
+/**
+ * Streamed synthesis starts playing after the first sentence instead of waiting for the
+ * whole reply. Set EXPO_PUBLIC_TTS_STREAMING=false to fall back to the file-based
+ * `/tts/generate` route if a device's player struggles with a chunked wav.
+ */
+export const TTS_STREAMING = (process.env.EXPO_PUBLIC_TTS_STREAMING ?? 'true') !== 'false';
+
 export const RequestTimeouts = {
   /** Chatbot replies and speech synthesis are both slow paths. */
   default: 20_000,
