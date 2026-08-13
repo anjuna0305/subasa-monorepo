@@ -183,6 +183,17 @@ async def login(payload: UserLogin, db: AsyncSession = Depends(get_db)):
             detail=[{"field": "password", "message": "Incorrect password."}],
         )
 
+    if not user.is_active:
+        raise HTTPException(
+            status_code=401,
+            detail=[
+                {
+                    "field": "user",
+                    "message": "User is blocked. Please contact your organization admin or system admin",
+                }
+            ],
+        )
+
     return tokenOutResponse(user)
 
 
