@@ -7,5 +7,5 @@ export function isOrgAdmin(role: string | null) {
 }
 
 export function isOrgUser(role: string | null) {
-  return role === "admin_user";
+  return role === "org_user";
 }
