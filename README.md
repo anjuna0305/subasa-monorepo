@@ -1,4 +1,7 @@
 ﻿# Subasa Monorepo
+#  Subasa Project.
+
+
 
 **Subasa** is a Sinhala-language AI platform combining automatic speech recognition (ASR), text-to-speech (TTS), and conversational AI into a unified, containerised system.
 
