@@ -142,9 +142,26 @@ frontend/
   voicebot/        legacy SPA, deprecated
 mobile-app/
   subasa-app/      Expo starter — not yet built out (issues #47–#51)
+grafana/           Prometheus + Grafana provisioning
 loadtests/         k6 scenarios
 docs/              security audit, testing guide
 ```
+
+**Every service has its own README** with its endpoints, configuration and
+known issues. Read the one for the service you are touching before this file:
+
+| | |
+|---|---|
+| [`backend/api-gateway`](backend/api-gateway/README.md) | auth, metering, proxying, tasks |
+| [`backend/ASR`](backend/ASR/README.md) | the three speech-to-text models |
+| [`backend/TTS`](backend/TTS/README.md) | the six voices and the streaming formats |
+| [`backend/chatbot-modified`](backend/chatbot-modified/README.md) | custom-chatbot RAG |
+| [`backend/framework`](backend/framework/README.md) | upload-then-chat RAG |
+| [`backend/shared`](backend/shared/README.md) | the shared RAG recipe and token accounting |
+| [`frontend/new-chat-app`](frontend/new-chat-app/README.md) | the web app |
+| [`frontend/voicebot`](frontend/voicebot/README.md) | the deprecated SPA |
+| [`mobile-app/subasa-app`](mobile-app/subasa-app/README.md) | the mobile scaffold |
+| [`grafana`](grafana/README.md) | monitoring |
 
 ## Known gaps
 
