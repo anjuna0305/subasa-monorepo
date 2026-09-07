@@ -50,6 +50,8 @@ export const API_ENDPOINTS = {
   USER_UNBLOCK: (id: string) => `${API_BASE_URL}/users/${id}/unblock`,
   GET_ME: `${API_BASE_URL}/users/me`,
 
+  USAGE_SUMMARY: `${API_BASE_URL}/usage/summary`,
+
   ASR_TRANSCRIBE: `${API_BASE_URL}/asr/transcribe`,
   ASR_TRANSCRIBE_STREAM: `${API_BASE_URL}/asr/transcribe/stream`,
   TTS_GENERATE: `${API_BASE_URL}/tts/generate`,

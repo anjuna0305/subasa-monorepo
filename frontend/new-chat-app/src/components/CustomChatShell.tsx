@@ -9,8 +9,8 @@ import { Message } from "@/types/message";
 import MessageBox from "./MessageBox";
 import AudioWaveform, { AudioWaveformHandle } from "./AudioWaveForm";
 import { API_ENDPOINTS } from "@/utils/api";
+import { useAsrRecorder } from "@/hooks/useAsrRecorder";
 import { CustomChatbot } from "@/types/custom-chatbot";
-import { reencodeAudio } from "@/utils/audio";
 import axiosInstance from "@/api/axios";
 
 interface Props {
@@ -35,20 +35,6 @@ const sendCustomMessage = async (
   return res.data.response;
 };
 
-const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
-  const formData = new FormData();
-  formData.append("file", audioBlob, "audio.wav");
-  const response = await axiosInstance.post<{ transcription: string }>(
-    API_ENDPOINTS.ASR_TRANSCRIBE,
-    formData,
-    {
-     withCredentials: false ,
-    headers: { "Content-Type": "multipart/form-data"},
-    }
-  );
-  return response.data.transcription;
-};
-
 // The gateway synthesizes, stores the wav, and returns an absolute URL for it.
 const fetchTtsAudioUrl = async (text: string): Promise<string> => {
   const payload = {
@@ -70,12 +56,8 @@ export default function CustomChatShell({ chatbotData, heroImageUrl }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
   const [isSending, setIsSending] = useState(false);
-  const [recordingState, setRecordingState] = useState<RecordingState>("idle");
 
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
   const waveformRef = useRef<AudioWaveformHandle>(null);
-  const streamRef = useRef<MediaStream | null>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -149,75 +131,37 @@ export default function CustomChatShell({ chatbotData, heroImageUrl }: Props) {
     [chatbotData.url_path],
   );
 
+  // Same VAD + SSE path the ASR page uses, so speech stops on silence and the
+  // transcript streams in rather than arriving in one lump.
+  const {
+    start: startRecording,
+    stop: stopRecording,
+    isRecording,
+    isTranscribing,
+  } = useAsrRecorder({
+    onTranscript: (transcript) => {
+      waveformRef.current?.stop();
+      void processAndSendText(transcript);
+    },
+  });
+
+  const recordingState: RecordingState = isRecording
+    ? "recording"
+    : isTranscribing
+      ? "processing"
+      : "idle";
+
   const handleSend = () => {
     processAndSendText(message);
   };
 
-  const handleStartRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-      });
-      streamRef.current = stream;
-
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: "audio/webm",
-      });
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
-
-      mediaRecorder.ondataavailable = (event) => {
-        audioChunksRef.current.push(event.data);
-      };
-
-      mediaRecorder.start();
-      waveformRef.current?.start();
-      setRecordingState("recording");
-    } catch (err) {
-      console.error("Microphone access error:", err);
-    }
-  };
-
-  const handleStopRecording = async () => {
-    const recorder = mediaRecorderRef.current;
-    if (!recorder || recorder.state !== "recording") return;
-
-    setRecordingState("processing");
-    waveformRef.current?.stop();
-
-    const pendingChunks = [...audioChunksRef.current];
-
-    await new Promise<void>((resolve) => {
-      recorder.onstop = () => {
-        resolve();
-      };
-      recorder.stop();
-    });
-
-    const combinedChunks = [...pendingChunks, ...audioChunksRef.current];
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-    streamRef.current = null;
-
-    const audioBlob = new Blob(combinedChunks, { type: "audio/webm" });
-
-    try {
-      const wavBlob = await reencodeAudio(audioBlob);
-      const transcription = await transcribeAudio(wavBlob);
-      if (transcription.trim()) {
-        processAndSendText(transcription);
-      }
-    } catch (err) {
-      console.error("ASR error:", err);
-    } finally {
-      setRecordingState("idle");
-    }
-  };
-
-  const handleMicClick = () => {
+  const handleMicClick = async () => {
     if (recordingState === "idle") {
-      handleStartRecording();
+      waveformRef.current?.start();
+      await startRecording();
     } else if (recordingState === "recording") {
-      handleStopRecording();
+      waveformRef.current?.stop();
+      await stopRecording();
     }
   };
 
