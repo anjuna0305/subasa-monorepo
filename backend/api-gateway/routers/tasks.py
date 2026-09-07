@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Header
+from fastapi.responses import Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -92,8 +93,6 @@ async def download_task_result(
             status_code=404,
             detail=[{"field": "response_body", "message": "No response body available for this task."}],
         )
-
-    from fastapi.responses import Response
 
     return Response(
         content=task.response_body,

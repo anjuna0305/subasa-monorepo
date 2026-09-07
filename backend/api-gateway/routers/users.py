@@ -139,7 +139,6 @@ async def register(payload: UserCreate, db: AsyncSession = Depends(get_db)):
 
 
 async def registerGoogleUser(payload: GoogleUserCreate, db: AsyncSession) -> User:
-    print(payload.name)
     if await db.scalar(select(User).where(User.email == payload.email)):
         raise HTTPException(
             status_code=409,

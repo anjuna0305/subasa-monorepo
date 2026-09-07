@@ -25,7 +25,3 @@ CUSTOM_CHATBOT_SERVICE_URL = os.environ.get(
 TTS_SERVICE_URL = os.environ.get("TTS_SERVICE_URL", "http://localhost:7002")
 PUBLIC_BASE_URL = os.environ.get("PUBLIC_BASE_URL", "")
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
-GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
-GOOGLE_REDIRECT_URI = os.environ.get(
-    "GOOGLE_REDIRECT_URI", "http://localhost:8000/users/login-with-google"
-)

@@ -69,13 +69,6 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     )
 
 
-# @app.middleware("http")
-# async def delay_middleware(request: Request, call_next):
-#     response = await call_next(request)
-#     await asyncio.sleep(1)
-#     return response
-
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

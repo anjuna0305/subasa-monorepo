@@ -28,10 +28,8 @@ import PeopleIcon from "@mui/icons-material/People";
 import { Service } from "@/types/service";
 import { isAdmin, isOrgAdmin } from "@/utils/auth";
 import { useAuth } from "@/hooks/useAuth";
-import { useOrganiztion } from "@/hooks/organiztion/useOrganization";
 import { Avatar, Typography } from "@mui/material";
 import { useUser } from "@/hooks/user/user";
-import { toUpperCase } from "zod";
 
 const drawerWidth = 240;
 
@@ -111,7 +109,7 @@ export default function SideBar({ services }: SideBarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const pathname = location.pathname;
-  const { role, logout, isAuthenticated, organization_uuid } = useAuth();
+  const { role, logout, isAuthenticated } = useAuth();
 
   const open = isAdmin(role) || isOrgAdmin(role) ? true : !collapsed;
 
@@ -124,7 +122,6 @@ export default function SideBar({ services }: SideBarProps) {
     return pathname.startsWith(path);
   };
 
-  // const { data: org } = useOrganiztion(organization_uuid || "");
   const { data: user } = useUser();
 
   return (

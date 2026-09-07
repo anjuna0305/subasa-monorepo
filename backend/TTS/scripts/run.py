@@ -1,5 +1,11 @@
-from TTS.api import TTS
 import os
+import sys
+
+# These scripts live one level below the package they import (text/, model.py),
+# so make backend/TTS importable however the script is invoked.
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from TTS.api import TTS
 
 # Import your preprocessing functions
 from text import text_to_sequence

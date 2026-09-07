@@ -107,7 +107,6 @@ export default function RegisterPage() {
                 onSuccess={handleGoogleSuccess}
                 onError={handleError}
               />
-              ;
             </Box>
           </form>
         </Box>

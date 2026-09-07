@@ -1,23 +1,31 @@
 import json
 
 from fastapi import APIRouter, Depends, Header, Request
-from fastapi.responses import Response, StreamingResponse
+from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api_key_validator import validate_api_key
 from database import get_db
 from models import ResponseType, Task, UsageLog
 from schemas import TaskSubmitOut
+from routers._http import get_http_client
 from task_worker import get_queue
 
 router = APIRouter(prefix="/api", tags=["gateway"])
+
+
+# Hop-by-hop and gateway-only headers that must not reach the upstream service:
+# `host` would point at the gateway, `content-length` is recomputed by httpx from
+# the body we pass, and `x-api-key` is a gateway credential the upstream has no
+# business seeing.
+_STRIPPED_HEADERS = frozenset({"host", "x-api-key", "content-length"})
 
 
 def _build_forward_headers(request: Request) -> str:
     headers = {
         k: v
         for k, v in request.headers.items()
-        # if k.lower() not in ("host", "x-api-key", "content-length")
+        if k.lower() not in _STRIPPED_HEADERS
     }
     return json.dumps(headers)
 
@@ -55,10 +63,6 @@ async def gateway_proxy(
         await queue.put(task.id)
 
         return TaskSubmitOut(task_uuid=task.uuid, status=task.status)
-
-    import httpx
-
-    from routers._http import get_http_client
 
     client = get_http_client()
 

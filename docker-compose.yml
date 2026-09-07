@@ -19,16 +19,6 @@ services:
             - "7000:6000"
         volumes:
             - $HOME/.cache/huggingface:/root/.cache/huggingface
-    chatbot-be:
-        build:
-            context: ./backend/chatbot
-            dockerfile: Dockerfile
-        container_name: chatbot-be
-        restart: unless-stopped
-        ports:
-            - "7001:6001"
-        volumes:
-            - $HOME/.cache/huggingface:/root/.cache/huggingface
     chatbot-mod:
         build:
             context: ./backend/chatbot-modified
