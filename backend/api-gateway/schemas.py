@@ -376,3 +376,26 @@ class TtsGenerateRequest(BaseModel):
 
 class TtsGenerateResponse(BaseModel):
     audioUrl: str
+
+
+class UsageSummaryRow(BaseModel):
+    api_key_uuid: str
+    api_key_label: str | None
+    user_uuid: str
+    user_name: str
+    user_email: str
+    organization_name: str | None
+    service_uuid: str
+    service_key: str
+    service_name: str
+    total_tokens_used: int
+    request_count: int
+    error_count: int
+    usage_limit: int | None
+    last_request_at: datetime | None
+
+
+class UsageSummaryOut(BaseModel):
+    items: list[UsageSummaryRow]
+    total_tokens_used: int
+    total_requests: int

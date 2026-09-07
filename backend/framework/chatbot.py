@@ -6,7 +6,7 @@ from threading import Lock
 from typing import Optional, Tuple
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, HTTPException, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
@@ -136,7 +136,7 @@ async def upload_file(file: UploadFile = File(...)):
 
 
 @app.post("/chat")
-async def chat(request: ChatRequest):
+async def chat(request: ChatRequest, response: Response):
     if not request.message:
         raise HTTPException(status_code=400, detail="පණිවිඩයක් සපයා නැත")
 
@@ -155,7 +155,10 @@ async def chat(request: ChatRequest):
         )
 
     try:
-        return {"response": rag.answer(chain, request.message)}
+        answer, tokens_used = rag.answer_with_usage(chain, request.message)
+        # The gateway reads this header to meter the caller's usage.
+        response.headers["X-Tokens-Used"] = str(tokens_used)
+        return {"response": answer}
     except Exception:
         logger.exception("Query failed for document %s", key)
         raise HTTPException(status_code=500, detail="ඉල්ලීම සැකසීමේ දෝෂයකි")

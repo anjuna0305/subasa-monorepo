@@ -1,4 +1,5 @@
 import json
+import math
 import os
 from io import BytesIO
 from threading import Thread
@@ -7,7 +8,7 @@ import librosa
 import numpy as np
 import soundfile as sf
 import uvicorn
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, HTTPException, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from prometheus_fastapi_instrumentator import Instrumentator
@@ -68,27 +69,45 @@ def process_audio_file(file: UploadFile):
     return audio_data
 
 
-def _transcribe(model, file: UploadFile):
+def _billed_seconds(audio) -> int:
+    """Audio duration, rounded up — the unit ASR usage is metered in."""
+    return max(1, math.ceil(len(audio) / SAMPLE_RATE))
+
+
+def _transcribe(model, file: UploadFile, response: Response):
     try:
-        return model.transcribe(process_audio_file(file))
+        audio = process_audio_file(file)
+        transcription = model.transcribe(audio)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    # The gateway reads this header to meter the caller's usage.
+    response.headers["X-Tokens-Used"] = str(_billed_seconds(audio))
+    return transcription
 
 
 @app.post("/transcribe")
-async def process_audio_bert(file: UploadFile = File(...)):
-    transcription = _transcribe(bert, file)
-    return JSONResponse(content={"transcription": process_sentence(transcription)})
+async def process_audio_bert(response: Response, file: UploadFile = File(...)):
+    transcription = _transcribe(bert, file, response)
+    return JSONResponse(
+        content={"transcription": process_sentence(transcription)},
+        headers=dict(response.headers),
+    )
 
 
 @app.post("/transcribe/wav")
-async def process_audio_wav(file: UploadFile = File(...)):
-    return JSONResponse(content={"transcription": _transcribe(wav, file)})
+async def process_audio_wav(response: Response, file: UploadFile = File(...)):
+    transcription = _transcribe(wav, file, response)
+    return JSONResponse(
+        content={"transcription": transcription}, headers=dict(response.headers)
+    )
 
 
 @app.post("/transcribe/whisper")
-async def process_audio_whisper(file: UploadFile = File(...)):
-    return JSONResponse(content={"transcription": _transcribe(whisper, file)})
+async def process_audio_whisper(response: Response, file: UploadFile = File(...)):
+    transcription = _transcribe(whisper, file, response)
+    return JSONResponse(
+        content={"transcription": transcription}, headers=dict(response.headers)
+    )
 
 
 @app.post("/transcribe/whisper/stream")
@@ -96,7 +115,8 @@ async def stream_audio_whisper(file: UploadFile = File(...)):
     # Decoding failures here happen before any bytes are sent, so they can
     # still surface as a normal error response rather than a stream event.
     try:
-        input_features = whisper.features(process_audio_file(file))
+        audio = process_audio_file(file)
+        input_features = whisper.features(audio)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -129,6 +149,7 @@ async def stream_audio_whisper(file: UploadFile = File(...)):
         event_stream(),
         media_type="text/event-stream",
         headers={
+            "X-Tokens-Used": str(_billed_seconds(audio)),
             "Cache-Control": "no-cache",
             # nginx buffers proxied responses by default, which would hold the
             # whole stream back until generation finishes.

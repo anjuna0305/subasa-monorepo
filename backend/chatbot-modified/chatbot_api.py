@@ -4,7 +4,7 @@ from typing import Optional
 
 import redis
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from langchain_community.document_loaders import TextLoader
 from langchain_community.vectorstores import FAISS
@@ -112,7 +112,7 @@ def get_or_create_vectorstore(retrieval_key: Optional[str], file_path: str):
 
 
 @app.post("/chat")
-async def chat(chat_request: ChatRequest) -> ChatResponse:
+async def chat(chat_request: ChatRequest, response: Response) -> ChatResponse:
     if not chat_request.message:
         raise HTTPException(status_code=400, detail="No message provided")
 
@@ -123,9 +123,11 @@ async def chat(chat_request: ChatRequest) -> ChatResponse:
     db, key = get_or_create_vectorstore(chat_request.retrieval_key, full_path)
 
     chain = rag.build_retrieval_chain(db.as_retriever(), llm=llm)
-    return ChatResponse(
-        response=rag.answer(chain, chat_request.message), retrieval_key=key
-    )
+    answer, tokens_used = rag.answer_with_usage(chain, chat_request.message)
+
+    # The gateway reads this header to meter the caller's usage.
+    response.headers["X-Tokens-Used"] = str(tokens_used)
+    return ChatResponse(response=answer, retrieval_key=key)
 
 
 @app.get("/health")

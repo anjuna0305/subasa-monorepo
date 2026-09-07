@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Header
 from fastapi.responses import Response
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api_key_validator import validate_api_key
@@ -17,7 +18,9 @@ async def get_task_status(
     x_api_key: str = Header(...),
     db: AsyncSession = Depends(get_db),
 ):
-    task = await db.scalar(select(Task).where(Task.uuid == task_uuid))
+    task = await db.scalar(
+        select(Task).options(selectinload(Task.service)).where(Task.uuid == task_uuid)
+    )
     if not task:
         raise HTTPException(
             status_code=404,
@@ -41,7 +44,9 @@ async def get_task_result(
     x_api_key: str = Header(...),
     db: AsyncSession = Depends(get_db),
 ):
-    task = await db.scalar(select(Task).where(Task.uuid == task_uuid))
+    task = await db.scalar(
+        select(Task).options(selectinload(Task.service)).where(Task.uuid == task_uuid)
+    )
     if not task:
         raise HTTPException(
             status_code=404,
@@ -73,7 +78,9 @@ async def download_task_result(
     x_api_key: str = Header(...),
     db: AsyncSession = Depends(get_db),
 ):
-    task = await db.scalar(select(Task).where(Task.uuid == task_uuid))
+    task = await db.scalar(
+        select(Task).options(selectinload(Task.service)).where(Task.uuid == task_uuid)
+    )
     if not task:
         raise HTTPException(
             status_code=404,

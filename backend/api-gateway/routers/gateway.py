@@ -7,11 +7,27 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from api_key_validator import validate_api_key
 from database import get_db
 from models import ResponseType, Task, UsageLog
+from rate_limit import check_rate_limit
 from schemas import TaskSubmitOut
 from routers._http import get_http_client
 from task_worker import get_queue
 
 router = APIRouter(prefix="/api", tags=["gateway"])
+
+
+def _tokens_from_headers(headers) -> int:
+    """Read the upstream's reported usage.
+
+    Services that do not report usage, or report something unparseable, are
+    billed one unit rather than zero, so an unmetered service can never be
+    used for free.
+    """
+    raw = headers.get("X-Tokens-Used")
+    try:
+        return max(0, int(raw))
+    except (TypeError, ValueError):
+        return 1
+
 
 
 # Hop-by-hop and gateway-only headers that must not reach the upstream service:
@@ -43,6 +59,10 @@ async def gateway_proxy(
 ):
     validation = await validate_api_key(db, x_api_key, service_key)
     service = validation.service
+
+    # Checked after validation so an unknown key cannot use the limiter as an
+    # oracle, and keyed per API key rather than per IP.
+    check_rate_limit(validation.api_key.uuid)
 
     if service.response_type == ResponseType.long:
         body = await request.body()
@@ -80,7 +100,7 @@ async def gateway_proxy(
         headers=headers,
     )
 
-    tokens_used = int(upstream_resp.headers.get("X-Tokens-Used", 1))
+    tokens_used = _tokens_from_headers(upstream_resp.headers)
 
     log = UsageLog(
         api_key_id=validation.api_key.id,

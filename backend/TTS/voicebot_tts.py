@@ -98,6 +98,11 @@ def preprocess_text(input_text: str):
 SENTENCE_END = re.compile(r"(?<=[.!?෴])\s+")
 
 
+def billed_characters(text: str) -> int:
+    """Characters synthesised — the unit TTS usage is metered in."""
+    return max(1, len(text.strip()))
+
+
 def split_sentences(text: str):
     parts = [part.strip() for part in SENTENCE_END.split(text.strip())]
     return [part for part in parts if part]
@@ -202,6 +207,8 @@ def build_audio_stream(
         audio_stream(),
         media_type="audio/wav",
         headers={
+            # The gateway reads this header to meter the caller's usage.
+            "X-Tokens-Used": str(billed_characters(text)),
             "Cache-Control": "no-cache",
             "X-Accel-Buffering": "no",
         },
@@ -328,7 +335,12 @@ def generate_audio(request_data: AudioRequest):
         sf.write(buffer, result, samplerate=22050, format="WAV")
         buffer.seek(0)
 
-        return StreamingResponse(buffer, media_type="audio/wav")
+        return StreamingResponse(
+            buffer,
+            media_type="audio/wav",
+            # The gateway reads this header to meter the caller's usage.
+            headers={"X-Tokens-Used": str(billed_characters(text))},
+        )
 
         # return JSONResponse(content={"audioUrl": result})
 
