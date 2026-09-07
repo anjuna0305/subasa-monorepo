@@ -92,6 +92,8 @@ services:
             CORS_ALLOW_ORIGINS: ${CORS_ALLOW_ORIGINS}
             CUSTOM_CHATBOT_SERVICE_URL: http://localhost:7006/chat
             TTS_SERVICE_URL: http://localhost:7002
+            ASR_SERVICE_URL: http://localhost:7000
+            FRAMEWORK_SERVICE_URL: http://localhost:7003
             FILE_STORE_DIR: /app/uploads/tts
             PUBLIC_BASE_URL: ${PUBLIC_BASE_URL}
             GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}

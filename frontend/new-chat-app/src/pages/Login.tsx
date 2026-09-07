@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useAlert } from "@/hooks/useAlert";
 import { GoogleLogin } from "@react-oauth/google";
 import { useGoogleAuthHandler } from "@/hooks/useGoogleAuthHandler";
+import { POST_LOGIN_REDIRECT } from "@/utils/routes";
 
 const loginSchema = z.object({
   email: z.email("Enter a valid email address"),
@@ -40,7 +41,7 @@ export default function LoginPage() {
     setErrorMessage(null);
     try {
       await login(data);
-      const redirectTo = searchParams.get("redirect") || "/p/chatbot";
+      const redirectTo = searchParams.get("redirect") || POST_LOGIN_REDIRECT;
       navigate(decodeURIComponent(redirectTo), { replace: true });
     } catch (err) {
       const msg =

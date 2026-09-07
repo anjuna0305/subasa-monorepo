@@ -4,6 +4,7 @@ import { Box, CircularProgress, Typography } from "@mui/material";
 import { useAuth } from "@/hooks/useAuth";
 import { useAlert } from "@/hooks/useAlert";
 import { getGoogleRedirectUri } from "@/utils/api";
+import { POST_LOGIN_REDIRECT } from "@/utils/routes";
 
 export default function GoogleCallbackPage() {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ export default function GoogleCallbackPage() {
           navigate("/onboarding", { replace: true });
         } else {
           const redirectTo =
-            searchParams.get("redirect") || "/p/chatbot";
+            searchParams.get("redirect") || POST_LOGIN_REDIRECT;
           navigate(decodeURIComponent(redirectTo), { replace: true });
         }
       })

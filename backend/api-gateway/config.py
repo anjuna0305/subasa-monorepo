@@ -65,6 +65,10 @@ CUSTOM_CHATBOT_SERVICE_URL = os.environ.get(
     "CUSTOM_CHATBOT_SERVICE_URL", "http://localhost:7006/chat"
 )
 TTS_SERVICE_URL = os.environ.get("TTS_SERVICE_URL", "http://localhost:7002")
+ASR_SERVICE_URL = os.environ.get("ASR_SERVICE_URL", "http://localhost:7000")
+FRAMEWORK_SERVICE_URL = os.environ.get(
+    "FRAMEWORK_SERVICE_URL", "http://localhost:7003"
+)
 PUBLIC_BASE_URL = os.environ.get("PUBLIC_BASE_URL", "")
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 

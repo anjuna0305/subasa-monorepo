@@ -1,16 +1,20 @@
 export const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
-export const WS_BASE_URL =
-  import.meta.env.VITE_WS_BASE_URL ?? "ws://localhost:8765";
+
+/**
+ * url_path of the custom chatbot that serves the Constitution corpus, used by
+ * the /p/gov-chatbot page.
+ */
+export const GOV_CHATBOT_PATH =
+  import.meta.env.VITE_GOV_CHATBOT_PATH ?? "gov-chatbot";
 
 export const API_ENDPOINTS = {
   LOGIN: `${API_BASE_URL}/users/login`,
   GOOGLE_AUTH: `${API_BASE_URL}/users/auth/google`,
   REGISTER: `${API_BASE_URL}/users/register`,
   GOOGLE_LOGIN: `${API_BASE_URL}/users/login-with-google`,
-  CHATBOT_CHAT: `${API_BASE_URL}/voc-si/api/chatbot/chat`,
-  FRAMEWORK_UPLOAD: `${API_BASE_URL}/voc-si/api/framework/upload`,
-  ASR_WS: WS_BASE_URL,
+  FRAMEWORK_UPLOAD: `${API_BASE_URL}/framework/upload`,
+  FRAMEWORK_CHAT: `${API_BASE_URL}/framework/chat`,
   CUSTOM_CHATBOT_LIST: `${API_BASE_URL}/custom-chatbots`,
   CUSTOM_CHATBOT_DETAIL: (id: string) =>
     `${API_BASE_URL}/custom-chatbots/${id}`,
@@ -46,7 +50,8 @@ export const API_ENDPOINTS = {
   USER_UNBLOCK: (id: string) => `${API_BASE_URL}/users/${id}/unblock`,
   GET_ME: `${API_BASE_URL}/users/me`,
 
-  ASR_TRANSCRIBE: `https://subasa.lk/voc-si/api/asr/transcribe`,
+  ASR_TRANSCRIBE: `${API_BASE_URL}/asr/transcribe`,
+  ASR_TRANSCRIBE_STREAM: `${API_BASE_URL}/asr/transcribe/stream`,
   TTS_GENERATE: `${API_BASE_URL}/tts/generate`,
 };
 

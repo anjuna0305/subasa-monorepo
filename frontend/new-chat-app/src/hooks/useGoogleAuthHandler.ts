@@ -2,6 +2,7 @@ import { useNavigate, useSearchParams } from "react-router";
 import { useAuth } from "./useAuth";
 import { CredentialResponse } from "@react-oauth/google";
 import { authGoogle } from "@/api/loginWithGoogle";
+import { POST_LOGIN_REDIRECT } from "@/utils/routes";
 
 export function useGoogleAuthHandler() {
   const { updateAuthStates } = useAuth();
@@ -14,7 +15,7 @@ export function useGoogleAuthHandler() {
     const data = await authGoogle(credentialResponse);
     updateAuthStates(data);
 
-    const redirectTo = searchParams.get("redirect") || "/p/chatbot";
+    const redirectTo = searchParams.get("redirect") || POST_LOGIN_REDIRECT;
     navigate(decodeURIComponent(redirectTo), { replace: true });
   };
 

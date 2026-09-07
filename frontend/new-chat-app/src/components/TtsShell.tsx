@@ -1,112 +1,60 @@
+import {
+  Alert,
+  Box,
+  CircularProgress,
+  MenuItem,
+  Select,
+  Typography,
+} from "@mui/material";
+import { ChangeEvent, ReactNode, useState } from "react";
 
-import { Box, SelectChangeEvent } from "@mui/material";
-import IconButton from "@mui/material/IconButton";
-import SendIcon from "@mui/icons-material/Send";
-import { ChangeEvent, ReactNode, useEffect, useRef, useState } from "react";
-import { Typography } from "@mui/material";
 import LiteCard from "./LiteCard";
 import InvisibleInput from "./InvisibleInput";
-import { Message } from "@/types/message";
-import { VoiceChat } from "@mui/icons-material";
 import ColorBgButton from "./ColorBgButton";
-import GenericSelector from "./GenericSelector";
+import {
+  DEFAULT_TTS_VOICE,
+  generateTtsAudio,
+  TTS_VOICES,
+  TtsVoiceOption,
+} from "@/api/tts";
 
 interface Props {
   heading?: ReactNode;
 }
 
-interface Voice {
-  id: string;
-  labelName: string;
-  codeName: string;
-}
-
-interface CharType {
-  id: string;
-  labelName: string;
-  codeName: string;
-}
-
-const getVoices = async (): Promise<Voice[]> => {
-  return [
-    {
-      id: "1",
-      labelName: "Male",
-      codeName: "male-001",
-    },
-    {
-      id: "2",
-      labelName: "Female",
-      codeName: "female-001",
-    },
-  ] as Voice[];
-};
-
-const getCharTypes = async (): Promise<CharType[]> => {
-  return [
-    {
-      id: "1",
-      labelName: "Sinhala",
-      codeName: "sinhala-001",
-    },
-    {
-      id: "2",
-      labelName: "Roman",
-      codeName: "roman-001",
-    },
-  ] as Voice[];
-};
+const MAX_CHARS = 2000;
 
 export default function TtsShell({ heading }: Props) {
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [typingAllowed, setTypingAllowed] = useState(true);
-  const bottomRef = useRef<HTMLDivElement>(null);
-  const [voice, setVoice] = useState<Voice>();
-  const [voiceList, setVoiceList] = useState<Voice[]>([]);
-  const [charType, setCharType] = useState<CharType>();
-  const [charTypeList, setCharTypeList] = useState<CharType[]>([]);
+  const [text, setText] = useState("");
+  const [option, setOption] = useState<TtsVoiceOption>(DEFAULT_TTS_VOICE);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchVoiceList = async () => {
-      const data = await getVoices();
-      if (data) setVoiceList(data);
-      else setVoiceList([] as Voice[]);
-    };
+  const canGenerate = text.trim().length > 0 && !isGenerating;
 
-    const fetchCharList = async () => {
-      const data = await getCharTypes();
-      if (data) setCharTypeList(data);
-      else setCharTypeList([] as Voice[]);
-    };
-
-    fetchCharList();
-    fetchVoiceList();
-  }, []);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  const updateMessage = (
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement, Element>,
+  const updateText = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    console.log("value is updated.");
-    setMessage(event.target.value);
+    setText(event.target.value.slice(0, MAX_CHARS));
   };
 
-  const handleSend = () => {
-    if (!message.trim()) return;
-    setMessages((prev) => [
-      ...prev,
-      { id: Date.now(), text: message, role: "user" },
-      {
-        id: Date.now() + 2,
-        text: "this is the message from bot mf",
-        role: "bot",
-      },
-    ]);
-    setMessage("");
+  const handleGenerate = async () => {
+    if (!canGenerate) return;
+    setIsGenerating(true);
+    setError(null);
+    try {
+      // Replacing the URL is enough to reload the player; the previous file
+      // stays on the gateway, which serves it from disk.
+      setAudioUrl(await generateTtsAudio(text, option));
+    } catch (e) {
+      setError(
+        e instanceof Error ? e.message : "කථනය ජනනය කිරීමට නොහැකි විය.",
+      );
+      setAudioUrl(null);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -123,8 +71,7 @@ export default function TtsShell({ heading }: Props) {
         mx: "auto",
       }}
     >
-      {/* headed area */}
-      {messages.length == 0 && (
+      {!audioUrl && (
         <Box
           sx={{
             display: "flex",
@@ -140,48 +87,22 @@ export default function TtsShell({ heading }: Props) {
         </Box>
       )}
 
-      {/* messages area */}
-      {messages.length > 0 && (
-        <Box
-          sx={{
-            flexGrow: 1,
-            overflowY: "auto",
-            p: 2,
-            flexDirection: "column",
-            gap: 2,
-            width: "100%",
-            maxWidth: "900px",
-          }}
-        >
-          {messages.map((msg) => (
-            <Box
-              key={msg.id}
-              sx={{
-                display: "flex",
-                justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
-              }}
-            >
-              <Box
-                sx={{
-                  maxWidth: "90%",
-                  px: 2,
-                  py: 1,
-                  borderRadius: 2,
-                  bgcolor: msg.role === "user" ? "primary.main" : "grey.200",
-                  color: msg.role === "user" ? "white" : "text.primary",
-                }}
-              >
-                <Typography>{msg.text}</Typography>
-              </Box>
-            </Box>
-          ))}
-          <div ref={bottomRef} />
+      {audioUrl && (
+        <Box sx={{ width: "100%", maxWidth: "900px", pb: 2 }}>
+          {/* keyed on the URL so a new synthesis resets playback position */}
+          <audio key={audioUrl} controls src={audioUrl} style={{ width: "100%" }}>
+            <track kind="captions" />
+          </audio>
         </Box>
       )}
 
-      {/*text box part*/}
+      {error && (
+        <Alert severity="error" sx={{ width: "100%", maxWidth: "900px", mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+
       <LiteCard
-        // paddingBottom={5}
         sx={{
           alignItems: "center",
           width: "100%",
@@ -192,73 +113,58 @@ export default function TtsShell({ heading }: Props) {
         <InvisibleInput
           fullWidth
           multiline
-          maxRows={6}
-          value={message}
-          onChange={(event) => updateMessage(event)}
+          maxRows={8}
+          value={text}
+          onChange={updateText}
           onKeyDown={(event) => {
-            if (event.key == "Enter") {
+            if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
               event.preventDefault();
-              handleSend();
+              void handleGenerate();
             }
           }}
-          placeholder="Message..."
-          disabled={!typingAllowed}
+          placeholder="කථනයට හැරවීමට පෙළ ඇතුළත් කරන්න..."
+          disabled={isGenerating}
         />
 
         <Box
           sx={{
-            height: "3rem",
+            minHeight: "3rem",
             width: "100%",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            gap: 1,
+            flexWrap: "wrap",
           }}
         >
-          {/* send icon */}
-          <Box sx={{ height: "3rem", display: "flex" }}>
-            <GenericSelector<Voice>
-              selected={voice}
-              onSelect={setVoice}
-              loader={getVoices}
-              getKey={(v: Voice) => v.id}
-              getLabel={(v: Voice) => v.labelName}
-              getValue={(v: Voice) => v.codeName}
-              defaultSelectOption
-            />
-
-            <GenericSelector<CharType>
-              selected={charType}
-              onSelect={setCharType}
-              loader={getCharTypes}
-              getKey={(ct: CharType) => ct.id}
-              getLabel={(ct: CharType) => ct.labelName}
-              getValue={(ct: CharType) => ct.codeName}
-              // defaultSelect={charTypeList[0]}
-              defaultSelectOption
-            />
-            {/*<IconButton
-              color="primary"
-              onClick={handleSend}
-              disabled={message ? false : true}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Select
+              size="small"
+              value={option.id}
+              onChange={(event) => {
+                const found = TTS_VOICES.find((v) => v.id === event.target.value);
+                if (found) setOption(found);
+              }}
+              disabled={isGenerating}
             >
-              <SendIcon />
-            </IconButton>*/}
+              {TTS_VOICES.map((voice) => (
+                <MenuItem key={voice.id} value={voice.id}>
+                  {voice.label}
+                </MenuItem>
+              ))}
+            </Select>
+            <Typography variant="caption" color="text.secondary">
+              {text.length}/{MAX_CHARS}
+            </Typography>
           </Box>
-          <Box sx={{ height: "3rem", display: "flex" }}>
-            <ColorBgButton>කථනයට හරවන්න 2</ColorBgButton>
-          </Box>
+
+          <ColorBgButton onClick={handleGenerate} disabled={!canGenerate}>
+            {isGenerating ? (
+              <CircularProgress size={18} sx={{ mr: 1 }} />
+            ) : null}
+            කථනයට හරවන්න
+          </ColorBgButton>
         </Box>
-        {/*<Box
-          sx={{ height: "3rem", display: "flex" }}
-        >
-          {message === "" ? (
-            <div />
-          ) : (
-            <IconButton color="primary" onClick={handleSend}>
-              <SendIcon />
-            </IconButton>
-          )}
-        </Box>*/}
       </LiteCard>
     </Box>
   );

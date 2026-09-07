@@ -11,7 +11,6 @@ import AsrPage from "./pages/Asr";
 import TtsPage from "./pages/Tts";
 import GovChatbotPage from "./pages/GovChatbot";
 import MakeChatbotPage from "./pages/MakeChatbot";
-import VoiceStreamPage from "./pages/VoiceStream";
 import CustomChatbotPage from "./pages/CustomChatbot";
 import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
@@ -46,7 +45,6 @@ function App() {
               <Route path="tts" element={<TtsPage />} />
               <Route path="gov-chatbot" element={<GovChatbotPage />} />
               <Route path="make-chatbot" element={<MakeChatbotPage />} />
-              <Route path="voice-stream" element={<VoiceStreamPage />} />
               <Route path=":url_path" element={<CustomChatbotPage />} />
             </Route>
             <Route
