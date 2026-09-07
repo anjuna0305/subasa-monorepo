@@ -17,17 +17,13 @@ def _upstream(path: str) -> str:
 
 async def _forward_file(file: UploadFile):
     content = await file.read()
-    return {
-        "file": (file.filename or "audio.wav", content, file.content_type or "audio/wav")
-    }
+    return {"file": (file.filename or "audio.wav", content, file.content_type or "audio/wav")}
 
 
 @router.post("/transcribe")
 async def transcribe(file: UploadFile = File(...)):
     client = get_http_client()
-    upstream = await client.post(
-        _upstream("/transcribe"), files=await _forward_file(file)
-    )
+    upstream = await client.post(_upstream("/transcribe"), files=await _forward_file(file))
     if upstream.status_code != 200:
         raise HTTPException(status_code=upstream.status_code, detail="ASR service error")
     return JSONResponse(content=upstream.json())

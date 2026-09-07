@@ -14,12 +14,12 @@ from routers._http import close_http_client
 from routers.api_keys import router as api_keys_router
 from routers.asr import router as asr_router
 from routers.custom_chatbots import router as custom_chatbots_router
-from routers.tts import router as tts_router
 from routers.framework import router as framework_router
 from routers.gateway import router as gateway_router
 from routers.organizations import router as organization_router
 from routers.services import router as services_router
 from routers.tasks import router as tasks_router
+from routers.tts import router as tts_router
 from routers.usage import router as usage_router
 from routers.users import router as users_router
 from task_worker import start_worker

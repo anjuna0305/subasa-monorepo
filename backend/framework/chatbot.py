@@ -124,7 +124,9 @@ async def upload_file(file: UploadFile = File(...)):
         logger.exception("Failed to process upload %s", stored_name)
         if os.path.exists(file_path):
             os.remove(file_path)
-        raise HTTPException(status_code=500, detail="ගොනුව සැකසීමේ දෝෂයකි")
+        raise HTTPException(
+            status_code=500, detail="ගොනුව සැකසීමේ දෝෂයකි"
+        ) from None
 
     return JSONResponse(
         content={
@@ -161,7 +163,9 @@ async def chat(request: ChatRequest, response: Response):
         return {"response": answer}
     except Exception:
         logger.exception("Query failed for document %s", key)
-        raise HTTPException(status_code=500, detail="ඉල්ලීම සැකසීමේ දෝෂයකි")
+        raise HTTPException(
+            status_code=500, detail="ඉල්ලීම සැකසීමේ දෝෂයකි"
+        ) from None
 
 
 @app.get("/health")

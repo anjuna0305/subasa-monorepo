@@ -8,8 +8,8 @@ from api_key_validator import validate_api_key
 from database import get_db
 from models import ResponseType, Task, UsageLog
 from rate_limit import check_rate_limit
-from schemas import TaskSubmitOut
 from routers._http import get_http_client
+from schemas import TaskSubmitOut
 from task_worker import get_queue
 
 router = APIRouter(prefix="/api", tags=["gateway"])
@@ -29,7 +29,6 @@ def _tokens_from_headers(headers) -> int:
         return 1
 
 
-
 # Hop-by-hop and gateway-only headers that must not reach the upstream service:
 # `host` would point at the gateway, `content-length` is recomputed by httpx from
 # the body we pass, and `x-api-key` is a gateway credential the upstream has no
@@ -38,11 +37,7 @@ _STRIPPED_HEADERS = frozenset({"host", "x-api-key", "content-length"})
 
 
 def _build_forward_headers(request: Request) -> str:
-    headers = {
-        k: v
-        for k, v in request.headers.items()
-        if k.lower() not in _STRIPPED_HEADERS
-    }
+    headers = {k: v for k, v in request.headers.items() if k.lower() not in _STRIPPED_HEADERS}
     return json.dumps(headers)
 
 

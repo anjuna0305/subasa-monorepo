@@ -23,17 +23,17 @@
 import os
 import subprocess
 import sys
-from packaging.version import Version
 
 import numpy
 import setuptools.command.build_py
 import setuptools.command.develop
 from Cython.Build import cythonize
+from packaging.version import Version
 from setuptools import Extension, find_packages, setup
 
 python_version = sys.version.split()[0]
 if Version(python_version) < Version("3.7") or Version(python_version) >= Version("3.11"):
-    raise RuntimeError("TTS requires python >= 3.7 and < 3.11 " "but your Python version is {}".format(sys.version))
+    raise RuntimeError("TTS requires python >= 3.7 and < 3.11 " f"but your Python version is {sys.version}")
 
 
 cwd = os.path.dirname(os.path.abspath(__file__))
@@ -59,14 +59,14 @@ def pip_install(package_name):
     subprocess.call([sys.executable, "-m", "pip", "install", package_name])
 
 
-requirements = open(os.path.join(cwd, "requirements.txt"), "r").readlines()
-with open(os.path.join(cwd, "requirements.notebooks.txt"), "r") as f:
+requirements = open(os.path.join(cwd, "requirements.txt")).readlines()
+with open(os.path.join(cwd, "requirements.notebooks.txt")) as f:
     requirements_notebooks = f.readlines()
-with open(os.path.join(cwd, "requirements.dev.txt"), "r") as f:
+with open(os.path.join(cwd, "requirements.dev.txt")) as f:
     requirements_dev = f.readlines()
 requirements_all = requirements_dev + requirements_notebooks
 
-with open("README.md", "r", encoding="utf-8") as readme_file:
+with open("README.md", encoding="utf-8") as readme_file:
     README = readme_file.read()
 
 exts = [

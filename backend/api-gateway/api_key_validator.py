@@ -1,10 +1,25 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models import ApiKey, Service, ServiceUsage, UsageLog
+
+
+def _is_expired(value: datetime | None) -> bool:
+    """Compare a stored expiry against now, in UTC.
+
+    Both MySQL DATETIME and SQLite return naive datetimes, so comparing one
+    directly against an aware datetime.now(timezone.utc) raises TypeError —
+    which turned every expiring key into a 500 instead of a 403. Stored values
+    are written as UTC, so that is what a naive one is read back as.
+    """
+    if value is None:
+        return False
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=UTC)
+    return value < datetime.now(UTC)
 
 
 class ApiKeyValidationResult:
@@ -18,9 +33,7 @@ async def validate_api_key(
     raw_api_key: str,
     service_key: str,
 ) -> ApiKeyValidationResult:
-    api_key = await db.execute(
-        select(ApiKey).where(ApiKey.key_hash == raw_api_key)
-    )
+    api_key = await db.execute(select(ApiKey).where(ApiKey.key_hash == raw_api_key))
     api_key = api_key.scalar_one_or_none()
 
     if not api_key:
@@ -35,15 +48,13 @@ async def validate_api_key(
             detail=[{"field": "api_key", "message": "API key has been deactivated."}],
         )
 
-    if api_key.expires_at and api_key.expires_at < datetime.now(timezone.utc):
+    if _is_expired(api_key.expires_at):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=[{"field": "api_key", "message": "API key has expired."}],
         )
 
-    service = await db.execute(
-        select(Service).where(Service.service_key == service_key)
-    )
+    service = await db.execute(select(Service).where(Service.service_key == service_key))
     service = service.scalar_one_or_none()
 
     if not service:
@@ -55,7 +66,12 @@ async def validate_api_key(
     if not service.is_active:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=[{"field": "service", "message": f"Service '{service_key}' is currently unavailable."}],
+            detail=[
+                {
+                    "field": "service",
+                    "message": f"Service '{service_key}' is currently unavailable.",
+                }
+            ],
         )
 
     service_usage = await db.execute(
@@ -69,10 +85,15 @@ async def validate_api_key(
     if not service_usage:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=[{"field": "api_key", "message": "API key does not have access to the requested service."}],
+            detail=[
+                {
+                    "field": "api_key",
+                    "message": "API key does not have access to the requested service.",
+                }
+            ],
         )
 
-    if service_usage.expires_at and service_usage.expires_at < datetime.now(timezone.utc):
+    if _is_expired(service_usage.expires_at):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=[{"field": "service_usage", "message": "Service usage allocation has expired."}],

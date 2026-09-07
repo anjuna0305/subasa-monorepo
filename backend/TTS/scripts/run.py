@@ -5,21 +5,21 @@ import sys
 # so make backend/TTS importable however the script is invoked.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from TTS.api import TTS
+from model import checkpoint_path, config_path
 
 # Import your preprocessing functions
-from text import text_to_sequence
 from text.cleaners import sinhala_cleaners
-from model import config_path, checkpoint_path
+from TTS.api import TTS
+
 
 # Preprocess text input
 def preprocess_text(input_text):
     """
     Preprocess input text for the Sinhala TTS model.
-    
+
     Args:
         input_text (str): Raw input text in Sinhala.
-    
+
     Returns:
         list[int]: Preprocessed text converted to a sequence of IDs.
     """
@@ -35,22 +35,22 @@ def preprocess_text(input_text):
 def generate_tts_output(input_text, output_dir="output"):
     """
     Generate TTS output from input text and save the audio to a specified directory.
-    
+
     Args:
         input_text (str): Raw input text in Sinhala.
         output_dir (str): Directory to save the output audio file.
     """
     # Preprocess the input text
     preprocessed_text = preprocess_text(input_text)
-    
+
     # Load TTS model
     tts = TTS(model_path=checkpoint_path, config_path=config_path)
-    
+
     # Generate audio
     audio_path = os.path.join(output_dir, "output.wav")
     os.makedirs(output_dir, exist_ok=True)
     tts.tts_to_file(text=preprocessed_text, file_path=audio_path)
-    
+
     print(f"Generated audio saved to: {audio_path}")
 
 # Example usage

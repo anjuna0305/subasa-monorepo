@@ -1,21 +1,25 @@
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
-from fastapi.middleware.cors import CORSMiddleware
-from prometheus_fastapi_instrumentator import Instrumentator
-from pydantic import BaseModel
-from huggingface_hub import hf_hub_download, login
-from TTS.api import TTS
-import os
-from text.cleaners import sinhala_cleaners
-import uvicorn
 import io
+import logging
+import os
 import re
 import struct
 import time
 import uuid
 from threading import Lock
+
 import numpy as np
 import soundfile as sf
+import uvicorn
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from huggingface_hub import hf_hub_download, login
+from prometheus_fastapi_instrumentator import Instrumentator
+from pydantic import BaseModel
+from text.cleaners import sinhala_cleaners
+from TTS.api import TTS
+
+logger = logging.getLogger("tts")
 
 app = FastAPI()
 
@@ -93,7 +97,9 @@ def preprocess_text(input_text: str):
     try:
         return sinhala_cleaners(input_text)
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Text preprocessing failed: {e}")
+        raise HTTPException(
+            status_code=400, detail=f"Text preprocessing failed: {e}"
+        ) from e
 
 SENTENCE_END = re.compile(r"(?<=[.!?෴])\s+")
 
@@ -297,15 +303,16 @@ def generate_audio(request_data: AudioRequest):
             model.tts_to_file(text=preprocessed_text, speaker=speaker, file_path=output_path)
 
         return JSONResponse(content={"audioUrl": f"/output/{os.path.basename(output_path)}"})
-    except HTTPException as e:
-        raise e
+    except HTTPException:
+        raise
     except Exception as e:
-        print(f"Internal Server Error: {e}")
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        # Logged, not returned: the client gets a fixed message.
+        logger.exception("Synthesis failed")
+        raise HTTPException(status_code=500, detail="Internal Server Error") from e
 
 # generate audio and return audio
 @app.post("/generate")
-def generate_audio(request_data: AudioRequest):
+def generate_audio_file(request_data: AudioRequest):
     try:
         text = request_data.text.strip()
         speaker = request_data.speaker.lower()
@@ -344,11 +351,12 @@ def generate_audio(request_data: AudioRequest):
 
         # return JSONResponse(content={"audioUrl": result})
 
-    except HTTPException as e:
-        raise e
+    except HTTPException:
+        raise
     except Exception as e:
-        print(f"Internal Server Error: {e}")
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        # Logged, not returned: the client gets a fixed message.
+        logger.exception("Synthesis failed")
+        raise HTTPException(status_code=500, detail="Internal Server Error") from e
 
 @app.get("/")
 def index():

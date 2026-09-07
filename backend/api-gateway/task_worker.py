@@ -1,7 +1,7 @@
 import asyncio
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import httpx
 from sqlalchemy import select
@@ -27,7 +27,6 @@ def _tokens_from_headers(headers) -> int:
         return max(0, int(raw))
     except (TypeError, ValueError):
         return 1
-
 
 
 def get_queue() -> asyncio.Queue[int]:
@@ -71,7 +70,7 @@ async def _process_task(task_id: int, client: httpx.AsyncClient) -> None:
             task.response_body = resp.content
             task.response_content_type = resp.headers.get("content-type")
             task.tokens_used = tokens_used
-            task.completed_at = datetime.now(timezone.utc)
+            task.completed_at = datetime.now(UTC)
 
             log = UsageLog(
                 api_key_id=task.api_key_id,
@@ -86,7 +85,7 @@ async def _process_task(task_id: int, client: httpx.AsyncClient) -> None:
             logger.exception("Task %s failed", task_id)
             task.status = TaskStatus.failed
             task.error_message = str(exc)[:1000]
-            task.completed_at = datetime.now(timezone.utc)
+            task.completed_at = datetime.now(UTC)
 
             log = UsageLog(
                 api_key_id=task.api_key_id,

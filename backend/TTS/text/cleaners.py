@@ -1,12 +1,12 @@
 import re
-from .numbers import normalize_numbers
 
+from .numbers import normalize_numbers
 
 # Regular expression matching whitespace:
 _whitespace_re = re.compile(r'\s+')
 
 # List of (regular expression, replacement) pairs for abbreviations:
-_abbreviations = [(re.compile('\%s.' % x[0]), x[1]) for x in [
+_abbreviations = [(re.compile(r'\%s.' % x[0]), x[1]) for x in [
   ('පෙ.ව.', 'පෙරවරු '),
   ('ප.ව.', 'පස්වරු '),
   ('බු.ව.', 'බුද්ධ වර්ෂ '),

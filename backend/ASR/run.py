@@ -11,11 +11,10 @@ import uvicorn
 from fastapi import FastAPI, File, HTTPException, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
-from prometheus_fastapi_instrumentator import Instrumentator
-from transformers import TextIteratorStreamer
-
 from models import SAMPLE_RATE, bert, wav, whisper
 from postprocessing.post_processing import process_sentence
+from prometheus_fastapi_instrumentator import Instrumentator
+from transformers import TextIteratorStreamer
 
 app = FastAPI()
 
@@ -79,7 +78,7 @@ def _transcribe(model, file: UploadFile, response: Response):
         audio = process_audio_file(file)
         transcription = model.transcribe(audio)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
     # The gateway reads this header to meter the caller's usage.
     response.headers["X-Tokens-Used"] = str(_billed_seconds(audio))
     return transcription
@@ -118,7 +117,7 @@ async def stream_audio_whisper(file: UploadFile = File(...)):
         audio = process_audio_file(file)
         input_features = whisper.features(audio)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
     streamer = TextIteratorStreamer(whisper.processor.tokenizer, skip_special_tokens=True)
     errors = []

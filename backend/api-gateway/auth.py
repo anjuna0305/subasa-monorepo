@@ -24,9 +24,7 @@ async def get_current_user(
 ) -> CurrentUser:
     exc = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail=[
-            {"field": "token", "message": "Invalid or expired authentication token."}
-        ],
+        detail=[{"field": "token", "message": "Invalid or expired authentication token."}],
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
@@ -38,11 +36,9 @@ async def get_current_user(
         if user_uuid is None or email is None or role_str is None:
             raise exc
         role = UserRole(role_str)
-    except (jwt.InvalidTokenError, ValueError):
-        raise exc
-    return CurrentUser(
-        uuid=user_uuid, email=email, role=role, organization_uuid=organization_uuid
-    )
+    except (jwt.InvalidTokenError, ValueError) as err:
+        raise exc from err
+    return CurrentUser(uuid=user_uuid, email=email, role=role, organization_uuid=organization_uuid)
 
 
 def require_role(*allowed_roles: UserRole):
@@ -66,6 +62,8 @@ def require_role(*allowed_roles: UserRole):
 
 AdminUser = Annotated[CurrentUser, Depends(require_role(UserRole.admin))]
 OrgAdminUser = Annotated[CurrentUser, Depends(require_role(UserRole.organization_admin))]
-AdminOrOrgAdminUser = Annotated[CurrentUser, Depends(require_role(UserRole.admin, UserRole.organization_admin))]
+AdminOrOrgAdminUser = Annotated[
+    CurrentUser, Depends(require_role(UserRole.admin, UserRole.organization_admin))
+]
 GeneralUser = Annotated[CurrentUser, Depends(require_role(UserRole.general_user))]
 AnyUser = Annotated[CurrentUser, Depends(get_current_user)]

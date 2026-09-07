@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, Header
+from fastapi import APIRouter, Depends, Header, HTTPException
 from fastapi.responses import Response
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from api_key_validator import validate_api_key
 from database import get_db
@@ -58,7 +58,12 @@ async def get_task_result(
     if task.status not in (TaskStatus.completed, TaskStatus.failed):
         raise HTTPException(
             status_code=400,
-            detail=[{"field": "task", "message": f"Task is still {task.status.value}. Check status endpoint for updates."}],
+            detail=[
+                {
+                    "field": "task",
+                    "message": f"Task is still {task.status.value}. Check status endpoint for updates.",
+                }
+            ],
         )
 
     return TaskResultOut(
@@ -92,13 +97,20 @@ async def download_task_result(
     if task.status != TaskStatus.completed:
         raise HTTPException(
             status_code=400,
-            detail=[{"field": "task", "message": f"Task status is {task.status.value}, cannot download result."}],
+            detail=[
+                {
+                    "field": "task",
+                    "message": f"Task status is {task.status.value}, cannot download result.",
+                }
+            ],
         )
 
     if task.response_body is None:
         raise HTTPException(
             status_code=404,
-            detail=[{"field": "response_body", "message": "No response body available for this task."}],
+            detail=[
+                {"field": "response_body", "message": "No response body available for this task."}
+            ],
         )
 
     return Response(

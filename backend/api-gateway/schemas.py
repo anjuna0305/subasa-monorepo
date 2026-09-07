@@ -1,16 +1,16 @@
 from datetime import datetime
-from typing import List
+
+from pydantic import BaseModel, EmailStr, field_validator
 
 from models import ResponseType, TaskStatus, UserRole
-from pydantic import BaseModel, EmailStr, field_validator
 
 
 class UserCreate(BaseModel):
     name: str
     email: EmailStr
-    # organization_uuid: str
     password: str
-    role: UserRole = UserRole.general_user
+    # No role field: self-registration always creates a general_user, and
+    # accepting one here would imply a caller can choose their own.
 
     @field_validator("name")
     @classmethod
@@ -348,15 +348,15 @@ class AssignOrgAdmin(BaseModel):
 
 
 class AssignUsersToOrg(BaseModel):
-    user_uuids: List[str]
+    user_uuids: list[str]
 
 
 class AssignUsersToOrgOut(BaseModel):
-    user_uuids: List[str]
+    user_uuids: list[str]
 
 
 class OrganizationUserIdsOut(BaseModel):
-    user_uuids: List[str]
+    user_uuids: list[str]
 
 
 class TtsGenerateRequest(BaseModel):

@@ -38,9 +38,7 @@ def check_rate_limit(key: str) -> None:
         _prune(timestamps, now)
 
         if len(timestamps) >= RATE_LIMIT_REQUESTS:
-            retry_after = max(
-                1, int(RATE_LIMIT_WINDOW_SECONDS - (now - timestamps[0])) + 1
-            )
+            retry_after = max(1, int(RATE_LIMIT_WINDOW_SECONDS - (now - timestamps[0])) + 1)
             raise HTTPException(
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                 detail=[

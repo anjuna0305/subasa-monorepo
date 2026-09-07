@@ -53,12 +53,8 @@ JWT_EXPIRE_MINUTES = int(os.environ.get("JWT_EXPIRE_MINUTES", "1440"))
 # against different extension allowlists, so they need separate directories.
 _DEFAULT_UPLOAD_ROOT = os.path.join(os.path.dirname(__file__), "uploads")
 UPLOAD_DIR = os.environ.get("UPLOAD_DIR", _DEFAULT_UPLOAD_ROOT)
-IMAGE_UPLOAD_DIR = os.environ.get(
-    "IMAGE_UPLOAD_DIR", os.path.join(UPLOAD_DIR, "chatbot_images")
-)
-FILE_UPLOAD_DIR = os.environ.get(
-    "FILE_UPLOAD_DIR", os.path.join(UPLOAD_DIR, "chatbot_files")
-)
+IMAGE_UPLOAD_DIR = os.environ.get("IMAGE_UPLOAD_DIR", os.path.join(UPLOAD_DIR, "chatbot_images"))
+FILE_UPLOAD_DIR = os.environ.get("FILE_UPLOAD_DIR", os.path.join(UPLOAD_DIR, "chatbot_files"))
 TTS_FILE_DIR = os.environ.get("FILE_STORE_DIR", os.path.join(UPLOAD_DIR, "tts"))
 
 CUSTOM_CHATBOT_SERVICE_URL = os.environ.get(
@@ -66,9 +62,7 @@ CUSTOM_CHATBOT_SERVICE_URL = os.environ.get(
 )
 TTS_SERVICE_URL = os.environ.get("TTS_SERVICE_URL", "http://localhost:7002")
 ASR_SERVICE_URL = os.environ.get("ASR_SERVICE_URL", "http://localhost:7000")
-FRAMEWORK_SERVICE_URL = os.environ.get(
-    "FRAMEWORK_SERVICE_URL", "http://localhost:7003"
-)
+FRAMEWORK_SERVICE_URL = os.environ.get("FRAMEWORK_SERVICE_URL", "http://localhost:7003")
 PUBLIC_BASE_URL = os.environ.get("PUBLIC_BASE_URL", "")
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 
@@ -79,14 +73,10 @@ def _parse_origins(raw: str) -> list[str]:
     return [origin.strip() for origin in raw.split(",") if origin.strip()]
 
 
-CORS_ALLOW_ORIGINS = _parse_origins(
-    os.environ.get("CORS_ALLOW_ORIGINS", _DEFAULT_DEV_ORIGINS)
-)
+CORS_ALLOW_ORIGINS = _parse_origins(os.environ.get("CORS_ALLOW_ORIGINS", _DEFAULT_DEV_ORIGINS))
 if "*" in CORS_ALLOW_ORIGINS:
     # allow_credentials=True plus a wildcard origin is rejected by browsers
     # anyway, and it would let any site drive the API with a user's cookies.
-    raise ConfigError(
-        "CORS_ALLOW_ORIGINS must list explicit origins; '*' is not accepted."
-    )
+    raise ConfigError("CORS_ALLOW_ORIGINS must list explicit origins; '*' is not accepted.")
 if not CORS_ALLOW_ORIGINS:
     raise ConfigError("CORS_ALLOW_ORIGINS is empty; list at least one origin.")

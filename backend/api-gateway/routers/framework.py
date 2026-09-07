@@ -50,7 +50,5 @@ async def chat(payload: FrameworkChatRequest):
     client = get_http_client()
     upstream = await client.post(_upstream("/chat"), json=payload.model_dump())
     if upstream.status_code != 200:
-        raise HTTPException(
-            status_code=upstream.status_code, detail="Document service error"
-        )
+        raise HTTPException(status_code=upstream.status_code, detail="Document service error")
     return JSONResponse(content=upstream.json())
