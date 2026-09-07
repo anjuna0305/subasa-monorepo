@@ -119,6 +119,10 @@ class TokenOut(BaseModel):
     organization_uuid: str | None
     token_type: str = "bearer"
     role: UserRole
+    # True only when this sign-in created the account, so the client can send
+    # the user through onboarding. Always False for password login, which is
+    # separate from registration.
+    is_new_user: bool = False
 
 
 class ApiKeyCreate(BaseModel):

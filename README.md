@@ -90,11 +90,25 @@ npm ci && npm run dev
 cd backend/api-gateway
 pip install -r requirements-dev.txt
 cp .env.example .env      # fill in JWT_SECRET and DATABASE_URL
-alembic upgrade head
 uvicorn main:app --reload --port 7010
 ```
 
 Interactive API docs at `http://localhost:7010/docs`.
+
+### A note on the database schema
+
+**Do not run `alembic upgrade head` — it does not work.** A past commit deleted
+ten migration files, one of which (`fd7d9a25f32a`) is still referenced as the
+`down_revision` of the surviving `a3ed621aab5e`, so alembic cannot build its
+revision map and dies with a `KeyError`. Existing databases are stamped at the
+initial revision and carry columns no surviving migration adds, so the
+`alembic_version` row does not describe the schema either.
+
+The schema is created by `Base.metadata.create_all` in `main.py`'s lifespan
+handler. That creates missing **tables** but never alters existing ones, so a
+model change against an already-deployed database has to be applied by hand.
+Rebuilding the migration history from the current models is the real fix, and
+has not been done.
 
 ## Configuration
 

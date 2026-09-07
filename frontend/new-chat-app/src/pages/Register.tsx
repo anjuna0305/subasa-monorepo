@@ -22,7 +22,7 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 export default function RegisterPage() {
   const navigate = useNavigate();
   const { addAlert } = useAlert();
-  const { handleGoogleSuccess } = useGoogleAuthHandler();
+  const { handleGoogleSuccess, handleGoogleError } = useGoogleAuthHandler();
 
   const {
     register,
@@ -42,10 +42,6 @@ export default function RegisterPage() {
     } catch {
       // Error alert handled by axios interceptor
     }
-  };
-
-  const handleError = () => {
-    addAlert("error", "Login failed. Please try again.");
   };
 
   return (
@@ -105,7 +101,7 @@ export default function RegisterPage() {
               <Divider sx={{ my: 1 }}>or</Divider>
               <GoogleLogin
                 onSuccess={handleGoogleSuccess}
-                onError={handleError}
+                onError={handleGoogleError}
               />
             </Box>
           </form>

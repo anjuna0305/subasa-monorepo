@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { useAlert } from "@/hooks/useAlert";
 import { GoogleLogin } from "@react-oauth/google";
@@ -24,11 +24,8 @@ export default function LoginPage() {
   const { login } = useAuth();
   const { addAlert } = useAlert();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const location = useLocation();
-  const { handleGoogleSuccess } = useGoogleAuthHandler();
+  const { handleGoogleSuccess, handleGoogleError } = useGoogleAuthHandler();
 
-  console.log("pathname: ", location.pathname);
-  console.log("search: ", location.search);
   const {
     register,
     handleSubmit,
@@ -113,9 +110,7 @@ export default function LoginPage() {
 
               <GoogleLogin
                 onSuccess={handleGoogleSuccess}
-                onError={() => {
-                  console.log("Login Failed");
-                }}
+                onError={handleGoogleError}
               />
             </Box>
           </form>

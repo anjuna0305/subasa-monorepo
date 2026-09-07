@@ -57,8 +57,25 @@ async def _get_user_by_uuid(db: AsyncSession, user_uuid: str) -> User | None:
     return result.scalar_one_or_none()
 
 
-@router.post("/auth/google")
+@router.post("/auth/google", response_model=TokenOut)
 async def google_login(payload: GoogleAuthRequest, db: AsyncSession = Depends(get_db)):
+    """Sign in with a Google ID token.
+
+    The client obtains the token from Google directly; the gateway only
+    verifies it. There is no authorization-code exchange here, so no client
+    secret and no redirect URI are involved.
+    """
+    if not GOOGLE_CLIENT_ID:
+        raise HTTPException(
+            status_code=503,
+            detail=[
+                {
+                    "field": "google",
+                    "message": "Google sign-in is not configured on this server.",
+                }
+            ],
+        )
+
     try:
         idinfo = id_token.verify_oauth2_token(
             payload.id_token,
@@ -66,33 +83,64 @@ async def google_login(payload: GoogleAuthRequest, db: AsyncSession = Depends(ge
             GOOGLE_CLIENT_ID,
         )
     except ValueError as err:
-        raise HTTPException(status_code=401, detail="Invalid Google token") from err
+        raise HTTPException(
+            status_code=401,
+            detail=[{"field": "id_token", "message": "Invalid Google token."}],
+        ) from err
 
     email = idinfo["email"]
-    email_verified = idinfo.get("email_verified", False)
     name = idinfo.get("name")
     google_sub = idinfo["sub"]  # stable Google user ID
     avatar_url = idinfo.get("picture")
 
-    if not email_verified:
-        raise HTTPException(status_code=401, detail="Google email not verified")
+    if not idinfo.get("email_verified", False):
+        raise HTTPException(
+            status_code=401,
+            detail=[{"field": "email", "message": "Google email is not verified."}],
+        )
 
-    # --- plug into your existing user/auth logic here ---
     result = await db.execute(
         select(User).options(selectinload(User.organization)).where(User.email == email)
     )
     user = result.scalar_one_or_none()
-    if not user:
-        createGoogleUserPayload = GoogleUserCreate(
-            name=name or "Google User",
-            email=email,
-            role=UserRole.general_user,
-            google_id=google_sub,
-            avatar_url=avatar_url or "",
-        )
-        user = await registerGoogleUser(createGoogleUserPayload, db)
+    is_new_user = user is None
 
-    return tokenOutResponse(user)
+    if is_new_user:
+        user = await registerGoogleUser(
+            GoogleUserCreate(
+                name=name or "Google User",
+                email=email,
+                role=UserRole.general_user,
+                google_id=google_sub,
+                avatar_url=avatar_url or "",
+            ),
+            db,
+        )
+    else:
+        # An account created with a password, signing in with Google for the
+        # first time: link the two rather than leaving google_id null and
+        # re-linking on every sign-in.
+        if not user.google_id:
+            user.google_id = google_sub
+        if avatar_url and not user.avatar_url:
+            user.avatar_url = avatar_url
+        await db.commit()
+        await db.refresh(user, ["organization"])
+
+    # Password login refuses blocked users; this path has to as well, or a
+    # block is trivially bypassed by signing in with Google instead.
+    if not user.is_active:
+        raise HTTPException(
+            status_code=401,
+            detail=[
+                {
+                    "field": "user",
+                    "message": "User is blocked. Please contact your organization admin or system admin",
+                }
+            ],
+        )
+
+    return tokenOutResponse(user, is_new_user=is_new_user)
 
 
 @router.post("/register", response_model=UserOut, status_code=201)
@@ -201,10 +249,15 @@ def tokenGenerator(user: User) -> str:
     return token
 
 
-def tokenOutResponse(user: User) -> TokenOut:
+def tokenOutResponse(user: User, is_new_user: bool = False) -> TokenOut:
     token = tokenGenerator(user)
     organization_uuid = str(user.organization.uuid) if user.organization else None
-    return TokenOut(access_token=token, role=user.role, organization_uuid=organization_uuid)
+    return TokenOut(
+        access_token=token,
+        role=user.role,
+        organization_uuid=organization_uuid,
+        is_new_user=is_new_user,
+    )
 
 
 @router.put("/{user_uuid}", response_model=UserOut)

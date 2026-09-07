@@ -14,7 +14,6 @@ import MakeChatbotPage from "./pages/MakeChatbot";
 import CustomChatbotPage from "./pages/CustomChatbot";
 import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
-import GoogleCallbackPage from "./pages/GoogleCallback";
 import OnboardingPage from "./pages/Onboarding";
 import AdminDashboardPage from "./pages/AdminDashboard";
 import CustomChatbotListPage from "./pages/CustomChatbotList";
@@ -34,7 +33,6 @@ function App() {
         <Route element={<RootLayout />}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/auth/callback" element={<GoogleCallbackPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route element={<AppLayout />}>
             <Route index element={<HomePage />} />

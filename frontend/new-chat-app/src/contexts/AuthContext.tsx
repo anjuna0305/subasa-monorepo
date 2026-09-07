@@ -1,10 +1,5 @@
 import React, { useCallback, useMemo } from "react";
-import {
-  LoginRequest,
-  GoogleLoginRequest,
-  GoogleLoginResponse,
-  LoginResponse,
-} from "@/types/auth";
+import { LoginRequest, LoginResponse } from "@/types/auth";
 import { API_ENDPOINTS } from "@/utils/api";
 import axiosInstance from "@/api/axios";
 import { AuthContext, AuthState } from "./authContext";
@@ -73,24 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [updateAuthStates],
   );
 
-  const loginWithGoogle = useCallback(
-    async (params: GoogleLoginRequest): Promise<boolean> => {
-      const response = await axiosInstance.post<GoogleLoginResponse>(
-        API_ENDPOINTS.GOOGLE_LOGIN,
-        params,
-      );
-
-      const data = response.data;
-
-      updateAuthStates(data);
-
-      return data.is_new_user;
-    },
-    [updateAuthStates],
-  );
-
   const logout = useCallback(() => {
-    console.log("logout called");
     localStorage.removeItem(STORAGE_KEY_TOKEN);
     localStorage.removeItem(STORAGE_KEY_ROLE);
     localStorage.removeItem(STORAGE_ORGANIZATION_UUID);
@@ -105,8 +83,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ ...authState, updateAuthStates, login, loginWithGoogle, logout }),
-    [authState, updateAuthStates, login, loginWithGoogle, logout],
+    () => ({ ...authState, updateAuthStates, login, logout }),
+    [authState, updateAuthStates, login, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
