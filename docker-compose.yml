@@ -22,8 +22,9 @@ services:
             - $HOME/.cache/huggingface:/root/.cache/huggingface
     chatbot-mod:
         build:
-            context: ./backend/chatbot-modified
-            dockerfile: Dockerfile
+            # ./backend so the image can COPY the shared RAG module
+            context: ./backend
+            dockerfile: chatbot-modified/Dockerfile
         container_name: chatbot-mod
         restart: unless-stopped
         ports:
@@ -39,8 +40,8 @@ services:
             - redis
     framework-be:
         build:
-            context: ./backend/framework
-            dockerfile: Dockerfile
+            context: ./backend
+            dockerfile: framework/Dockerfile
         container_name: framework-be
         restart: unless-stopped
         environment:

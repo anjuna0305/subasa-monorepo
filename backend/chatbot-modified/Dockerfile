@@ -2,13 +2,14 @@ FROM python:3.10-slim AS builder
 
 WORKDIR /usr/src/app
 
-COPY requirements-base.txt requirements-app.txt ./
+COPY chatbot-modified/requirements-base.txt chatbot-modified/requirements-app.txt ./
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --no-cache-dir --upgrade pip && \
     pip install --timeout=120 -r requirements-base.txt && \
     pip install --timeout=120 -r requirements-app.txt
 
-COPY . .
+COPY shared/ ./shared/
+COPY chatbot-modified/ ./
 
 # ---- runtime stage ----
 FROM python:3.10 AS runtime
