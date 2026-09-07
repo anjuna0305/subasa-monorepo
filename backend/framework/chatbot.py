@@ -22,9 +22,27 @@ app = FastAPI()
 Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
 # CORS setup
+
+# CORS origins come from the environment so a deployment cannot fall back to a
+# wildcard. Comma-separated; '*' is rejected outright.
+_DEFAULT_DEV_ORIGINS = "http://localhost:7007,http://localhost:5173"
+
+
+def _cors_origins() -> list[str]:
+    raw = os.environ.get("CORS_ALLOW_ORIGINS", _DEFAULT_DEV_ORIGINS)
+    origins = [origin.strip() for origin in raw.split(",") if origin.strip()]
+    if "*" in origins:
+        raise RuntimeError(
+            "CORS_ALLOW_ORIGINS must list explicit origins; '*' is not accepted."
+        )
+    if not origins:
+        raise RuntimeError("CORS_ALLOW_ORIGINS is empty; list at least one origin.")
+    return origins
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust this in production
+    allow_origins=_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
