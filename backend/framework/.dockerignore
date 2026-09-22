@@ -1,0 +1,12 @@
+__pycache__
+*.pyc
+*.pyo
+.git
+*.log
+venv/
+.venv/
+dist/
+build/
+uploaded_files/
+*.pdf
+*.docx

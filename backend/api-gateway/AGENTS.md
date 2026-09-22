@@ -21,7 +21,7 @@ Subasa Services Backend — An API gateway backend that proxies requests to down
 
 ```bash
 # Install dependencies
-pip install -r requirements-dev.txt
+pip install -r requirments.txt
 
 # Run database migrations
 alembic upgrade head
@@ -67,8 +67,7 @@ docker run -p 8000:8000 subasa-backend
 │   └── versions/               # Migration files
 ├── Dockerfile
 ├── alembic.ini
-├── requirements.txt            # runtime deps
-└── requirements-dev.txt        # + pytest, ruff, aiosqlite
+└── requirments.txt             # Note: filename has a typo
 ```
 
 ## Architecture
@@ -114,28 +113,18 @@ Role-based access control with roles: `admin_user`, `general_user`, `org_user`, 
 | Variable | Default | Purpose |
 |---|---|---|
 | `DATABASE_URL` | `mysql+aiomysql://subasa:your_password@localhost:3306/subasa` | Async MySQL connection string |
-| `JWT_SECRET` | *(required, no default)* | HS256 signing key; startup fails without a strong one |
+| `JWT_SECRET` | `change-me-in-production` | HS256 signing key |
 | `JWT_EXPIRE_MINUTES` | `1440` (24 hours) | JWT token expiration |
-| `UPLOAD_DIR` | `./uploads` | Upload root; images and files get separate subdirectories |
-| `CUSTOM_CHATBOT_SERVICE_URL` | `http://localhost:7006/chat` | chatbot-mod |
+| `UPLOAD_DIR` | `./uploads/chatbot_images` or `./uploads/chatbot_files` | File upload directories |
+| `CUSTOM_CHATBOT_SERVICE_URL` | `http://localhost:6002/chat` | Downstream chatbot service URL |
 
 ## Known Issues
 
-See the "Known issues" section of `README.md`, which is kept current. In short,
-worst first:
-
-1. `PUT /users/{uuid}` has no auth dependency and accepts `role` — anyone can
-   promote any account to `admin_user`.
-2. Most of `/orgs` and `/custom-chatbots` have no auth dependency either.
-3. The chatbot access model (public / registered-only / org-only / unpublished)
-   is enforced in the browser only.
-4. API keys are stored and compared in plaintext despite the `key_hash` name.
-5. Proxy routes let httpx exceptions escape, so a downed upstream produces a
-   500 with a traceback rather than a clean 502.
-6. Alembic cannot run; the schema comes from `Base.metadata.create_all`.
-
-Fixed since this file was first written: the CORS wildcard, the default JWT
-secret, the `requirments.txt` typo, `IMAGE_UPLOAD_DIR`/`FILE_UPLOAD_DIR`
-aliasing the same variable, the placeholder values in `custom_chatbots.py`, and
-the absence of tests, linting and CI — there are now 64 tests, ruff, and a
-GitHub Actions workflow.
+- Filename typo: `requirments.txt` should be `requirements.txt`
+- Both `IMAGE_UPLOAD_DIR` and `FILE_UPLOAD_DIR` read from the same `UPLOAD_DIR` env var
+- Many endpoints lack authentication (user listing, org CRUD, chatbot management)
+- CORS allows all origins (`allow_origins=["*"]`)
+- No test coverage — zero test files exist
+- No CI/CD pipeline configured
+- No linter or formatter configured (no ruff, black, mypy, or isort)
+- Hardcoded placeholder values in custom_chatbots.py create endpoint

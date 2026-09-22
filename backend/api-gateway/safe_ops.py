@@ -1,7 +1,6 @@
 import sqlalchemy as sa
-from sqlalchemy import inspect
-
 from alembic import op
+from sqlalchemy import inspect
 
 
 def table_exists(table_name: str) -> bool:
@@ -83,7 +82,10 @@ def enum_values(table_name: str, column_name: str) -> list[str]:
     )
     col_type = result.scalar()
     if col_type and isinstance(col_type, str) and col_type.startswith("enum("):
-        return [v.strip().strip("'") for v in col_type[5:-1].split(",")]
+        return [
+            v.strip().strip("'")
+            for v in col_type[5:-1].split(",")
+        ]
     return []
 
 
@@ -125,7 +127,9 @@ def safe_create_foreign_key(
             and set(fk["referred_columns"]) == set(remote_cols)
         ):
             return
-    op.create_foreign_key(constraint_name, source_table, referent_table, local_cols, remote_cols)
+    op.create_foreign_key(
+        constraint_name, source_table, referent_table, local_cols, remote_cols
+    )
 
 
 def safe_drop_foreign_key(table_name: str, fk_name: str) -> None:

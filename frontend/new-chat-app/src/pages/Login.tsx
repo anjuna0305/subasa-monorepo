@@ -4,12 +4,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+import { useLocation, useNavigate, useSearchParams } from "react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { useAlert } from "@/hooks/useAlert";
 import { GoogleLogin } from "@react-oauth/google";
 import { useGoogleAuthHandler } from "@/hooks/useGoogleAuthHandler";
-import { POST_LOGIN_REDIRECT } from "@/utils/routes";
 
 const loginSchema = z.object({
   email: z.email("Enter a valid email address"),
@@ -24,8 +23,11 @@ export default function LoginPage() {
   const { login } = useAuth();
   const { addAlert } = useAlert();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { handleGoogleSuccess, handleGoogleError } = useGoogleAuthHandler();
+  const location = useLocation();
+  const { handleGoogleSuccess } = useGoogleAuthHandler();
 
+  console.log("pathname: ", location.pathname);
+  console.log("search: ", location.search);
   const {
     register,
     handleSubmit,
@@ -38,7 +40,7 @@ export default function LoginPage() {
     setErrorMessage(null);
     try {
       await login(data);
-      const redirectTo = searchParams.get("redirect") || POST_LOGIN_REDIRECT;
+      const redirectTo = searchParams.get("redirect") || "/p/chatbot";
       navigate(decodeURIComponent(redirectTo), { replace: true });
     } catch (err) {
       const msg =
@@ -110,7 +112,9 @@ export default function LoginPage() {
 
               <GoogleLogin
                 onSuccess={handleGoogleSuccess}
-                onError={handleGoogleError}
+                onError={() => {
+                  console.log("Login Failed");
+                }}
               />
             </Box>
           </form>

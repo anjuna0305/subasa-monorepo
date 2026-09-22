@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ශ්‍රී ලංකා ආණ්ඩුක්‍රම ව්‍යවස්ථාවෙන් විමසන්න</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">අදම දැනගන්න</div>
+        <div id="chat-display" class="chat-display"></div>
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="ඔබේ ප්‍රශ්නය ටයිප් කරන්න" onkeydown="if(event.key === 'Enter') sendMessage()">
+            <button onclick="sendMessage()" class="send-button">යොමු කරන්න</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

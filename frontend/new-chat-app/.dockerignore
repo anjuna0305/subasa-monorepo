@@ -4,7 +4,3 @@ node_modules/
 dist/
 .opencode/
 .vscode/
-# Secrets are injected at run time, never baked into the image.
-.env
-.env.*
-!.env.example

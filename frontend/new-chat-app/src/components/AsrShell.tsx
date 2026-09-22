@@ -1,13 +1,19 @@
 
-import { Box, CircularProgress, Typography } from "@mui/material";
-import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { Box, Button, Tooltip, Typography } from "@mui/material";
+import { ChangeEvent, ReactNode, useEffect, useRef, useState } from "react";
+import { Message } from "@/types/message";
 import TextDisplayBox from "./TextDisplayBox";
 import ColorBgIconButton from "./ColorBgIconButton";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import { Mic } from "@mui/icons-material";
+import MicIcon from "@mui/icons-material/Mic";
+import { HideImage, Mic } from "@mui/icons-material";
+import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
+import { useCustomMicVAD } from "@/hooks/useCustomMicVad";
+import { API_ENDPOINTS } from "@/utils/api";
+import { useMicVAD } from "@ricky0123/vad-react";
+import SendIcon from "@mui/icons-material/Send";
 import CloseIcon from "@mui/icons-material/Close";
-import StopIcon from "@mui/icons-material/Stop";
-import { useAsrRecorder } from "@/hooks/useAsrRecorder";
+import Waveform2 from "./WaveForm2";
 import AudioWaveform, { AudioWaveformHandle } from "./AudioWaveForm";
 
 interface Props {
@@ -15,54 +21,77 @@ interface Props {
 }
 
 export default function AsrShell({ heading }: Props) {
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState<Message[]>([]);
   const audioWaveRef = useRef<AudioWaveformHandle>(null);
-  const [copied, setCopied] = useState(false);
-  // Finalised utterances accumulate; the in-flight one is shown separately.
-  const [transcript, setTranscript] = useState("");
 
-  const appendTranscript = useCallback((utterance: string) => {
-    setTranscript((prev) => (prev ? `${prev} ${utterance}` : utterance));
-  }, []);
+  const { start, stop, cancel, isRecording } = useVoiceRecorder(
+    API_ENDPOINTS.ASR_WS,
+    useMicVAD({
+      baseAssetPath: "https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.30/dist/",
+      onnxWASMBasePath: "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/",
+      onSpeechEnd: (audio) => {
+        handleSendRecording();
+      },
+      startOnLoad: false,
+    }),
+  );
 
-  const {
-    start,
-    stop,
-    cancel,
-    isRecording,
-    isTranscribing,
-    partial,
-    error,
-    isLoading,
-  } = useAsrRecorder({ onTranscript: appendTranscript });
+  const handleSendRecording = () => {
+    audioWaveRef.current?.stop();
+    stop();
+  };
 
+  const handleStartRecording = () => {
+    audioWaveRef.current?.start();
+    start();
+  };
+
+  const handleCancelRecording = () => {
+    audioWaveRef.current?.stop();
+    cancel();
+  };
+
+  const [copied, setCopied] = useState<boolean>(false);
+  const [responseMessage, setResponseMessage] = useState<string>(`
+    ඇමෙරිකාව සහ ඉරානය අතර තීරණාත්මක සාම සාකච්ඡා අද (10) පාකිස්තානයේ
+    මැදිහත් වීමෙන්, පාකිස්තානයේ ඉස්ලාමාබාද් අගනුවරදී පැවැත්වෙයි. සාම
+    සාකච්ඡා හේතුවෙන්, ඉස්ලාමාබාද් අගනුවරට විශේෂ ආරක්ෂාවක් යොදා ඇත. විශේෂ
+    ද පැවැසෙයි. හෝටලයට ඉහළින් ගුවන් කලාපය ද වසා දමා ඇත.
+  `);
+  const [typingAllowed, setTypingAllowed] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [transcript, partial]);
+  }, [messages]);
 
-  const handleStartRecording = async () => {
-    audioWaveRef.current?.start();
-    await start();
-  };
-
-  const handleStopRecording = async () => {
-    audioWaveRef.current?.stop();
-    await stop();
-  };
-
-  const handleCancelRecording = async () => {
-    audioWaveRef.current?.stop();
-    await cancel();
+  const updateMessage = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement, Element>,
+  ) => {
+    console.log("value is updated.");
+    setMessage(event.target.value);
   };
 
   const handleCopyToClipBoard = async () => {
-    await navigator.clipboard.writeText(transcript);
+    await navigator.clipboard.writeText(responseMessage);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const hasContent = Boolean(transcript || partial);
+  const handleSend = () => {
+    if (!message.trim()) return;
+    setMessages((prev) => [
+      ...prev,
+      { id: Date.now(), text: message, role: "user" },
+      {
+        id: Date.now() + 2,
+        text: "this is the message from bot mf",
+        role: "bot",
+      },
+    ]);
+    setMessage("");
+  };
 
   return (
     <Box
@@ -79,7 +108,7 @@ export default function AsrShell({ heading }: Props) {
       }}
     >
       {/* headed area */}
-      {!hasContent && (
+      {messages.length == 0 && (
         <Box
           sx={{
             display: "flex",
@@ -107,28 +136,29 @@ export default function AsrShell({ heading }: Props) {
         <Box>
           <AudioWaveform ref={audioWaveRef} />
         </Box>
-        <Box sx={{ width: "110px", display: "flex", alignItems: "center" }}>
+        <Box sx={{ width: "80px" }}>
           {!isRecording ? (
-            <ColorBgIconButton
-              tooltip={isLoading ? "Loading speech model" : "Start recording"}
-              onClick={handleStartRecording}
-              disabled={isLoading}
-            >
-              {isLoading ? <CircularProgress size={20} /> : <Mic />}
-            </ColorBgIconButton>
-          ) : (
-            <Box sx={{ display: "flex" }}>
+            <Box>
               <ColorBgIconButton
-                tooltip="Stop recording"
-                onClick={handleStopRecording}
+                tooltip="Start recording"
+                onClick={handleStartRecording}
               >
-                <StopIcon />
+                <Mic />
               </ColorBgIconButton>
+            </Box>
+          ) : (
+            <Box>
               <ColorBgIconButton
-                tooltip="Cancel recording"
+                tooltip="Cancel the recoring"
                 onClick={handleCancelRecording}
               >
                 <CloseIcon />
+              </ColorBgIconButton>
+              <ColorBgIconButton
+                tooltip="Send the recording"
+                onClick={handleSendRecording}
+              >
+                <SendIcon />
               </ColorBgIconButton>
             </Box>
           )}
@@ -158,51 +188,16 @@ export default function AsrShell({ heading }: Props) {
             },
           }}
         >
-          <Typography
-            sx={{
-              whiteSpace: "pre-wrap",
-              color: hasContent ? "text.primary" : "text.secondary",
-            }}
-          >
-            {hasContent ? (
-              <>
-                {transcript}
-                {/* the utterance still decoding is dimmed until it finalises */}
-                {partial && (
-                  <Typography component="span" sx={{ opacity: 0.55 }}>
-                    {transcript ? " " : ""}
-                    {partial}
-                  </Typography>
-                )}
-              </>
-            ) : isRecording ? (
-              "අසමින් සිටී..."
-            ) : (
-              "පටිගත කිරීම ආරම්භ කිරීමට මයික්‍රොෆෝනය ඔබන්න."
-            )}
-          </Typography>
-          {error && (
-            <Typography sx={{ mt: 1 }} color="error" variant="body2">
-              {error}
-            </Typography>
-          )}
-          <div ref={bottomRef} />
+          <Typography sx={{ height: "100%" }}>{responseMessage}</Typography>
         </Box>
-        {isTranscribing && (
-          <Box sx={{ position: "absolute", bottom: "12px", left: "12px" }}>
-            <CircularProgress size={16} />
-          </Box>
-        )}
-        {hasContent && (
-          <Box sx={{ position: "absolute", bottom: "8px", right: "8px" }}>
-            <ColorBgIconButton
-              tooltip={copied ? "Copied" : "Copy to clipboard"}
-              onClick={handleCopyToClipBoard}
-            >
-              <ContentCopyIcon />
-            </ColorBgIconButton>
-          </Box>
-        )}
+        <Box sx={{ position: "absolute", bottom: "8px", right: "8px" }}>
+          <ColorBgIconButton
+            tooltip={copied ? "Copied" : "Copy to clipboard"}
+            onClick={handleCopyToClipBoard}
+          >
+            <ContentCopyIcon />
+          </ColorBgIconButton>
+        </Box>
       </TextDisplayBox>
     </Box>
   );

@@ -3,7 +3,7 @@ import re
 
 def process_sentence(sentence):
     # Load question words from the file
-    with open("postprocessing/question_words.txt", encoding='utf-16') as f:
+    with open("postprocessing/question_words.txt", 'r', encoding='utf-16') as f:
         question_words = set(f.read().strip().splitlines())
 
     # Tokenize the sentence into words
