@@ -7,16 +7,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 
+from config import CORS_ALLOW_ORIGINS
 from database import engine
 from models import Base
 from routers._http import close_http_client
 from routers.api_keys import router as api_keys_router
+from routers.asr import router as asr_router
 from routers.custom_chatbots import router as custom_chatbots_router
-from routers.tts import router as tts_router
+from routers.framework import router as framework_router
 from routers.gateway import router as gateway_router
 from routers.organizations import router as organization_router
 from routers.services import router as services_router
 from routers.tasks import router as tasks_router
+from routers.tts import router as tts_router
 from routers.usage import router as usage_router
 from routers.users import router as users_router
 from task_worker import start_worker
@@ -69,16 +72,9 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     )
 
 
-# @app.middleware("http")
-# async def delay_middleware(request: Request, call_next):
-#     response = await call_next(request)
-#     await asyncio.sleep(1)
-#     return response
-
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=CORS_ALLOW_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -93,3 +89,5 @@ app.include_router(tasks_router)
 app.include_router(organization_router)
 app.include_router(custom_chatbots_router)
 app.include_router(tts_router)
+app.include_router(asr_router)
+app.include_router(framework_router)

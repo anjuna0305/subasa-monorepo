@@ -1,13 +1,14 @@
 import { Box, Typography, Button } from "@mui/material";
 import { useNavigate } from "react-router";
 import { useAuth } from "@/hooks/useAuth";
+import { POST_LOGIN_REDIRECT } from "@/utils/routes";
 
 export default function OnboardingPage() {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
   const handleContinue = () => {
-    navigate("/p/chatbot", { replace: true });
+    navigate(POST_LOGIN_REDIRECT, { replace: true });
   };
 
   const handleLogout = () => {

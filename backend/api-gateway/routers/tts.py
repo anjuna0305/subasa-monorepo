@@ -1,12 +1,12 @@
-from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import StreamingResponse, FileResponse
-
-from config import TTS_SERVICE_URL
-from schemas import TtsGenerateRequest, TtsGenerateResponse
-import uuid
 import os
+import uuid
+
 import aiofiles
-from config import TTS_FILE_DIR, PUBLIC_BASE_URL
+from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import FileResponse
+
+from config import PUBLIC_BASE_URL, TTS_FILE_DIR, TTS_SERVICE_URL
+from schemas import TtsGenerateRequest, TtsGenerateResponse
 
 router = APIRouter(prefix="/tts", tags=["tts"])
 

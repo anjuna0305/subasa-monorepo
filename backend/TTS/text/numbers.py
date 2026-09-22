@@ -1,5 +1,6 @@
 import re
-from .numbers2wordsSi import converter 
+
+from .numbers2wordsSi import converter
 
 _comma_number_re = re.compile(r'([0-9][0-9\,]+[0-9])')
 _decimal_number_re = re.compile(r'([0-9]+\.[0-9]+)')
@@ -23,14 +24,14 @@ def _expand_decimal_point(m):
     For other decimals, use the existing logic to replace '.' with ' යි දශම '.
     """
     text = m.group(1)
-    
+
     # Check for time context using regex for HH.MM format
     time_pattern = re.compile(r"(\d{1,2})\.(\d{2})")
     time_match = time_pattern.match(text)
 
     # Check if the expression is a date-related context (e.g., '10.11.2024' or '10/11/2024')
     date_match = re.match(r"(\d{1,2})[\./](\d{1,2})[\./](\d{4})", text)
-    
+
     if time_match and re.search(r"(පෙ\.ව\.|ප\.ව\.)", text):
         hours = time_match.group(1)
         minutes = time_match.group(2)

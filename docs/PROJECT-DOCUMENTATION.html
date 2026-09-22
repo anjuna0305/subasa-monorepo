@@ -1,0 +1,3589 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Subasa Documentation</title>
+  <style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+  <style type="text/css">:root{--bg:#fff;--fg:#1f2328;--muted:#59636e;--line:#d1d9e0;--code:#f6f8fa;--head:#eef3f9;--link:#0969da}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1117;--fg:#e6edf3;--muted:#9198a1;--line:#3d444d;--code:#161b22;--head:#1c2733;--link:#4493f8}}
+body{background:var(--bg);color:var(--fg);font:16px/1.6 -apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans Sinhala","Iskoola Pota",sans-serif;max-width:980px;margin:0 auto;padding:32px 16px}
+h1,h2,h3,h4{line-height:1.25;margin-top:1.8em}h1{font-size:2em;border-bottom:1px solid var(--line);padding-bottom:.3em}
+h2{font-size:1.5em;border-bottom:1px solid var(--line);padding-bottom:.3em}a{color:var(--link)}
+code{font-family:ui-monospace,Consolas,"Noto Sans Mono","Noto Sans Sinhala",monospace;font-size:85%;background:var(--code);padding:.15em .35em;border-radius:5px}
+pre{background:var(--code);padding:14px;border-radius:6px;overflow-x:auto;line-height:1.4}pre code{background:none;padding:0;font-size:13px}
+table{border-collapse:collapse;display:block;overflow-x:auto;margin:1em 0;font-size:14px}th,td{border:1px solid var(--line);padding:6px 11px;vertical-align:top}th{background:var(--head);text-align:left}
+blockquote{margin:1em 0;padding:.2em 1em;color:var(--muted);border-left:4px solid var(--line)}hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+@media print{body{max-width:none}pre,table{page-break-inside:avoid}}
+</style>
+</head>
+<body>
+<h1 id="subasa-vocsi--complete-project-documentation">Subasa (VocSi) —
+Complete Project Documentation</h1>
+<blockquote>
+<p>One document covering the whole system: what it is, how every piece
+works, how to run it, how to operate it, and what is broken. Every claim
+here was checked against the code on the
+<code>chore/handover-fixes</code> branch (last commit
+<code>e9e10a9</code>, 2026-09-08). Items marked
+<strong>[verified]</strong> were reproduced by running code; everything
+else was checked by reading the source.</p>
+<p>The per-service READMEs remain the quick reference for each service.
+Where this document and a README disagree, this document was written
+later and says why (see <a href="#21-documentation-drift">§21
+Documentation drift</a>).</p>
+</blockquote>
+<hr />
+<h2 id="table-of-contents">Table of contents</h2>
+<ol type="1">
+<li><a href="#1-what-subasa-is">What Subasa is</a></li>
+<li><a href="#2-the-product-model">The product model: roles,
+organizations, chatbot visibility</a></li>
+<li><a href="#3-system-architecture">System architecture</a></li>
+<li><a href="#4-request-flows-end-to-end">Request flows, end to
+end</a></li>
+<li><a href="#5-repository-layout">Repository layout</a></li>
+<li><a href="#6-getting-started">Getting started</a></li>
+<li><a href="#7-configuration-reference">Configuration
+reference</a></li>
+<li><a href="#8-api-gateway">api-gateway</a></li>
+<li><a href="#9-asr-be--speech-to-text">asr-be — speech to text</a></li>
+<li><a href="#10-tts-be--text-to-speech">tts-be — text to
+speech</a></li>
+<li><a href="#11-shared--the-rag-recipe">shared — the RAG
+recipe</a></li>
+<li><a href="#12-chatbot-mod--custom-chatbot-rag">chatbot-mod —
+custom-chatbot RAG</a></li>
+<li><a href="#13-framework-be--upload-then-chat-rag">framework-be —
+upload-then-chat RAG</a></li>
+<li><a href="#14-new-chat-app--the-web-app">new-chat-app — the web
+app</a></li>
+<li><a href="#15-voicebot--the-deprecated-spa">voicebot — the deprecated
+SPA</a></li>
+<li><a href="#16-subasa-app--the-mobile-scaffold">subasa-app — the
+mobile scaffold</a></li>
+<li><a href="#17-monitoring">Monitoring</a></li>
+<li><a href="#18-testing-and-ci">Testing and CI</a></li>
+<li><a href="#19-security-posture">Security posture</a></li>
+<li><a href="#20-known-issues--the-complete-list">Known issues — the
+complete list</a></li>
+<li><a href="#21-documentation-drift">Documentation drift</a></li>
+<li><a href="#22-operational-runbooks">Operational runbooks</a></li>
+<li><a href="#23-project-history-and-state">Project history and
+state</a></li>
+<li><a href="#24-recommended-next-steps">Recommended next steps</a></li>
+<li><a href="#25-glossary">Glossary</a></li>
+</ol>
+<hr />
+<h2 id="1-what-subasa-is">1. What Subasa is</h2>
+<p>Subasa (repository name <strong>VocSi</strong>) is a <strong>Sinhala
+speech and language platform</strong>. It offers three capabilities:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Capability</th>
+<th>What it does</th>
+<th>Backed by</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>ASR</strong> (speech-to-text)</td>
+<td>Transcribes spoken Sinhala, including token-by-token streaming</td>
+<td>three fine-tuned checkpoints: Wav2Vec2, Wav2Vec2-BERT, Whisper</td>
+</tr>
+<tr class="even">
+<td><strong>TTS</strong> (text-to-speech)</td>
+<td>Speaks Sinhala text (native script or romanized) in six voices</td>
+<td>Coqui VITS models</td>
+</tr>
+<tr class="odd">
+<td><strong>Document chatbots</strong></td>
+<td>Answers questions about an uploaded Sinhala document, in
+Sinhala</td>
+<td>retrieval-augmented generation (FAISS + Groq
+<code>llama-3.3-70b-versatile</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>It ships two ways:</p>
+<ul>
+<li><strong>A web app</strong> (<code>frontend/new-chat-app</code>)
+where people use those models directly, and where admins create chatbots
+over documents and publish them to the public, to registered users, or
+to one organization.</li>
+<li><strong>A metered HTTP API</strong> at
+<code>/api/{service_key}/...</code>, gated by an <code>X-Api-Key</code>
+header, with per-key rate limits and per-key-per-service usage
+quotas.</li>
+</ul>
+<p>Production is deployed at <code>subasa.lk</code> (web app under
+<code>/voc-si</code>) with the API at <code>api.subasa.lk</code>.</p>
+<hr />
+<h2 id="2-the-product-model">2. The product model</h2>
+<h3 id="21-roles">2.1 Roles</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Role (API/JWT value)</th>
+<th>DB enum name</th>
+<th>Python name</th>
+<th>Who they are</th>
+<th>Intended powers</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>admin_user</code></td>
+<td><code>admin</code></td>
+<td><code>UserRole.admin</code></td>
+<td>System administrator</td>
+<td>Everything: create organizations, assign organization admins,
+create/publish chatbots, manage any user, manage API keys, services and
+quotas</td>
+</tr>
+<tr class="even">
+<td><code>org_admin</code></td>
+<td><code>organization_admin</code></td>
+<td><code>UserRole.organization_admin</code></td>
+<td>Organization administrator (appointed by a system admin)</td>
+<td>Manage users of their own organization; create chatbots and publish
+them to their org or the public</td>
+</tr>
+<tr class="odd">
+<td><code>org_user</code></td>
+<td><code>organization_user</code></td>
+<td><code>UserRole.organization_user</code></td>
+<td>Member of an organization</td>
+<td>Use chatbots available to their organization</td>
+</tr>
+<tr class="even">
+<td><code>general_user</code></td>
+<td><code>general_user</code></td>
+<td><code>UserRole.general_user</code></td>
+<td>Anyone who registered</td>
+<td>Use public and registered-only chatbots</td>
+</tr>
+<tr class="odd">
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>Anonymous visitor</td>
+<td>Use public chatbots, ASR, TTS</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>The enum trap.</strong> SQLAlchemy stores the enum
+<strong>name</strong> in the <code>users.role</code> column, while JSON
+and JWTs use the enum <strong>value</strong>. So the database contains
+<code>admin</code>, <code>organization_admin</code>, … while the API
+speaks <code>admin_user</code>, <code>org_admin</code>, …. The ORM
+converts both ways; hand-written SQL does not. When you write
+<code>UPDATE users SET role = ...</code>, use the <strong>DB
+name</strong>.</p>
+</blockquote>
+<p>Self-registration (<code>POST /users/register</code>) and Google
+sign-in always create a <code>general_user</code>. There is no API for
+creating the first system admin other than the unauthenticated-promotion
+hole described in §20 — see <a href="#221-create-the-first-system-admin">runbook 22.1</a> for the
+proper way.</p>
+<h3 id="22-organizations">2.2 Organizations</h3>
+<p>Organizations are the tenancy boundary. A user belongs to <strong>at
+most one</strong> organization (<code>users.organization_id</code>). An
+organization is meant to have one admin — a user with role
+<code>org_admin</code> whose <code>organization_id</code> is that org.
+The schema does not enforce &quot;one admin&quot;;
+<code>PUT /orgs/{uuid}/admin</code> simply promotes a member, and
+<code>GET /orgs/{uuid}/admin</code> returns the first
+<code>org_admin</code> it finds.</p>
+<h3 id="23-chatbot-visibility">2.3 Chatbot visibility</h3>
+<p>A custom chatbot has three columns that together decide who may use
+it:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Who can use it</th>
+<th><code>is_publish</code></th>
+<th><code>is_public</code></th>
+<th><code>organization_id</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Public</td>
+<td>anyone, signed in or not</td>
+<td><code>true</code></td>
+<td><code>true</code></td>
+<td>anything</td>
+</tr>
+<tr class="even">
+<td>Registered users only</td>
+<td>any signed-in user</td>
+<td><code>true</code></td>
+<td><code>false</code></td>
+<td><code>NULL</code></td>
+</tr>
+<tr class="odd">
+<td>Organization only</td>
+<td>members of that organization</td>
+<td><code>true</code></td>
+<td><code>false</code></td>
+<td>set</td>
+</tr>
+<tr class="even">
+<td>Unpublished</td>
+<td>nobody except system admins</td>
+<td><code>false</code></td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>System admins can always use any chatbot.</p>
+<p><strong>Where this is enforced:</strong> only in the browser, in
+<code>frontend/new-chat-app/src/hooks/useChatbotAccess.ts</code>. The
+endpoint the chat actually calls
+(<code>POST /custom-chatbots/api/{url_path}</code>) checks
+<code>is_publish</code> and nothing else. See §20, issue S3.</p>
+<hr />
+<h2 id="3-system-architecture">3. System architecture</h2>
+<h3 id="31-component-diagram">3.1 Component diagram</h3>
+<pre><code>                     ┌──────────────┐          ┌───────────────────────┐
+  browser ──────────▶│ new-chat-app │─────────▶│                       │
+                     │ React SPA    │  JWT     │                       │     ┌──────────┐
+                     │ nginx :7007  │          │                       │────▶│  asr-be  │ :7000→6000
+                     └──────────────┘          │                       │     │ Wav2Vec2 │
+                                               │      api-gateway      │     │ W2V-BERT │
+  browser ──────────▶ voicebot (deprecated)    │      FastAPI :7010    │     │ Whisper  │
+                     nginx :7005 ─────────────▶│   (network_mode:host) │     └──────────┘
+                                               │                       │     ┌──────────┐
+  third party ────────────────────────────────▶│  auth · tenancy       │────▶│  tts-be  │ :7002→6002
+  X-Api-Key                                    │  API keys · quotas    │     │ 6 × VITS │
+                                               │  rate limit · tasks   │     └──────────┘
+                                               │  uploads · metering   │     ┌─────────────┐    ┌───────┐
+                                               │                       │────▶│ chatbot-mod │───▶│ Redis │
+                                               │                       │     │ :7006       │    │ FAISS │
+                                               │                       │     └─────────────┘    └───────┘
+                                               │                       │     ┌──────────────┐        │
+                                               │                       │────▶│ framework-be │   Groq API
+                                               └───────────┬───────────┘     │ :7003→6003   │  (llama-3.3
+                                                           │                 └──────────────┘   -70b)
+                                                        MySQL
+                                                           
+            Prometheus :9090  ── scrapes /metrics on every backend ──▶  Grafana :3000</code></pre>
+<h3 id="32-principles-the-design-follows">3.2 Principles the design
+follows</h3>
+<ul>
+<li><strong>The gateway is the only stateful service.</strong> It owns
+MySQL (users, orgs, keys, quotas, logs, tasks, chatbots). Every model
+service is a stateless HTTP model server — except for two in-process
+caches (TTS pending streams, framework index LRU) and chatbot-mod&#39;s
+Redis index cache.</li>
+<li><strong>Two doors into the same models.</strong>
+<ul>
+<li><strong>First-party, keyless:</strong> <code>/asr/*</code>,
+<code>/tts/*</code>, <code>/framework/*</code>,
+<code>/custom-chatbots/*</code>. Used by the web app. No metering, no
+quota.</li>
+<li><strong>Metered, key-gated:</strong>
+<code>/api/{service_key}/{path}</code>. Data-driven routing from the
+<code>services</code> table; requires <code>X-Api-Key</code>;
+rate-limited; quota- checked; every call logged in
+<code>usage_logs</code>.</li>
+</ul></li>
+<li><strong>Metering is reported by the upstream.</strong> Each model
+service sets an <code>X-Tokens-Used</code> response header; the gateway
+bills whatever it says (or 1 if it says nothing, so no call is ever
+free).</li>
+<li><strong>Secrets are injected at runtime.</strong> <code>.env</code>
+files are gitignored and excluded from every Docker build context.</li>
+<li><strong>Fail closed on config.</strong> The gateway refuses to start
+with a weak JWT secret; every service refuses to start with wildcard or
+empty CORS.</li>
+</ul>
+<h3 id="33-services-and-ports">3.3 Services and ports</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Compose service</th>
+<th>Host port</th>
+<th>Container port</th>
+<th>Python</th>
+<th>Build context</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>api-gateway</code></td>
+<td>7010</td>
+<td>7010 (host network)</td>
+<td>3.13</td>
+<td><code>backend/api-gateway</code></td>
+<td>Auth, tenancy, keys, quotas, proxying, tasks</td>
+</tr>
+<tr class="even">
+<td><code>asr-be</code></td>
+<td>7000</td>
+<td>6000</td>
+<td>3.10</td>
+<td><code>backend/ASR</code></td>
+<td>Sinhala ASR</td>
+</tr>
+<tr class="odd">
+<td><code>tts-be</code></td>
+<td>7002</td>
+<td>6002</td>
+<td>3.10</td>
+<td><code>backend/TTS</code></td>
+<td>Sinhala TTS</td>
+</tr>
+<tr class="even">
+<td><code>chatbot-mod</code></td>
+<td>7006</td>
+<td>7006</td>
+<td>3.10</td>
+<td><code>backend</code> (for <code>shared/</code>)</td>
+<td>RAG for custom chatbots</td>
+</tr>
+<tr class="odd">
+<td><code>framework-be</code></td>
+<td>7003</td>
+<td>6003</td>
+<td>3.9</td>
+<td><code>backend</code> (for <code>shared/</code>)</td>
+<td>Upload-then-chat RAG</td>
+</tr>
+<tr class="even">
+<td><code>new-chat-app</code></td>
+<td>7007</td>
+<td>7007</td>
+<td>— (Node 24 build, nginx)</td>
+<td><code>frontend/new-chat-app</code></td>
+<td>The web app</td>
+</tr>
+<tr class="odd">
+<td><code>voicebot-frontend</code></td>
+<td>7005</td>
+<td>7005</td>
+<td>— (nginx)</td>
+<td><code>frontend/voicebot</code></td>
+<td>Legacy SPA (deprecated)</td>
+</tr>
+<tr class="even">
+<td><code>redis</code></td>
+<td>6379</td>
+<td>6379</td>
+<td>—</td>
+<td><code>redis:7-alpine</code></td>
+<td>FAISS index cache</td>
+</tr>
+<tr class="odd">
+<td><code>prometheus</code></td>
+<td>9090</td>
+<td>9090</td>
+<td>—</td>
+<td><code>prom/prometheus</code></td>
+<td>Metrics</td>
+</tr>
+<tr class="even">
+<td><code>grafana</code></td>
+<td>3000</td>
+<td>3000</td>
+<td>—</td>
+<td><code>grafana/grafana-oss</code></td>
+<td>Dashboards</td>
+</tr>
+</tbody>
+</table>
+<p>MySQL is <strong>not</strong> in the compose file. The gateway
+connects to whatever <code>DATABASE_URL</code> points at (in production,
+a MySQL server on the host).</p>
+<p>The gateway runs with <code>network_mode: host</code>, which is why
+its downstream URLs are <code>http://localhost:700x</code> (host ports)
+and why Prometheus reaches it through
+<code>host.docker.internal:7010</code> rather than a container name.
+With host networking, the <code>ports:</code> mapping on that service is
+ignored.</p>
+<hr />
+<h2 id="4-request-flows-end-to-end">4. Request flows, end to end</h2>
+<h3 id="41-password-sign-in">4.1 Password sign-in</h3>
+<pre><code>SPA  POST /users/login {email, password}
+GW   look up user by email ─ none → 401 &quot;Invalid email or password.&quot;
+     argon2 verify         ─ fail → 401 &quot;Incorrect password.&quot;
+     is_active?            ─ no   → 401 &quot;User is blocked…&quot;
+     mint HS256 JWT {sub: uuid, email, role, organization_uuid, exp: now+24h}
+  ←  {access_token, role, organization_uuid, token_type, is_new_user: false}
+SPA  store in localStorage: subasa_access_token, subasa_role,
+     subasa_organization, subasa_is_new_user
+     navigate to ?redirect or /p/gov-chatbot</code></pre>
+<h3 id="42-google-sign-in">4.2 Google sign-in</h3>
+<pre><code>SPA  &lt;GoogleLogin&gt; widget → Google returns an ID token (credential)
+SPA  POST /users/auth/google {id_token}
+GW   GOOGLE_CLIENT_ID unset?        → 503
+     google.oauth2.id_token.verify_oauth2_token(token, GOOGLE_CLIENT_ID) fails → 401
+     email_verified false?          → 401
+     user by email exists?
+       no  → create general_user (google_id, avatar_url, no password), is_new_user = true
+       yes → link google_id / avatar_url if missing
+     is_active?  no → 401
+  ←  TokenOut (is_new_user true only if just created)
+SPA  is_new_user → /onboarding, else → redirect target</code></pre>
+<p>There is no authorization-code exchange, no client secret, no
+redirect URI.</p>
+<h3 id="43-chatting-with-a-custom-chatbot-web-app">4.3 Chatting with a
+custom chatbot (web app)</h3>
+<pre><code>SPA  /p/:url_path
+     GET /custom-chatbots/by-url-path/{url_path}          (no auth)
+     useChatbotAccess(chatbot, auth) → allowed | not_published | org_required
+                                        | org_mismatch | login_required
+     (allowed) render CustomChatShell
+SPA  POST /custom-chatbots/api/{url_path} {message}
+GW   load chatbot by url_path → 404 if missing, 503 if !is_publish
+     POST chatbot-mod /chat {message, retrieval_key, file_path}
+CM   resolve file_path under UPLOAD_DIR (reject traversal)
+     retrieval_key in Redis? → deserialize FAISS index
+                       else → TextLoader → split → embed → FAISS → store under NEW uuid
+     RetrievalQA(stuff, SINHALA_PROMPT) → Groq
+  ←  {response, retrieval_key}   header X-Tokens-Used
+GW   return {response}    (the returned retrieval_key is discarded — see §20 P1)
+SPA  show answer, then POST /tts/generate {text: answer, mettananda/single/male/sinhala}
+     play the returned audioUrl</code></pre>
+<p>Voice input on this page uses the same path as §4.4.</p>
+<h3 id="44-speech-to-text-streaming-web-app">4.4 Speech-to-text
+streaming (web app)</h3>
+<pre><code>SPA  useMicVAD (Silero VAD in the browser, assets from jsDelivr)
+     on speech end → Float32 PCM @16 kHz mono
+     encodeWav() → 16-bit PCM WAV Blob
+     fetch POST /asr/transcribe/stream (multipart &quot;file&quot;)
+GW   forward multipart to asr-be /transcribe/whisper/stream, stream=True
+ASR  soundfile decode → resample to 16k if needed → mono
+     Whisper.generate() on a thread with TextIteratorStreamer
+  ←  text/event-stream:
+       data: {&quot;delta&quot;: &quot;ආයු&quot;}
+       data: {&quot;delta&quot;: &quot;බෝවන්&quot;}
+       data: {&quot;transcription&quot;: &quot;ආයුබෝවන්&quot;, &quot;done&quot;: true}
+     (or a final data: {&quot;error&quot;: &quot;...&quot;} if generation failed mid-stream)
+GW   relay raw bytes, X-Accel-Buffering: no
+SPA  read response.body, split on blank lines, surface partial text</code></pre>
+<p><code>EventSource</code> is not used because it can only issue
+GET.</p>
+<h3 id="45-text-to-speech-web-app">4.5 Text-to-speech (web app)</h3>
+<pre><code>SPA  POST /tts/generate {text, speaker, speaker_type, voice, input_type}
+GW   POST tts-be /generate (stream=True), write body to
+     FILE_STORE_DIR/&lt;uuid4&gt;.wav
+  ←  {audioUrl: &quot;&lt;PUBLIC_BASE_URL or request host&gt;/tts/output/&lt;uuid&gt;.wav&quot;}
+SPA  &lt;audio src=audioUrl&gt;
+     GET /tts/output/&lt;uuid&gt;.wav → FileResponse</code></pre>
+<h3 id="46-upload-then-chat-framework">4.6 Upload-then-chat
+(framework)</h3>
+<pre><code>SPA  /p/make-chatbot → XHR POST /framework/upload (multipart, progress events)
+GW   forward to framework-be /upload
+FW   validate extension (.txt/.pdf) and size (20 MB)
+     save as &lt;uuid4hex&gt;&lt;ext&gt;, load (TextLoader | PyPDFLoader), split, embed,
+     FAISS, build chain, cache in LRU under that filename
+  ←  {success, message, document_key}
+     POST /framework/chat {message, document_key} → {response}</code></pre>
+<p>The web app currently implements only the upload half — see §20
+F4.</p>
+<h3 id="47-metered-api--short-service">4.7 Metered API — short
+service</h3>
+<pre><code>client  ANY /api/{service_key}/{path}   X-Api-Key: &lt;key&gt;
+GW      validate_api_key():
+          key row where key_hash == header      none → 401
+          is_active                              no   → 403
+          expires_at in past                     yes  → 403
+          service by service_key                 none → 404
+          service.is_active                      no   → 503
+          ServiceUsage(api_key, service)         none → 403
+          allocation expired                     yes  → 403
+          SUM(usage_logs.tokens_used) &gt;= limit   yes  → 429 (field &quot;usage_limit&quot;)
+        check_rate_limit(api_key.uuid)           full → 429 + Retry-After
+        forward method, body, query, headers (minus host, x-api-key, content-length)
+          to service.base_url + &quot;/&quot; + path
+        tokens = int(X-Tokens-Used) or 1
+        INSERT usage_logs(tokens, &quot;success&quot;|&quot;error&quot;)
+     ←  upstream status, body and content-type</code></pre>
+<h3 id="48-metered-api--long-service-async-tasks">4.8 Metered API — long
+service (async tasks)</h3>
+<pre><code>client  ANY /api/{service_key}/{path}      (service.response_type == &quot;long&quot;)
+GW      same validation and rate limit
+        INSERT tasks(pending, method, path, query, headers JSON, body)
+        queue.put(task.id)
+     ←  {task_uuid, status: &quot;pending&quot;}         immediately
+
+worker  (single asyncio consumer started in lifespan)
+        status → processing; perform the upstream call (300 s timeout)
+        success → completed, store status/body/content-type/tokens, log usage
+        exception → failed, error_message, log usage(0, &quot;error&quot;)
+
+client  GET /tasks/{uuid}/status     X-Api-Key → {status, created_at, completed_at, error_message}
+        GET /tasks/{uuid}/result     → metadata (400 while pending/processing)
+        GET /tasks/{uuid}/download   → the stored upstream body (only when completed)</code></pre>
+<p>The queue is in memory: tasks still <code>pending</code> when the
+gateway restarts are never picked up again.</p>
+<hr />
+<h2 id="5-repository-layout">5. Repository layout</h2>
+<pre><code>.
+├── README.md                    project overview (product model, known gaps)
+├── docker-compose.yml           the whole stack
+├── .env.example                 variables compose itself reads
+├── prometheus.yml               scrape config
+├── Dockerfile                   personal Fedora dev-shell image; NOT part of the stack
+├── todo.txt                     four-line old to-do list
+├── .github/workflows/ci.yml     lint, tests, typecheck, build, compose validation
+├── docs/
+│   ├── PROJECT-DOCUMENTATION.md this file
+│   ├── SECURITY-AUDIT.md        secret audit + rotation checklist
+│   └── TESTING.md               how tests are organised
+├── backend/
+│   ├── .dockerignore            shared by chatbot-mod and framework builds
+│   ├── ruff.toml                lint config for the model services (py39 target)
+│   ├── pytest.ini               smoke-test marker
+│   ├── api-gateway/             FastAPI gateway — see §8
+│   │   ├── main.py  config.py  database.py  models.py  schemas.py
+│   │   ├── auth.py  api_key_validator.py  rate_limit.py  task_worker.py
+│   │   ├── safe_ops.py          idempotent alembic helpers (unused by live code)
+│   │   ├── routers/             users, organizations, api_keys, services, usage,
+│   │   │                        gateway, tasks, custom_chatbots, asr, tts, framework, _http
+│   │   ├── alembic/             BROKEN migration history — see §8.10
+│   │   └── tests/               64 pytest tests
+│   ├── ASR/                     run.py (app) · models.py · postprocessing/
+│   ├── TTS/                     voicebot_tts.py (app) · text/ (Sinhala cleaners)
+│   │   ├── TTS/                 vendored Coqui TTS library (third-party)
+│   │   └── scripts/             offline batch/eval/cloning scripts (not deployed)
+│   ├── chatbot-modified/        chatbot_api.py + the Sinhala Constitution corpus
+│   ├── framework/               chatbot.py
+│   ├── shared/rag.py            the single RAG recipe
+│   └── tests/smoke/             HTTP smoke tests against a running stack
+├── frontend/
+│   ├── new-chat-app/            React 19 + Vite + MUI web app — see §14
+│   └── voicebot/                deprecated vanilla-JS app — see §15
+├── mobile-app/subasa-app/       unmodified Expo starter — see §16
+├── grafana/                     provisioning for datasource + one dashboard
+└── loadtests/                   k6 scenarios</code></pre>
+<p>Untracked but present in working copies: <code>.env</code> files,
+<code>api-gw-venv/</code> (a local virtualenv), <code>.idea/</code>,
+<code>.claude/</code>, <code>.ruff_cache/</code>,
+<code>.DS_Store</code>.</p>
+<hr />
+<h2 id="6-getting-started">6. Getting started</h2>
+<h3 id="61-prerequisites">6.1 Prerequisites</h3>
+<ul>
+<li>Docker with Compose v2 and BuildKit (Dockerfiles use
+<code>RUN --mount=type=cache</code>)</li>
+<li>A MySQL 8 server reachable from the host (the gateway uses
+<code>aiomysql</code>)</li>
+<li>A Hugging Face token with access to the checkpoints
+(<code>L-Inuri/*</code>, <code>Sasangi/*</code>)</li>
+<li>A Groq API key</li>
+<li>Disk: several GB for model checkpoints in
+<code>~/.cache/huggingface</code></li>
+<li>RAM: the TTS container alone loads six VITS models; ASR loads three
+models; chatbot-mod and framework each load
+<code>multilingual-e5-large-instruct</code>. Budget generously (16 GB+).
+GPU is optional; code runs on CPU.</li>
+<li>For local frontend work: Node 22+ (CI uses 22; the Docker build uses
+24)</li>
+<li>For local gateway work: Python 3.13</li>
+</ul>
+<h3 id="62-run-the-whole-stack">6.2 Run the whole stack</h3>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> .env.example .env</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Fill in at minimum:</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   DATABASE_URL            mysql+aiomysql://user:pass@localhost:3306/subasa</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   JWT_SECRET              python -c &#39;import secrets; print(secrets.token_urlsafe(48))&#39;</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   GROQ_API_KEY</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   ASR_HF_TOKEN, TTS_HF_TOKEN</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   GRAFANA_ADMIN_PASSWORD</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   GOOGLE_CLIENT_ID        (only if you want Google sign-in)</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   CORS_ALLOW_ORIGINS      include every origin the browser will load the app from</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose up <span class="at">-d</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose logs <span class="at">-f</span> asr-be tts-be     <span class="co"># first boot downloads checkpoints; minutes</span></span></code></pre></div>
+<p>On first start the gateway creates any missing tables via
+<code>Base.metadata.create_all</code>. <strong>Do not run
+<code>alembic upgrade head</code></strong> (§8.10).</p>
+<p>Then:</p>
+<ul>
+<li>Web app: <a href="http://localhost:7007">http://localhost:7007</a></li>
+<li>Gateway OpenAPI docs: <a href="http://localhost:7010/docs">http://localhost:7010/docs</a></li>
+<li>Grafana: <a href="http://localhost:3000">http://localhost:3000</a>
+(admin / <code>GRAFANA_ADMIN_PASSWORD</code>)</li>
+<li>Prometheus: <a href="http://localhost:9090">http://localhost:9090</a></li>
+</ul>
+<p><strong>Frontend build caveat.</strong> Vite bakes
+<code>VITE_*</code> variables in at <strong>build</strong> time, but
+<code>frontend/new-chat-app/.dockerignore</code> excludes
+<code>.env</code>, and neither the Dockerfile nor compose passes build
+args. So the image built by <code>docker compose</code> gets the code
+defaults: <code>VITE_API_BASE_URL</code> falls back to
+<code>http://localhost:8000</code> (nothing listens there; the gateway
+is on 7010), <code>VITE_GOOGLE_CLIENT_ID</code> is empty and
+<code>VITE_BASE_PATH</code> is <code>/</code>. Until build args are
+wired in (see F9), either build the SPA outside Docker with a real
+<code>.env</code>, or add <code>ARG</code>/<code>ENV</code> lines for
+the <code>VITE_*</code> variables to the Dockerfile&#39;s build stage and
+pass them from compose.</p>
+<h3 id="63-run-just-the-gateway">6.3 Run just the gateway</h3>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> backend/api-gateway</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python3.13</span> <span class="at">-m</span> venv .venv <span class="kw">&amp;&amp;</span> <span class="bu">.</span> .venv/bin/activate</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-r</span> requirements-dev.txt</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> .env.example .env          <span class="co"># set JWT_SECRET and DATABASE_URL</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ex">uvicorn</span> main:app <span class="at">--reload</span> <span class="at">--port</span> 7010</span></code></pre></div>
+<p>For a throwaway database,
+<code>DATABASE_URL=sqlite+aiosqlite:///./dev.db</code> works (that is
+what the tests use), with <code>aiosqlite</code> installed from
+<code>requirements-dev.txt</code>.</p>
+<h3 id="64-run-just-the-frontend">6.4 Run just the frontend</h3>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> frontend/new-chat-app</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> .env.example .env</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># set VITE_API_BASE_URL=http://localhost:7010 and VITE_BASE_PATH=/ for local dev</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> ci</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run dev                   <span class="co"># http://localhost:5173</span></span></code></pre></div>
+<p>The gateway&#39;s CORS list must include
+<code>http://localhost:5173</code> (it does by default).</p>
+<h3 id="65-run-one-model-service-outside-docker">6.5 Run one model
+service outside Docker</h3>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> backend/ASR <span class="kw">&amp;&amp;</span> <span class="ex">pip</span> install <span class="at">-r</span> requirements-base.txt <span class="at">-r</span> requirements-app.txt <span class="kw">&amp;&amp;</span> <span class="ex">python</span> run.py          <span class="co"># :6000</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> backend/TTS <span class="kw">&amp;&amp;</span> <span class="ex">pip</span> install <span class="at">-r</span> requirements-base.txt <span class="at">-r</span> requirements-app.txt <span class="kw">&amp;&amp;</span> <span class="ex">python</span> voicebot_tts.py <span class="co"># :6002</span></span></code></pre></div>
+<p><code>chatbot-mod</code> and <code>framework</code> import
+<code>shared.rag</code>, so run them with <code>backend/</code> on
+<code>PYTHONPATH</code>:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> backend/chatbot-modified <span class="kw">&amp;&amp;</span> <span class="va">PYTHONPATH</span><span class="op">=</span>.. <span class="ex">python</span> chatbot_api.py   <span class="co"># :7006, needs Redis</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> backend/framework        <span class="kw">&amp;&amp;</span> <span class="va">PYTHONPATH</span><span class="op">=</span>.. <span class="ex">python</span> chatbot.py       <span class="co"># :6003</span></span></code></pre></div>
+<p>Remember the host-port vs container-port difference: outside Docker,
+ASR is on 6000, not 7000. Point the gateway&#39;s
+<code>ASR_SERVICE_URL</code> etc. accordingly.</p>
+<h3 id="66-one-time-data-setup">6.6 One-time data setup</h3>
+<p>The stack cannot bootstrap these for itself:</p>
+<ol type="1">
+<li><strong>A system admin.</strong> See <a href="#221-create-the-first-system-admin">runbook 22.1</a>.</li>
+<li><strong>The government chatbot.</strong> <code>/p/gov-chatbot</code>
+chats with the custom chatbot whose <code>url_path</code> equals
+<code>VITE_GOV_CHATBOT_PATH</code> (default <code>gov-chatbot</code>).
+Create it, upload
+<code>backend/chatbot-modified/Sri Lanka Constitution-Sinhala.txt</code>
+as its knowledge file, publish it, make it public. See <a href="#222-set-up-the-government-chatbot">runbook 22.2</a>.</li>
+<li><strong>The metered API.</strong> The <code>services</code> table is
+empty, so <code>/api/*</code> resolves nothing until you register
+services, keys and allocations. See <a href="#223-open-the-metered-api-for-a-client">runbook 22.3</a>.</li>
+</ol>
+<hr />
+<h2 id="7-configuration-reference">7. Configuration reference</h2>
+<h3 id="71-root-env-read-by-docker-composeyml">7.1 Root
+<code>.env</code> (read by <code>docker-compose.yml</code>)</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Used by</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>DATABASE_URL</code></td>
+<td>gateway</td>
+<td>—</td>
+<td><code>mysql+aiomysql://…</code></td>
+</tr>
+<tr class="even">
+<td><code>JWT_SECRET</code></td>
+<td>gateway</td>
+<td>— (required)</td>
+<td>≥32 chars; placeholders rejected</td>
+</tr>
+<tr class="odd">
+<td><code>APP_ENV</code></td>
+<td>gateway</td>
+<td><code>development</code></td>
+<td><code>production</code> makes a short secret fatal</td>
+</tr>
+<tr class="even">
+<td><code>PUBLIC_BASE_URL</code></td>
+<td>gateway</td>
+<td>blank</td>
+<td>Base for absolute TTS audio URLs; blank → request
+<code>Host</code></td>
+</tr>
+<tr class="odd">
+<td><code>GOOGLE_CLIENT_ID</code></td>
+<td>gateway</td>
+<td>blank</td>
+<td>Blank → Google sign-in returns 503</td>
+</tr>
+<tr class="even">
+<td><code>CORS_ALLOW_ORIGINS</code></td>
+<td>all backends</td>
+<td><code>http://localhost:7007,http://localhost:5173</code></td>
+<td>Comma-separated; <code>*</code> or empty is fatal</td>
+</tr>
+<tr class="odd">
+<td><code>ASR_HF_TOKEN</code></td>
+<td>asr-be (<code>HF_TOKEN</code>)</td>
+<td>—</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>TTS_HF_TOKEN</code></td>
+<td>tts-be (<code>HF_TOKEN</code>)</td>
+<td>—</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>GROQ_API_KEY</code></td>
+<td>chatbot-mod, framework-be</td>
+<td>—</td>
+<td>Required at import</td>
+</tr>
+<tr class="even">
+<td><code>RATE_LIMIT_REQUESTS</code></td>
+<td>gateway</td>
+<td><code>60</code></td>
+<td>Per API key per window; <code>0</code> disables</td>
+</tr>
+<tr class="odd">
+<td><code>RATE_LIMIT_WINDOW_SECONDS</code></td>
+<td>gateway</td>
+<td><code>60</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>GRAFANA_ADMIN_PASSWORD</code></td>
+<td>grafana</td>
+<td>—</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="72-api-gateway-backendapi-gatewayconfigpy-rate_limitpy">7.2
+api-gateway (<code>backend/api-gateway/config.py</code>,
+<code>rate_limit.py</code>)</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>DATABASE_URL</code></td>
+<td><code>mysql+aiomysql://subasa:your_password@localhost:3306/subasa</code></td>
+<td>Async SQLAlchemy URL. SQLite is supported (tests).</td>
+</tr>
+<tr class="even">
+<td><code>JWT_SECRET</code></td>
+<td>none</td>
+<td>Refuses to start if missing, in
+<code>{change-me-in-production, changeme, secret, your_jwt_secret_here}</code>,
+or &lt;32 chars in production (warning otherwise).</td>
+</tr>
+<tr class="odd">
+<td><code>JWT_EXPIRE_MINUTES</code></td>
+<td><code>1440</code></td>
+<td>Token lifetime.</td>
+</tr>
+<tr class="even">
+<td><code>APP_ENV</code></td>
+<td><code>development</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>UPLOAD_DIR</code></td>
+<td><code>&lt;gateway dir&gt;/uploads</code></td>
+<td>Upload root.</td>
+</tr>
+<tr class="even">
+<td><code>IMAGE_UPLOAD_DIR</code></td>
+<td><code>&lt;UPLOAD_DIR&gt;/chatbot_images</code></td>
+<td>Chatbot hero images.</td>
+</tr>
+<tr class="odd">
+<td><code>FILE_UPLOAD_DIR</code></td>
+<td><code>&lt;UPLOAD_DIR&gt;/chatbot_files</code></td>
+<td>Chatbot knowledge files. Must be the directory chatbot-mod
+reads.</td>
+</tr>
+<tr class="even">
+<td><code>FILE_STORE_DIR</code></td>
+<td><code>&lt;UPLOAD_DIR&gt;/tts</code></td>
+<td>Generated TTS audio.</td>
+</tr>
+<tr class="odd">
+<td><code>CUSTOM_CHATBOT_SERVICE_URL</code></td>
+<td><code>http://localhost:7006/chat</code></td>
+<td>Full URL including <code>/chat</code>.</td>
+</tr>
+<tr class="even">
+<td><code>TTS_SERVICE_URL</code></td>
+<td><code>http://localhost:7002</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>ASR_SERVICE_URL</code></td>
+<td><code>http://localhost:7000</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>FRAMEWORK_SERVICE_URL</code></td>
+<td><code>http://localhost:7003</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>PUBLIC_BASE_URL</code></td>
+<td>blank</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>GOOGLE_CLIENT_ID</code></td>
+<td>blank</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>CORS_ALLOW_ORIGINS</code></td>
+<td>dev origins</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>RATE_LIMIT_REQUESTS</code> /
+<code>RATE_LIMIT_WINDOW_SECONDS</code></td>
+<td><code>60</code> / <code>60</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>In compose, <code>UPLOAD_DIR=/app/uploads</code> and
+<code>FILE_STORE_DIR=/app/uploads/tts</code>, with
+<code>./backend/framework/uploaded_files</code> mounted at
+<code>/app/uploads</code>.</p>
+<h3 id="73-model-services">7.3 Model services</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Service</th>
+<th>Variable</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>asr-be</td>
+<td><code>HF_TOKEN</code>, <code>CORS_ALLOW_ORIGINS</code></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>tts-be</td>
+<td><code>HF_TOKEN</code>, <code>CORS_ALLOW_ORIGINS</code></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td>chatbot-mod</td>
+<td><code>GROQ_API_KEY</code></td>
+<td>required</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>REDIS_HOST</code> / <code>REDIS_PORT</code></td>
+<td><code>redis</code> / <code>6379</code></td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><code>UPLOAD_DIR</code></td>
+<td><code>/usr/src/app/uploaded_files</code></td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>CORS_ALLOW_ORIGINS</code></td>
+<td>dev origins</td>
+</tr>
+<tr class="odd">
+<td>framework-be</td>
+<td><code>GROQ_API_KEY</code></td>
+<td>required</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>UPLOAD_DIR</code></td>
+<td><code>uploaded_files</code> (relative to
+<code>/usr/src/app</code>)</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><code>MAX_UPLOAD_BYTES</code></td>
+<td><code>20971520</code> (20 MB)</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>MAX_CACHED_DOCUMENTS</code></td>
+<td><code>8</code></td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><code>CORS_ALLOW_ORIGINS</code></td>
+<td>dev origins</td>
+</tr>
+</tbody>
+</table>
+<h3 id="74-web-app-frontendnew-chat-appenv-build-time">7.4 Web app
+(<code>frontend/new-chat-app/.env</code>, build-time)</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Default in code</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>VITE_API_BASE_URL</code></td>
+<td><code>http://localhost:8000</code> (note: <em>not</em> the gateway&#39;s
+7010)</td>
+<td>Gateway base URL</td>
+</tr>
+<tr class="even">
+<td><code>VITE_BASE_PATH</code></td>
+<td><code>/</code> (example sets <code>/voc-si</code>)</td>
+<td>Vite <code>base</code> and router basename</td>
+</tr>
+<tr class="odd">
+<td><code>VITE_GOOGLE_CLIENT_ID</code></td>
+<td>—</td>
+<td>Must equal the gateway&#39;s <code>GOOGLE_CLIENT_ID</code></td>
+</tr>
+<tr class="even">
+<td><code>VITE_GOV_CHATBOT_PATH</code></td>
+<td><code>gov-chatbot</code></td>
+<td><code>url_path</code> of the chatbot behind
+<code>/p/gov-chatbot</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="75-shared-file-paths-across-containers">7.5 Shared file paths
+across containers</h3>
+<pre><code>gateway   /app/uploads/chatbot_files/&lt;name&gt;        (writes)
+   │  bind mount ./backend/framework/uploaded_files → /app/uploads
+host      ./backend/framework/uploaded_files/chatbot_files/&lt;name&gt;
+   │  bind mount ./backend/framework/uploaded_files/chatbot_files → /usr/src/app/uploaded_files
+chatbot-mod /usr/src/app/uploaded_files/&lt;name&gt;     (reads)
+
+framework-be  /usr/src/app/uploaded_files/&lt;uuid&gt;.&lt;ext&gt;
+   │  bind mount ./backend/framework/uploaded_files → /usr/src/app/uploaded_files
+host      ./backend/framework/uploaded_files/&lt;uuid&gt;.&lt;ext&gt;
+
+gateway   /app/uploads/tts/&lt;uuid&gt;.wav              (TTS cache)
+gateway   /app/uploads/chatbot_images/&lt;uuid&gt;.&lt;ext&gt; (hero images)</code></pre>
+<p><code>custom_chatbots.file_path</code> stores only the bare filename;
+each side joins it onto its own directory.</p>
+<hr />
+<h2 id="8-api-gateway">8. api-gateway</h2>
+<p><strong>Stack:</strong> Python 3.13 · FastAPI 0.136 · Starlette 1.0 ·
+SQLAlchemy 2.0 async · aiomysql · Pydantic v2 · PyJWT · passlib + argon2
+· google-auth · httpx · prometheus-fastapi-instrumentator.
+<strong>Entry:</strong> <code>main.py</code>. <strong>Port:</strong>
+7010.</p>
+<h3 id="81-module-map">8.1 Module map</h3>
+<table>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>main.py</code></td>
+<td>App, lifespan (create tables, start task worker; on shutdown cancel
+worker, close HTTP client, dispose engine), <code>/health</code>,
+<code>/metrics</code>, error handlers, CORS, router registration</td>
+</tr>
+<tr class="even">
+<td><code>config.py</code></td>
+<td>Reads and validates env at import; raises <code>ConfigError</code>
+on unsafe values</td>
+</tr>
+<tr class="odd">
+<td><code>database.py</code></td>
+<td>Async engine (<code>pool_size=10, max_overflow=20</code> for
+non-SQLite), <code>AsyncSessionLocal</code>, <code>get_db</code>
+dependency</td>
+</tr>
+<tr class="even">
+<td><code>models.py</code></td>
+<td>ORM models and enums</td>
+</tr>
+<tr class="odd">
+<td><code>schemas.py</code></td>
+<td>Pydantic request/response models and validators</td>
+</tr>
+<tr class="even">
+<td><code>auth.py</code></td>
+<td>JWT decode → <code>CurrentUser</code>; <code>require_role()</code>;
+dependency aliases</td>
+</tr>
+<tr class="odd">
+<td><code>api_key_validator.py</code></td>
+<td>The metered-path gatekeeper</td>
+</tr>
+<tr class="even">
+<td><code>rate_limit.py</code></td>
+<td>In-process sliding-window limiter per API key</td>
+</tr>
+<tr class="odd">
+<td><code>task_worker.py</code></td>
+<td>In-process <code>asyncio.Queue</code> and its single consumer</td>
+</tr>
+<tr class="even">
+<td><code>routers/_http.py</code></td>
+<td>One shared <code>httpx.AsyncClient</code> (120 s timeout)</td>
+</tr>
+<tr class="odd">
+<td><code>routers/*.py</code></td>
+<td>One router per area; business logic lives in the handlers</td>
+</tr>
+<tr class="even">
+<td><code>safe_ops.py</code></td>
+<td>Idempotent alembic helpers (<code>safe_add_column</code>, …). Not
+imported by any live migration.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="82-authentication">8.2 Authentication</h3>
+<p>Two independent mechanisms; they never mix.</p>
+<p><strong>Bearer JWT</strong> (<code>auth.py</code>)</p>
+<ul>
+<li>HS256 with <code>JWT_SECRET</code>; claims <code>sub</code> (user
+uuid), <code>email</code>, <code>role</code> (enum value),
+<code>organization_uuid</code>, <code>exp</code>.</li>
+<li><code>get_current_user</code> validates signature, expiry and
+required claims. It does <strong>not</strong> consult the database — so
+blocking a user, changing their role or moving them between
+organizations only takes effect when their token is reissued (up to 24 h
+later).</li>
+<li>Dependency aliases: <code>AdminUser</code> (admin_user),
+<code>OrgAdminUser</code> (org_admin), <code>AdminOrOrgAdminUser</code>,
+<code>GeneralUser</code>, <code>AnyUser</code> (any valid token).</li>
+<li>Unauthenticated → 401; wrong role → 403.</li>
+</ul>
+<p><strong><code>X-Api-Key</code></strong>
+(<code>api_key_validator.py</code>) — for <code>/api/*</code> and
+<code>/tasks/*</code>. The key is looked up by exact match on
+<code>api_keys.key_hash</code> (plaintext; see S4). It carries no user
+role.</p>
+<p>Passwords are hashed with <strong>argon2</strong> via passlib.
+Registration requires 8–128 characters with an uppercase letter, a
+lowercase letter and a digit. Names are unique (a second user cannot
+register with an existing name).</p>
+<h3 id="83-error-shape">8.3 Error shape</h3>
+<p><code>main.py</code> normalises errors to:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;detail&quot;</span><span class="fu">:</span> <span class="ot">[</span> <span class="fu">{</span> <span class="dt">&quot;field&quot;</span><span class="fu">:</span> <span class="st">&quot;email&quot;</span><span class="fu">,</span> <span class="dt">&quot;message&quot;</span><span class="fu">:</span> <span class="st">&quot;User email already exists.&quot;</span> <span class="fu">}</span> <span class="ot">]</span> <span class="fu">}</span></span></code></pre></div>
+<ul>
+<li><code>RequestValidationError</code> → 422 with one entry per failing
+field (the field is the last element of Pydantic&#39;s <code>loc</code>,
+&quot;Value error, &quot; prefix stripped).</li>
+<li><code>HTTPException</code> → its status with <code>detail</code>
+passed through untouched.</li>
+</ul>
+<p>Most handlers raise with the list shape. The first-party proxies
+(<code>/asr</code>, <code>/tts</code>, <code>/framework</code>) and
+<code>/tts/output</code> raise plain-string <code>detail</code>s, which
+the web app renders as a generic &quot;Request failed (4xx)&quot;.</p>
+<h3 id="84-data-model">8.4 Data model</h3>
+<pre><code>organizations 1───* users 1───* api_keys 1───* service_usages *───1 services
+      │                              │ 1                              1 │
+      │                              └──────* usage_logs *──────────────┘
+      │                              │ 1                              1 │
+      │                              └──────* tasks      *──────────────┘
+      └───* custom_chatbots</code></pre>
+<p><strong>users</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Type</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>id</code></td>
+<td>int PK</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>uuid</code></td>
+<td>varchar(36) unique</td>
+<td>public identifier</td>
+</tr>
+<tr class="odd">
+<td><code>name</code></td>
+<td>varchar(100)</td>
+<td>unique in practice (checked by handlers, not constrained)</td>
+</tr>
+<tr class="even">
+<td><code>email</code></td>
+<td>varchar(255) unique</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>hashed_password</code></td>
+<td>varchar(255) null</td>
+<td>null for Google-only accounts</td>
+</tr>
+<tr class="even">
+<td><code>google_id</code></td>
+<td>varchar(255) unique null</td>
+<td>Google <code>sub</code></td>
+</tr>
+<tr class="odd">
+<td><code>avatar_url</code></td>
+<td>varchar(500) null</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>role</code></td>
+<td>enum(<code>admin</code>,<code>general_user</code>,<code>organization_user</code>,<code>organization_admin</code>)</td>
+<td>default <code>general_user</code></td>
+</tr>
+<tr class="odd">
+<td><code>organization_id</code></td>
+<td>FK organizations null</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>is_active</code></td>
+<td>bool</td>
+<td>false = blocked</td>
+</tr>
+<tr class="odd">
+<td><code>created_at</code></td>
+<td>datetime</td>
+<td>UTC</td>
+</tr>
+</tbody>
+</table>
+<p><strong>organizations</strong> — <code>id</code>, <code>uuid</code>,
+<code>name</code> (unique by handler check, ≤50 chars by schema),
+<code>is_active</code>, <code>created_at</code>.</p>
+<p><strong>api_keys</strong> — <code>id</code>, <code>uuid</code>,
+<code>user_id</code> FK, <code>key_hash</code> varchar(64) (holds the
+raw key), <code>label</code>, <code>created_at</code>,
+<code>expires_at</code> null, <code>is_active</code>.</p>
+<p><strong>services</strong> — <code>id</code>, <code>uuid</code>,
+<code>service_key</code> varchar(50) unique (the URL segment),
+<code>service_name</code> unique, <code>base_url</code> varchar(500),
+<code>response_type</code> enum(<code>short</code>,<code>long</code>),
+<code>is_active</code>.</p>
+<p><strong>service_usages</strong> (allocations) — <code>id</code>,
+<code>uuid</code>, <code>api_key_id</code>, <code>service_id</code>,
+<code>usage_limit</code> int, <code>expires_at</code> null. No unique
+constraint on (<code>api_key_id</code>,<code>service_id</code>) — see
+P5.</p>
+<p><strong>usage_logs</strong> — <code>id</code>, <code>uuid</code>,
+<code>api_key_id</code>, <code>service_id</code>,
+<code>tokens_used</code>, <code>requested_at</code>, <code>status</code>
+(<code>success</code>/<code>error</code>).</p>
+<p><strong>tasks</strong> — <code>id</code>, <code>uuid</code>,
+<code>api_key_id</code>, <code>service_id</code>, <code>status</code>
+enum(<code>pending</code>,<code>processing</code>,<code>completed</code>,<code>failed</code>),
+<code>request_method</code>, <code>request_path</code> (500),
+<code>request_query</code> (2000), <code>request_headers</code> (JSON
+text, 5000), <code>request_body</code> blob,
+<code>response_status_code</code>, <code>response_body</code> blob,
+<code>response_content_type</code>, <code>tokens_used</code>,
+<code>error_message</code> (1000), <code>created_at</code>,
+<code>completed_at</code>.</p>
+<p><strong>custom_chatbots</strong> — <code>id</code>,
+<code>uuid</code>, <code>chatbot_name</code> (unique by handler),
+<code>file_path</code> (bare filename, <code>&quot;&quot;</code> until uploaded),
+<code>organization_id</code> null, <code>description</code>,
+<code>hero_image</code> (bare filename, <code>&quot;&quot;</code> until uploaded),
+<code>url_path</code> (unique by handler; slug
+<code>^[a-z0-9]+(?:-[a-z0-9]+)*$</code>, ≤100),
+<code>retrieval_key</code> (uuid4 generated at creation),
+<code>is_publish</code>, <code>is_public</code>,
+<code>created_at</code>.</p>
+<h3 id="85-endpoint-reference">8.5 Endpoint reference</h3>
+<p>&quot;Auth&quot; is what the code <strong>actually</strong> requires today, not
+what it should. Endpoints with <strong>none</strong> that mutate data
+are security bugs (§20).</p>
+<h4 id="health-and-metrics">Health and metrics</h4>
+<table>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Returns</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>GET</td>
+<td><code>/health</code></td>
+<td>none</td>
+<td><code>{&quot;status&quot;:&quot;ok&quot;}</code></td>
+</tr>
+<tr class="even">
+<td>GET</td>
+<td><code>/metrics</code></td>
+<td>none</td>
+<td>Prometheus exposition</td>
+</tr>
+<tr class="odd">
+<td>GET</td>
+<td><code>/docs</code>, <code>/openapi.json</code></td>
+<td>none</td>
+<td>Swagger UI / schema</td>
+</tr>
+</tbody>
+</table>
+<h4 id="users"><code>/users</code></h4>
+<table>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Body / query</th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>POST</td>
+<td><code>/users/register</code></td>
+<td>none</td>
+<td><code>{name, email, password}</code></td>
+<td>Creates <code>general_user</code>. 409 on duplicate email or name. →
+<code>UserOut</code> 201</td>
+</tr>
+<tr class="even">
+<td>POST</td>
+<td><code>/users/login</code></td>
+<td>none</td>
+<td><code>{email, password}</code></td>
+<td>→ <code>TokenOut</code>. 401 on unknown email, wrong password, or
+blocked</td>
+</tr>
+<tr class="odd">
+<td>POST</td>
+<td><code>/users/auth/google</code></td>
+<td>none</td>
+<td><code>{id_token}</code></td>
+<td>See §4.2. → <code>TokenOut</code></td>
+</tr>
+<tr class="even">
+<td>GET</td>
+<td><code>/users/me</code></td>
+<td>any user</td>
+<td>—</td>
+<td>The caller → <code>UserOut</code></td>
+</tr>
+<tr class="odd">
+<td>GET</td>
+<td><code>/users</code></td>
+<td>admin or org_admin</td>
+<td><code>page</code>, <code>page_size</code>≤100, <code>search</code>,
+<code>sort_by</code>∈{name,created_at}, <code>sort_order</code>,
+<code>organization_uuid</code>, <code>is_active</code></td>
+<td>Paginated. org_admin is forced to their own org and may not pass
+<code>organization_uuid</code> (422)</td>
+</tr>
+<tr class="even">
+<td>GET</td>
+<td><code>/users/{uuid}</code></td>
+<td>any user</td>
+<td>—</td>
+<td>Any user can read any user</td>
+</tr>
+<tr class="odd">
+<td>PUT</td>
+<td><code>/users/{uuid}</code></td>
+<td><strong>none</strong></td>
+<td><code>{name, email, organization_uuid, role}</code></td>
+<td>Updates everything including <strong>role</strong> (S1)</td>
+</tr>
+<tr class="even">
+<td>PUT</td>
+<td><code>/users/{uuid}/block</code></td>
+<td>admin or org_admin</td>
+<td>—</td>
+<td>org_admin limited to own org. No other guards (P3)</td>
+</tr>
+<tr class="odd">
+<td>PUT</td>
+<td><code>/users/{uuid}/unblock</code></td>
+<td>admin or org_admin</td>
+<td>—</td>
+<td>Refuses self, admins and org_admins (P3)</td>
+</tr>
+<tr class="even">
+<td>PUT</td>
+<td><code>/users/{uuid}/organization</code></td>
+<td><strong>none</strong></td>
+<td><code>{organization_uuid}</code></td>
+<td>Moves user to an org</td>
+</tr>
+</tbody>
+</table>
+<p><code>UserOut</code>:
+<code>uuid, name, email, role, created_at, is_active, organization_uuid, organization_name, avatar_url</code>.
+<code>TokenOut</code>:
+<code>access_token, token_type=&quot;bearer&quot;, role, organization_uuid, is_new_user</code>.</p>
+<h4 id="orgs--every-endpoint-has-no-auth"><code>/orgs</code> — every
+endpoint has <strong>no auth</strong></h4>
+<table>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Path</th>
+<th>Body</th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>POST</td>
+<td><code>/orgs</code></td>
+<td><code>{name, is_active}</code></td>
+<td>Create; 409 on duplicate name</td>
+</tr>
+<tr class="even">
+<td>GET</td>
+<td><code>/orgs</code></td>
+<td>—</td>
+<td>All, newest first</td>
+</tr>
+<tr class="odd">
+<td>GET</td>
+<td><code>/orgs/{uuid}</code></td>
+<td>—</td>
+<td>One</td>
+</tr>
+<tr class="even">
+<td>POST</td>
+<td><code>/orgs/activate/{uuid}</code></td>
+<td>—</td>
+<td><code>is_active = true</code></td>
+</tr>
+<tr class="odd">
+<td>POST</td>
+<td><code>/orgs/deactivate/{uuid}</code></td>
+<td>—</td>
+<td><code>is_active = false</code> (nothing else consults this
+flag)</td>
+</tr>
+<tr class="even">
+<td>PUT</td>
+<td><code>/orgs/{uuid}/admin</code></td>
+<td><code>{user_uuid}</code></td>
+<td>User must already be a member (409 otherwise); sets role
+<code>org_admin</code></td>
+</tr>
+<tr class="odd">
+<td>GET</td>
+<td><code>/orgs/{uuid}/admin</code></td>
+<td>—</td>
+<td>First <code>org_admin</code> of that org, 404 if none</td>
+</tr>
+<tr class="even">
+<td>POST</td>
+<td><code>/orgs/{uuid}/users</code></td>
+<td><code>{user_uuids: [...]}</code></td>
+<td>Sets org <strong>and forces role <code>org_user</code></strong> for
+each (S6). Not atomic on a missing user: earlier users in the list are
+already modified in the session but the 404 aborts before commit</td>
+</tr>
+</tbody>
+</table>
+<h4 id="custom-chatbots"><code>/custom-chatbots</code></h4>
+<table>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>POST</td>
+<td><code>/custom-chatbots</code></td>
+<td><strong>none</strong></td>
+<td><code>{chatbot_name, description, url_path, organization_uuid?, is_public}</code>
+→ 201. 409 on duplicate name or url_path. Generates
+<code>retrieval_key</code>. Starts unpublished.</td>
+</tr>
+<tr class="even">
+<td>GET</td>
+<td><code>/custom-chatbots</code></td>
+<td>admin</td>
+<td>Paginated list; <code>search</code>,
+<code>sort_by</code>∈{chatbot_name,created_at}, <code>sort_order</code>,
+<code>is_publish</code>, <code>is_public</code>,
+<code>organization_uuid</code></td>
+</tr>
+<tr class="odd">
+<td>GET</td>
+<td><code>/custom-chatbots/{uuid}</code></td>
+<td>none</td>
+<td>One chatbot (includes <code>file_path</code>,
+<code>retrieval_key</code>)</td>
+</tr>
+<tr class="even">
+<td>GET</td>
+<td><code>/custom-chatbots/by-url-path/{url_path}</code></td>
+<td>none</td>
+<td>Same, by slug</td>
+</tr>
+<tr class="odd">
+<td>GET</td>
+<td><code>/custom-chatbots/by-url-organization/{org_uuid}</code></td>
+<td>none</td>
+<td>All chatbots of an org</td>
+</tr>
+<tr class="even">
+<td>POST</td>
+<td><code>/custom-chatbots/publish/{uuid}</code></td>
+<td><strong>none</strong></td>
+<td><code>is_publish = true</code></td>
+</tr>
+<tr class="odd">
+<td>POST</td>
+<td><code>/custom-chatbots/unpublish/{uuid}</code></td>
+<td><strong>none</strong></td>
+<td><code>is_publish = false</code></td>
+</tr>
+<tr class="even">
+<td>POST</td>
+<td><code>/custom-chatbots/make-public/{uuid}</code></td>
+<td><strong>none</strong></td>
+<td><code>is_public = true</code></td>
+</tr>
+<tr class="odd">
+<td>POST</td>
+<td><code>/custom-chatbots/make-private/{uuid}</code></td>
+<td><strong>none</strong></td>
+<td><code>is_public = false</code></td>
+</tr>
+<tr class="even">
+<td>POST</td>
+<td><code>/custom-chatbots/{uuid}/upload-image</code></td>
+<td><strong>none</strong></td>
+<td>multipart <code>file</code>, <code>.jpg/.jpeg/.png</code>; replaces
+previous image</td>
+</tr>
+<tr class="odd">
+<td>GET</td>
+<td><code>/custom-chatbots/images/{name}</code></td>
+<td>none</td>
+<td>Serves a hero image</td>
+</tr>
+<tr class="even">
+<td>POST</td>
+<td><code>/custom-chatbots/{uuid}/upload-file</code></td>
+<td><strong>none</strong></td>
+<td>multipart <code>file</code>, <code>.txt/.pdf</code>; see P2 for the
+replacement bug</td>
+</tr>
+<tr class="odd">
+<td>POST</td>
+<td><code>/custom-chatbots/api/{url_path}</code></td>
+<td>none</td>
+<td>Chat. Checks only <code>is_publish</code> (S3)</td>
+</tr>
+<tr class="even">
+<td>POST</td>
+<td><code>/custom-chatbots/api/private/{url_path}</code></td>
+<td>any user</td>
+<td>Chat, requiring admin or same organization. <strong>Not called by
+anything.</strong> Returns 401 (not 403) on mismatch.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="api-keys"><code>/api-keys</code></h4>
+<table>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>POST</td>
+<td><code>/api-keys/users/{user_uuid}/api-keys</code></td>
+<td>admin</td>
+<td><code>{key_hash, label?, expires_at?}</code> — the caller supplies
+the key value (S4)</td>
+</tr>
+<tr class="even">
+<td>GET</td>
+<td><code>/api-keys</code></td>
+<td>admin</td>
+<td>All keys</td>
+</tr>
+<tr class="odd">
+<td>GET</td>
+<td><code>/api-keys/{uuid}</code></td>
+<td>any user</td>
+<td>Any user can read any key&#39;s metadata</td>
+</tr>
+</tbody>
+</table>
+<p>There is no endpoint to deactivate, rotate or delete a key; do it in
+SQL.</p>
+<h4 id="services"><code>/services</code></h4>
+<table>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>POST</td>
+<td><code>/services</code></td>
+<td>admin</td>
+<td><code>{service_key, service_name, base_url, response_type}</code>;
+duplicate key → unhandled 500 (IntegrityError)</td>
+</tr>
+<tr class="even">
+<td>GET</td>
+<td><code>/services</code></td>
+<td>any user</td>
+<td>All services, <strong>including internal
+<code>base_url</code>s</strong></td>
+</tr>
+<tr class="odd">
+<td>GET</td>
+<td><code>/services/{uuid}</code></td>
+<td>any user</td>
+<td>One</td>
+</tr>
+</tbody>
+</table>
+<p>No update/deactivate endpoint; <code>is_active</code> must be changed
+in SQL.</p>
+<h4 id="usage"><code>/usage</code></h4>
+<table>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>POST</td>
+<td><code>/usage/service-usage</code></td>
+<td>admin</td>
+<td><code>{api_key_uuid, service_uuid, usage_limit, expires_at?}</code>
+— creates an allocation. Does not check for an existing one (P5)</td>
+</tr>
+<tr class="even">
+<td>POST</td>
+<td><code>/usage/logs</code></td>
+<td>any user</td>
+<td>Inserts an arbitrary usage row, <strong>negative
+<code>tokens_used</code> accepted</strong> (S7)</td>
+</tr>
+<tr class="odd">
+<td>GET</td>
+<td><code>/usage/current/{api_key_uuid}/{service_uuid}</code></td>
+<td>any user</td>
+<td><code>{total_tokens_used, request_count}</code> for any key</td>
+</tr>
+<tr class="even">
+<td>GET</td>
+<td><code>/usage/summary</code></td>
+<td>admin</td>
+<td>One grouped query: per key × service totals, error counts, limit,
+last request; plus grand totals. Drives the admin dashboard.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="api-and-tasks--the-metered-path-x-api-key"><code>/api</code> and
+<code>/tasks</code> — the metered path (<code>X-Api-Key</code>)</h4>
+<table>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Path</th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>GET/POST/PUT/PATCH/DELETE</td>
+<td><code>/api/{service_key}/{path}</code></td>
+<td>§4.7 / §4.8</td>
+</tr>
+<tr class="even">
+<td>GET</td>
+<td><code>/tasks/{uuid}/status</code></td>
+<td>Key must be valid <strong>for the task&#39;s service</strong> (it is not
+required to be the key that created the task)</td>
+</tr>
+<tr class="odd">
+<td>GET</td>
+<td><code>/tasks/{uuid}/result</code></td>
+<td>400 while pending/processing</td>
+</tr>
+<tr class="even">
+<td>GET</td>
+<td><code>/tasks/{uuid}/download</code></td>
+<td>400 unless completed; 404 if no body</td>
+</tr>
+</tbody>
+</table>
+<p>Note that <code>/tasks/*</code> runs the full
+<code>validate_api_key</code>, including the quota check, so a key that
+has exhausted its quota can no longer poll or download results it
+already paid for.</p>
+<h4 id="first-party-proxies--no-auth-no-metering">First-party proxies —
+no auth, no metering</h4>
+<table>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Path</th>
+<th>Upstream</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>POST</td>
+<td><code>/asr/transcribe</code></td>
+<td>asr-be <code>/transcribe</code> (Wav2Vec-BERT + punctuation)</td>
+</tr>
+<tr class="even">
+<td>POST</td>
+<td><code>/asr/transcribe/stream</code></td>
+<td>asr-be <code>/transcribe/whisper/stream</code> (SSE relay)</td>
+</tr>
+<tr class="odd">
+<td>GET</td>
+<td><code>/asr/health</code></td>
+<td>asr-be <code>/health</code> → <code>ok</code> /
+<code>degraded</code> / <code>unreachable</code></td>
+</tr>
+<tr class="even">
+<td>POST</td>
+<td><code>/tts/generate</code></td>
+<td>tts-be <code>/generate</code>; stores WAV, returns
+<code>{audioUrl}</code></td>
+</tr>
+<tr class="odd">
+<td>GET</td>
+<td><code>/tts/output/{file}</code></td>
+<td>serves a stored WAV</td>
+</tr>
+<tr class="even">
+<td>POST</td>
+<td><code>/framework/upload</code></td>
+<td>framework-be <code>/upload</code></td>
+</tr>
+<tr class="odd">
+<td>POST</td>
+<td><code>/framework/chat</code></td>
+<td>framework-be <code>/chat</code></td>
+</tr>
+</tbody>
+</table>
+<p>The gateway&#39;s <code>TtsGenerateRequest</code> defaults are
+<code>speaker=mettananda, speaker_type=single, voice=male, input_type=sinhala</code>
+(tts-be&#39;s own defaults differ:
+<code>oshadi / multi / female</code>).</p>
+<h3 id="86-the-metered-proxy-in-detail">8.6 The metered proxy in
+detail</h3>
+<ul>
+<li><strong>Routing is data.</strong> A service exists on
+<code>/api</code> only once a <code>services</code> row exists;
+<code>base_url</code> is where requests go.</li>
+<li><strong>Header hygiene.</strong> <code>host</code>,
+<code>x-api-key</code> and <code>content-length</code> are stripped;
+everything else (including <code>Authorization</code> and cookies, if a
+client sends them) is forwarded.</li>
+<li><strong>Response.</strong> The whole upstream body is read, then
+returned. The proxy does not stream, so SSE endpoints behind
+<code>/api</code> arrive in one lump after completion.</li>
+<li><strong>Billing.</strong> <code>X-Tokens-Used</code> parsed as int,
+clamped at ≥0; missing or unparseable → 1. Failures are logged with
+<code>status=&quot;error&quot;</code> and still billed what the upstream
+reported.</li>
+<li><strong>Quota check timing.</strong> The quota is checked before the
+call against the running sum, so the call that crosses the limit
+succeeds and only the next one is refused. Concurrent calls can
+overshoot.</li>
+</ul>
+<p>Units per service, as reported by upstreams:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Service</th>
+<th>Unit billed</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ASR</td>
+<td>seconds of audio, rounded up, min 1</td>
+</tr>
+<tr class="even">
+<td>TTS</td>
+<td>characters of input text, min 1</td>
+</tr>
+<tr class="odd">
+<td>chatbot-mod / framework</td>
+<td>LLM prompt + completion tokens (fallback: chars÷4 of question +
+answer)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="87-rate-limiting">8.7 Rate limiting</h3>
+<p><code>rate_limit.py</code>: a <code>deque</code> of monotonic
+timestamps per API-key UUID, under a threading lock. When the deque
+holds <code>RATE_LIMIT_REQUESTS</code> entries within the window → 429
+with <code>Retry-After</code>. Applied <strong>after</strong> key
+validation (so an invalid key is never counted and the limiter is not an
+oracle). Empty deques are garbage-collected once more than 10 000 keys
+are tracked. Counters live in process: restarts reset them and replicas
+multiply the limit.</p>
+<p>Only the metered path is rate-limited. The first-party routes
+(<code>/asr</code>, <code>/tts</code>, <code>/framework</code>,
+<code>/custom-chatbots/api</code>) have no limit at all.</p>
+<h3 id="88-task-worker">8.8 Task worker</h3>
+<ul>
+<li><code>get_queue()</code> lazily creates one
+<code>asyncio.Queue[int]</code> of task IDs.</li>
+<li><code>start_worker()</code> spawns <strong>one</strong> consumer
+with its own <code>httpx.AsyncClient</code> (300 s timeout). Tasks run
+strictly one at a time.</li>
+<li><code>_process_task</code> eager-loads <code>task.service</code> (a
+lazy load on an async session raises <code>MissingGreenlet</code>),
+marks <code>processing</code>, performs the call, stores the result and
+a <code>UsageLog</code>, or marks <code>failed</code> with the exception
+text.</li>
+<li>Nothing re-enqueues <code>pending</code> rows on startup; a restart
+strands them.</li>
+</ul>
+<h3 id="89-uploads-served-by-the-gateway">8.9 Uploads served by the
+gateway</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Kind</th>
+<th>Directory</th>
+<th>Allowed</th>
+<th>Served at</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Hero images</td>
+<td><code>IMAGE_UPLOAD_DIR</code></td>
+<td><code>.jpg .jpeg .png</code> (by extension only)</td>
+<td><code>GET /custom-chatbots/images/{name}</code></td>
+</tr>
+<tr class="even">
+<td>Knowledge files</td>
+<td><code>FILE_UPLOAD_DIR</code></td>
+<td><code>.txt .pdf</code> (by extension only)</td>
+<td>not served; read by chatbot-mod</td>
+</tr>
+<tr class="odd">
+<td>TTS audio</td>
+<td><code>FILE_STORE_DIR</code></td>
+<td>—</td>
+<td><code>GET /tts/output/{name}</code></td>
+</tr>
+</tbody>
+</table>
+<p>Stored names are <code>uuid4().hex + ext</code>. There is no size
+limit on gateway uploads and no cleanup of TTS audio.</p>
+<h3 id="810-database-schema-and-alembic">8.10 Database schema and
+Alembic</h3>
+<p><strong>Alembic is broken; do not run it.</strong> The surviving
+revisions are <code>55a46c9cfe3c_initial</code> and
+<code>a3ed621aab5e</code> (adds <code>google_id</code>,
+<code>avatar_url</code>, makes <code>hashed_password</code> nullable),
+whose <code>down_revision</code> is <code>fd7d9a25f32a</code> — a file
+deleted in a past commit (&quot;removed that alembic shit&quot;,
+<code>3d3a273</code>). Alembic cannot build its revision graph and fails
+with a <code>KeyError</code>. Deployed databases are stamped at the
+initial revision while carrying columns added by the deleted migrations,
+so <code>alembic_version</code> also misdescribes them.</p>
+<p>What actually happens: <code>main.py</code>&#39;s lifespan runs
+<code>Base.metadata.create_all</code>, which <strong>creates missing
+tables</strong> but <strong>never alters existing ones</strong>. Any
+model change against a deployed database must be applied by hand with
+<code>ALTER TABLE</code>.</p>
+<p>The real fix (not done): dump the live schema, compare with the
+models, reconcile by hand, delete the history, autogenerate a fresh
+baseline and <code>alembic stamp head</code> every environment.</p>
+<h3 id="811-tests">8.11 Tests</h3>
+<p>64 tests, all passing <strong>[verified: <code>pytest -q</code> → 64
+passed in 12 s]</strong>, run against in-memory SQLite with
+<code>StaticPool</code>, <code>get_db</code> overridden, and httpx
+<code>MockTransport</code> for upstreams. Files:</p>
+<table>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Covers</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>test_auth.py</code></td>
+<td>register, duplicate email, login, wrong password, blocked login,
+<code>/me</code>, garbage token, user-list role guard (parametrised),
+org_admin filter restriction</td>
+</tr>
+<tr class="even">
+<td><code>test_google_auth.py</code></td>
+<td>first sign-in creates + flags new, returning user, password-account
+linking, blocked user, invalid token, unverified email, org in token,
+error shape, password login never &quot;new&quot;</td>
+</tr>
+<tr class="odd">
+<td><code>test_api_key_validation.py</code></td>
+<td>every branch of <code>validate_api_key</code></td>
+</tr>
+<tr class="even">
+<td><code>test_gateway_proxy.py</code></td>
+<td>missing/invalid key, short proxy, header stripping, token logging,
+unreported → 1, unparseable header, upstream failure logged, long →
+task, rate-limit 429 + Retry-After, quota block</td>
+</tr>
+<tr class="odd">
+<td><code>test_task_worker.py</code></td>
+<td>worker success + usage, failure path, status/result/download
+endpoints, unknown task</td>
+</tr>
+<tr class="even">
+<td><code>test_organizations.py</code></td>
+<td>org create/duplicate, assign org, unknown org, block rules</td>
+</tr>
+<tr class="odd">
+<td><code>test_config_guards.py</code></td>
+<td>each <code>config.py</code> refusal, in its own subprocess</td>
+</tr>
+</tbody>
+</table>
+<p><code>tests/factories.py</code> seeds rows directly.</p>
+<hr />
+<h2 id="9-asr-be--speech-to-text">9. asr-be — speech to text</h2>
+<p><strong>Stack:</strong> Python 3.10 · FastAPI · transformers 4.46 ·
+torch 2.5 · librosa 0.8 · soundfile · numpy 1.22.
+<strong>Entry:</strong> <code>run.py</code> (port 6000).
+<strong>Models:</strong> <code>models.py</code>.</p>
+<h3 id="91-models">9.1 Models</h3>
+<p>All three load at import (after
+<code>huggingface_hub.login(HF_TOKEN)</code>), which is why startup
+takes minutes and why the service cannot be imported in unit tests.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Hub repo</th>
+<th>Class</th>
+<th>Kind</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>wav</code></td>
+<td><code>L-Inuri/wav2vec</code></td>
+<td><code>AsrModel</code> + <code>Wav2Vec2Processor</code></td>
+<td>CTC, reads <code>input_values</code></td>
+</tr>
+<tr class="even">
+<td><code>bert</code></td>
+<td><code>L-Inuri/Wav2Vec-BERT</code></td>
+<td><code>BertAsrModel</code> + <code>Wav2Vec2BertProcessor</code></td>
+<td>CTC, reads <code>input_features</code></td>
+</tr>
+<tr class="odd">
+<td><code>whisper</code></td>
+<td><code>L-Inuri/whisper-sinhala-asr-test</code></td>
+<td><code>WhisperAsrModel</code> + <code>WhisperProcessor</code></td>
+<td>seq2seq; <code>transcribe()</code> uses <code>generate()</code>;
+<code>generate(features, streamer)</code> for streaming</td>
+</tr>
+</tbody>
+</table>
+<p>CTC path: one forward pass → <code>argmax</code> →
+<code>batch_decode</code>. Whisper: <code>generate</code> →
+<code>batch_decode(skip_special_tokens=True)</code>.</p>
+<h3 id="92-endpoints">9.2 Endpoints</h3>
+<p>All transcribe endpoints take multipart with a <code>file</code>
+field.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Path</th>
+<th>Model</th>
+<th>Response</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>POST</td>
+<td><code>/transcribe</code></td>
+<td>Wav2Vec-BERT</td>
+<td><code>{transcription}</code> with <code>?</code>/<code>.</code>
+appended by post-processing</td>
+</tr>
+<tr class="even">
+<td>POST</td>
+<td><code>/transcribe/wav</code></td>
+<td>wav2vec2</td>
+<td><code>{transcription}</code></td>
+</tr>
+<tr class="odd">
+<td>POST</td>
+<td><code>/transcribe/whisper</code></td>
+<td>Whisper</td>
+<td><code>{transcription}</code></td>
+</tr>
+<tr class="even">
+<td>POST</td>
+<td><code>/transcribe/whisper/stream</code></td>
+<td>Whisper</td>
+<td>SSE (<code>delta</code> frames, then
+<code>{transcription, done}</code> or <code>{error}</code>)</td>
+</tr>
+<tr class="odd">
+<td>GET</td>
+<td><code>/</code>, <code>/health</code></td>
+<td>—</td>
+<td>liveness</td>
+</tr>
+<tr class="even">
+<td>GET</td>
+<td><code>/metrics</code></td>
+<td>—</td>
+<td>Prometheus</td>
+</tr>
+</tbody>
+</table>
+<p>Every transcribe response carries <code>X-Tokens-Used</code> =
+ceil(seconds), min 1.</p>
+<h3 id="93-audio-handling">9.3 Audio handling</h3>
+<p><code>process_audio_file()</code> decodes with
+<strong>soundfile</strong> (libsndfile): WAV, FLAC, OGG/Vorbis work;
+<strong>webm/opus and MP3 do not</strong>. Non-16 kHz input is resampled
+with librosa; multichannel input is averaged to mono. Decode errors →
+500 with the exception text as <code>detail</code>.</p>
+<h3 id="94-streaming-internals">9.4 Streaming internals</h3>
+<p><code>generate_whisper</code> runs on a daemon thread;
+<code>TextIteratorStreamer</code> yields text at word boundaries (empty
+strings are skipped). If generation raises, the error is recorded and
+<code>streamer.end()</code> is called so the consumer does not hang; the
+final frame is then <code>{&quot;error&quot;: &quot;...&quot;}</code>. The status line has
+already been sent as 200 by then. <code>X-Accel-Buffering: no</code>
+stops nginx from buffering the stream.</p>
+<h3 id="95-post-processing">9.5 Post-processing</h3>
+<p><code>postprocessing/post_processing.py</code> reads
+<code>question_words.txt</code> (UTF-16, 1 947 lines) <strong>on every
+call</strong>, tokenises the transcription, and appends <code>?</code>
+if <strong>any</strong> word is a question word, else <code>.</code>.
+The path is CWD-relative, so the service must run from
+<code>backend/ASR</code> (the Dockerfile&#39;s <code>WORKDIR</code> ensures
+it). Only <code>/transcribe</code> applies it.</p>
+<h3 id="96-concurrency">9.6 Concurrency</h3>
+<p>Handlers are <code>async def</code> but run inference synchronously,
+so a transcription <strong>blocks the event loop</strong> — while one
+request is decoding, the service cannot answer anything else, including
+<code>/health</code> and <code>/metrics</code>. The streaming endpoint
+offloads <code>generate</code> to a thread but decodes/features on the
+loop.</p>
+<hr />
+<h2 id="10-tts-be--text-to-speech">10. tts-be — text to speech</h2>
+<p><strong>Stack:</strong> Python 3.10 · FastAPI · vendored Coqui TTS
+(<code>backend/TTS/TTS</code>) · soundfile · numpy.
+<strong>Entry:</strong> <code>voicebot_tts.py</code> (port 6002).</p>
+<h3 id="101-voices">10.1 Voices</h3>
+<p>Keyed <code>&quot;{speaker_type}_{voice}_{input_type}&quot;</code>. All six
+load at import.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Key</th>
+<th>Hub repo</th>
+<th>Checkpoint</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>single_male_sinhala</code></td>
+<td><code>Sasangi/VITS_Metta_SInhala</code></td>
+<td><code>checkpoint_324600.pth</code></td>
+</tr>
+<tr class="even">
+<td><code>single_female_sinhala</code></td>
+<td><code>Sasangi/Vits_Oshadi_Sinhala</code></td>
+<td><code>checkpoint_38400.pth</code></td>
+</tr>
+<tr class="odd">
+<td><code>multi_male_sinhala</code></td>
+<td><code>Sasangi/Vits_Multi_Sinhala</code></td>
+<td><code>checkpoint_323400.pth</code></td>
+</tr>
+<tr class="even">
+<td><code>multi_female_sinhala</code></td>
+<td><code>Sasangi/Vits_Multi_Sinhala</code></td>
+<td><code>checkpoint_323400.pth</code> (same model, loaded a second
+time)</td>
+</tr>
+<tr class="odd">
+<td><code>single_male_romanized</code></td>
+<td><code>Sasangi/Vits_Metta_Roman</code></td>
+<td><code>checkpoint_87600.pth</code></td>
+</tr>
+<tr class="even">
+<td><code>single_female_romanized</code></td>
+<td><code>Sasangi/Vits_Oshadi_Roman</code></td>
+<td><code>checkpoint_38400.pth</code></td>
+</tr>
+</tbody>
+</table>
+<p>For <code>multi</code> models the voice is chosen by the
+<code>speaker</code> name (<code>mettananda</code> /
+<code>oshadi</code>), not by <code>voice</code>; <code>voice</code> only
+picks which of the two identical model copies to use. There is no
+multi-speaker romanized model.</p>
+<h3 id="102-request">10.2 Request</h3>
+<div class="sourceCode" id="cb19"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;text&quot;</span><span class="fu">:</span> <span class="st">&quot;ආයුබෝවන්.&quot;</span><span class="fu">,</span> <span class="dt">&quot;speaker&quot;</span><span class="fu">:</span> <span class="st">&quot;oshadi&quot;</span><span class="fu">,</span> <span class="dt">&quot;speaker_type&quot;</span><span class="fu">:</span> <span class="st">&quot;multi&quot;</span><span class="fu">,</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;voice&quot;</span><span class="fu">:</span> <span class="st">&quot;female&quot;</span><span class="fu">,</span> <span class="dt">&quot;input_type&quot;</span><span class="fu">:</span> <span class="st">&quot;sinhala&quot;</span> <span class="fu">}</span></span></code></pre></div>
+<p>(the values above are the service defaults).
+<code>speaker_type</code> ∈ {single, multi}, <code>voice</code> ∈ {male,
+female}; otherwise 400. Unknown key → 404. Empty text → 400.</p>
+<h3 id="103-text-normalisation">10.3 Text normalisation</h3>
+<p><code>text/cleaners.py::sinhala_cleaners</code> runs, in order:</p>
+<ol type="1">
+<li><code>normalize_numbers</code> (<code>text/numbers.py</code>,
+<code>numbers2wordsSi.py</code>) — spells out digits, including negative
+numbers and thousands/millions/billions, in Sinhala;</li>
+<li>abbreviation expansion — <code>පෙ.ව.</code> → පෙරවරු,
+<code>ප.ව.</code> → පස්වරු, <code>බු.ව.</code> → බුද්ධ වර්ෂ,
+<code>ක්‍රි.ව.</code> → ක්‍රිස්තු වර්ෂ;</li>
+<li>whitespace collapse.</li>
+</ol>
+<p><code>text/symbols.py</code> lists the model&#39;s character set.</p>
+<h3 id="104-endpoints">10.4 Endpoints</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Path</th>
+<th>Returns</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>POST</td>
+<td><code>/generate</code></td>
+<td>One complete WAV (written at a hard-coded 22 050 Hz header).
+<code>X-Tokens-Used</code> = characters</td>
+</tr>
+<tr class="even">
+<td>POST</td>
+<td><code>/generate/stream</code></td>
+<td>Streaming WAV, sentence by sentence</td>
+</tr>
+<tr class="odd">
+<td>GET</td>
+<td><code>/generate/stream?text=…&amp;speaker=…</code></td>
+<td>Same, for <code>&lt;audio src&gt;</code></td>
+</tr>
+<tr class="even">
+<td>POST</td>
+<td><code>/generate/prepare</code></td>
+<td><code>{id}</code> (12 hex chars) — stash a request for 10
+minutes</td>
+</tr>
+<tr class="odd">
+<td>GET</td>
+<td><code>/generate/stream/{id}</code></td>
+<td>Stream a stashed request; replayable until expiry</td>
+</tr>
+<tr class="even">
+<td>POST</td>
+<td><code>/voicebot-generate-audio</code></td>
+<td>Writes <code>output/output.wav</code>, returns
+<code>{audioUrl: &quot;/output/output.wav&quot;}</code> (legacy app)</td>
+</tr>
+<tr class="odd">
+<td>GET</td>
+<td><code>/output/{filename}</code></td>
+<td>Serve a file from <code>output/</code></td>
+</tr>
+<tr class="even">
+<td>GET</td>
+<td><code>/</code>, <code>/health</code>, <code>/metrics</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="105-streaming-wav-format">10.5 Streaming WAV format</h3>
+<p><code>build_audio_stream</code> splits text on
+<code>(?&lt;=[.!?෴])\s+</code>, emits a RIFF/WAVE header with
+<code>0xFFFFFFFF</code> in both size fields (length unknown up front),
+then PCM16 little-endian per sentence at the model&#39;s
+<code>output_sample_rate</code> (default 22 050). If a sentence fails to
+synthesise, the stream just ends.</p>
+<p>The prepare/stream split exists because <code>&lt;audio&gt;</code>
+can only GET, and Sinhala percent-encodes to roughly nine bytes per
+character, so long replies overflow URL limits. The pending map is in
+process: prepare and stream must hit the same replica.</p>
+<h3 id="106-offline-scripts">10.6 Offline scripts</h3>
+<p><code>backend/TTS/scripts/</code> — <code>run.py</code> (one sample),
+<code>evaluation.py</code> (batch), <code>voice_clone.py</code>
+(speaker-embedding cloning), <code>model.py</code> (which checkpoint the
+scripts use). Not imported by the service.</p>
+<hr />
+<h2 id="11-shared--the-rag-recipe">11. shared — the RAG recipe</h2>
+<p><code>backend/shared/rag.py</code> is the single definition used by
+chatbot-mod and framework-be.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Piece</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Embeddings</td>
+<td><code>HuggingFaceBgeEmbeddings(&quot;intfloat/multilingual-e5-large-instruct&quot;)</code>,
+CPU, normalised</td>
+</tr>
+<tr class="even">
+<td>Splitter</td>
+<td><code>RecursiveCharacterTextSplitter(chunk_size=514, chunk_overlap=20)</code></td>
+</tr>
+<tr class="odd">
+<td>LLM</td>
+<td><code>ChatGroq(model_name=&quot;llama-3.3-70b-versatile&quot;)</code>; raises
+if <code>GROQ_API_KEY</code> is unset</td>
+</tr>
+<tr class="even">
+<td>Chain</td>
+<td><code>RetrievalQA.from_chain_type(chain_type=&quot;stuff&quot;, chain_type_kwargs={&quot;prompt&quot;: SINHALA_PROMPT})</code>
+with the vector store&#39;s default retriever</td>
+</tr>
+<tr class="odd">
+<td>Prompt</td>
+<td>Formal Sinhala; answer <strong>only</strong> from context; if not in
+context, say you don&#39;t know in Sinhala</td>
+</tr>
+</tbody>
+</table>
+<p><code>TokenCounter</code> (a LangChain callback) captures usage from
+<code>llm_output[&quot;token_usage&quot;]</code> or per-generation
+<code>usage_metadata</code>. <code>answer_with_usage(chain, q)</code>
+returns <code>(text, tokens)</code>; if nothing is reported it estimates
+<code>len(q)//4 + len(answer)//4</code> (each at least 1).</p>
+<p><strong>Compatibility constraint:</strong> imported under Python 3.9
++ LangChain 0.3 (framework) and Python 3.10 + LangChain 0.1
+(chatbot-mod). Hence <code>from __future__ import annotations</code>,
+<code>typing.Optional</code>, guarded imports. Test changes against
+both.</p>
+<p>Both consuming Dockerfiles build from <code>./backend</code> and
+<code>COPY shared/</code>.</p>
+<hr />
+<h2 id="12-chatbot-mod--custom-chatbot-rag">12. chatbot-mod —
+custom-chatbot RAG</h2>
+<p><strong>Stack:</strong> Python 3.10 · FastAPI · LangChain 0.1 · FAISS
+· Redis · Groq. <strong>Entry:</strong>
+<code>backend/chatbot-modified/chatbot_api.py</code> (port 7006).</p>
+<h3 id="endpoint">Endpoint</h3>
+<p><code>POST /chat</code>
+<code>{message, file_path, retrieval_key?}</code> →
+<code>{response, retrieval_key}</code> with
+<code>X-Tokens-Used</code>.</p>
+<ol type="1">
+<li>Empty <code>message</code> or <code>file_path</code> → 400.</li>
+<li><code>file_path</code> is joined onto <code>UPLOAD_DIR</code> via
+<code>realpath</code> and rejected (400) if it escapes; missing file →
+404.</li>
+<li>If <code>retrieval_key</code> is given <strong>and</strong> present
+in Redis, the FAISS index is deserialised from it. Otherwise the file is
+loaded with <code>TextLoader(encoding=&quot;utf-8&quot;)</code>, split, embedded,
+indexed, serialised to Redis under a <strong>new</strong> uuid, and that
+new key is returned.</li>
+<li>A <code>RetrievalQA</code> chain is built per request and
+answered.</li>
+</ol>
+<p>Also <code>GET /health</code>, <code>GET /metrics</code>.</p>
+<h3 id="behaviour-worth-knowing">Behaviour worth knowing</h3>
+<ul>
+<li><strong>Only UTF-8 text is loadable.</strong> The gateway accepts
+<code>.pdf</code> knowledge files; those fail here with an unhandled
+exception.</li>
+<li><strong>Redis has no TTL.</strong> Every index written stays
+forever.</li>
+<li>The embedding model and the Groq client are created once, at
+import.</li>
+<li>Handlers are <code>async def</code> doing blocking work (embedding,
+Redis, Groq), so concurrent chats serialise on the event loop.</li>
+</ul>
+<p>The seed corpus, <code>Sri Lanka Constitution-Sinhala.txt</code> (≈1
+MB, the Constitution as amended to 31 Oct 2022, 2023 reprint), lives in
+this directory and is excluded from the Docker context — it has to be
+uploaded through the gateway.</p>
+<hr />
+<h2 id="13-framework-be--upload-then-chat-rag">13. framework-be —
+upload-then-chat RAG</h2>
+<p><strong>Stack:</strong> Python 3.9 · FastAPI · LangChain 0.3 · FAISS
+· pypdf · Groq. <strong>Entry:</strong>
+<code>backend/framework/chatbot.py</code> (port 6003).</p>
+<table>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Path</th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>POST</td>
+<td><code>/upload</code></td>
+<td>multipart <code>file</code>; <code>.txt</code>/<code>.pdf</code>
+else 400; &gt;<code>MAX_UPLOAD_BYTES</code> → 413; saved as
+<code>&lt;uuid4hex&gt;&lt;ext&gt;</code>; loaded
+(<code>TextLoader</code> / <code>PyPDFLoader</code>), split, embedded,
+indexed; chain cached. → <code>{success, message, document_key}</code>
+(the stored filename). On failure the file is deleted and a generic
+Sinhala 500 is returned.</td>
+</tr>
+<tr class="even">
+<td>POST</td>
+<td><code>/chat</code></td>
+<td><code>{message, document_key?}</code>. Missing key → the most
+recently used document. Evicted/unknown key → 404 &quot;re-upload&quot;. →
+<code>{response}</code> with <code>X-Tokens-Used</code>.</td>
+</tr>
+<tr class="odd">
+<td>GET</td>
+<td><code>/health</code>, <code>/metrics</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The cache is an <code>OrderedDict</code> LRU behind a lock, at most
+<code>MAX_CACHED_DOCUMENTS</code> (8) chains. Nothing is persisted: a
+restart or an eviction loses the index, and the uploaded file remains on
+disk forever. User-facing error messages are in Sinhala.</p>
+<p>Every upload calls <code>rag.build_embeddings()</code>, which
+constructs a new embedding model instance each time (slow and
+memory-heavy) instead of reusing one.</p>
+<h3 id="chatbot-mod-vs-framework-be">chatbot-mod vs framework-be</h3>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>chatbot-mod</th>
+<th>framework-be</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Used by</td>
+<td>custom chatbots, gov chatbot</td>
+<td><code>/p/make-chatbot</code>, legacy voicebot</td>
+</tr>
+<tr class="even">
+<td>Document comes from</td>
+<td>gateway upload, referenced by filename</td>
+<td>uploaded directly to this service</td>
+</tr>
+<tr class="odd">
+<td>Formats</td>
+<td><code>.txt</code></td>
+<td><code>.txt</code>, <code>.pdf</code></td>
+</tr>
+<tr class="even">
+<td>Index cache</td>
+<td>Redis, survives restarts, never expires</td>
+<td>in-process LRU of 8</td>
+</tr>
+<tr class="odd">
+<td>Key</td>
+<td><code>retrieval_key</code></td>
+<td><code>document_key</code></td>
+</tr>
+<tr class="even">
+<td>Python / LangChain</td>
+<td>3.10 / 0.1</td>
+<td>3.9 / 0.3</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="14-new-chat-app--the-web-app">14. new-chat-app — the web
+app</h2>
+<p><strong>Stack:</strong> React 19 · TypeScript 6 · Vite 8 (Rolldown)
+with the React Compiler (babel preset) · MUI 9 · TanStack Query 5 ·
+react-router 7 · react-hook-form + zod · axios ·
+<code>@react-oauth/google</code> · <code>@ricky0123/vad-react</code>
+(Silero VAD) · wavesurfer.js. Fonts: Geist Sans/Mono, Maname
+(Sinhala).</p>
+<h3 id="141-scripts">14.1 Scripts</h3>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run dev        <span class="co"># vite dev server</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run build      <span class="co"># tsc -b &amp;&amp; vite build → dist/</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run lint       <span class="co"># eslint .</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run typecheck  <span class="co"># tsc -b --noEmit</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run preview</span></code></pre></div>
+<h3 id="142-source-layout">14.2 Source layout</h3>
+<pre><code>src/
+  main.tsx          QueryClient, BrowserRouter(basename = BASE_URL), devtools
+  App.tsx           AlertProvider + route table
+  RootLayout.tsx    ThemeRegistry → GoogleOAuthProvider → AuthProvider → Outlet
+  AppLayout.tsx     Sidebar + Outlet; nav items by role
+  api/              axios instance + one module per backend area
+  components/       *Shell = feature surfaces; guards; skeletons; widgets
+  contexts/         AuthContext (localStorage-backed), AlertContext
+  hooks/            useAuth, useAlert, useAsrRecorder, useChatbotAccess,
+                    useGoogleAuthHandler, useUser, useOrganiztion
+  pages/            route targets
+  themes/           MUI theme
+  types/            response shapes mirroring gateway schemas
+  utils/            api.ts (endpoint map), asrStream.ts, auth.ts (role helpers), routes.ts</code></pre>
+<h3 id="143-routes">14.3 Routes</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Path</th>
+<th>Guard</th>
+<th>Page / component</th>
+<th>Talks to</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>/login</code></td>
+<td>—</td>
+<td><code>Login</code> (form + Google button)</td>
+<td><code>/users/login</code>, <code>/users/auth/google</code></td>
+</tr>
+<tr class="even">
+<td><code>/register</code></td>
+<td>—</td>
+<td><code>Register</code></td>
+<td><code>/users/register</code></td>
+</tr>
+<tr class="odd">
+<td><code>/onboarding</code></td>
+<td>—</td>
+<td><code>Onboarding</code> (after first Google sign-in)</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><code>/</code></td>
+<td>—</td>
+<td><code>Home</code></td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><code>/about</code></td>
+<td>—</td>
+<td><code>About</code></td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><code>/p/asr</code></td>
+<td>—</td>
+<td><code>AsrShell</code> (mic → streaming transcript)</td>
+<td><code>/asr/transcribe/stream</code></td>
+</tr>
+<tr class="odd">
+<td><code>/p/tts</code></td>
+<td>—</td>
+<td><code>TtsShell</code> (voice picker, text → audio)</td>
+<td><code>/tts/generate</code></td>
+</tr>
+<tr class="even">
+<td><code>/p/gov-chatbot</code></td>
+<td>—</td>
+<td><code>ChatShell</code> with
+<code>urlPath = VITE_GOV_CHATBOT_PATH</code></td>
+<td><code>/custom-chatbots/api/{path}</code></td>
+</tr>
+<tr class="odd">
+<td><code>/p/make-chatbot</code></td>
+<td>—</td>
+<td><code>UploadChatBotFile</code></td>
+<td><code>/framework/upload</code></td>
+</tr>
+<tr class="even">
+<td><code>/p/:url_path</code></td>
+<td><code>useChatbotAccess</code></td>
+<td><code>CustomChatShell</code> (text + voice in, TTS out)</td>
+<td>by-url-path, <code>/custom-chatbots/api/...</code>,
+<code>/tts/generate</code>, <code>/asr/transcribe/stream</code></td>
+</tr>
+<tr class="odd">
+<td><code>/admin</code></td>
+<td><code>AdminGuard</code></td>
+<td><code>AdminDashboard</code> (usage summary)</td>
+<td><code>/usage/summary</code></td>
+</tr>
+<tr class="even">
+<td><code>/admin/custom-chatbot</code></td>
+<td><code>AdminGuard</code></td>
+<td>list + create dialog</td>
+<td><code>/custom-chatbots</code>, <code>/orgs</code></td>
+</tr>
+<tr class="odd">
+<td><code>/admin/custom-chatbot/:id</code></td>
+<td><code>AdminGuard</code></td>
+<td>detail: publish, visibility, hero image, knowledge file</td>
+<td>publish/unpublish/make-public/make-private/upload-*</td>
+</tr>
+<tr class="even">
+<td><code>/admin/organizations</code></td>
+<td><code>AdminGuard</code></td>
+<td>list + create</td>
+<td><code>/orgs</code></td>
+</tr>
+<tr class="odd">
+<td><code>/admin/organizations/:id</code></td>
+<td><code>AdminGuard</code></td>
+<td>detail, activate/deactivate</td>
+<td><code>/orgs/...</code></td>
+</tr>
+<tr class="even">
+<td><code>/admin/users</code></td>
+<td><code>AuthGuard[admin, org_admin]</code></td>
+<td>paginated list</td>
+<td><code>/users</code></td>
+</tr>
+<tr class="odd">
+<td><code>/admin/users/:id</code></td>
+<td><code>AuthGuard[admin, org_admin]</code></td>
+<td>detail, change org, block/unblock</td>
+<td><code>/users/...</code></td>
+</tr>
+</tbody>
+</table>
+<p>Post-login default destination:
+<code>POST_LOGIN_REDIRECT = &quot;/p/gov-chatbot&quot;</code>
+(<code>utils/routes.ts</code>). Guards redirect to
+<code>/login?redirect=&lt;path&gt;</code>.</p>
+<p>The sidebar (<code>AppLayout</code>) lists, for everyone: Chatbot
+(<code>/p/chatbot</code>), ASR, TTS, Gov-chatbot, Make your own chatbot,
+Voice stream test (<code>/p/voice-stream</code>); admins additionally
+get Dashboard, Custom Chatbots, Organization, Users; org admins get
+Users. <code>/p/chatbot</code> and <code>/p/voice-stream</code> have no
+routes and fall into the <code>/p/:url_path</code> catch-all.</p>
+<h3 id="144-auth-state">14.4 Auth state</h3>
+<p><code>AuthContext</code> keeps <code>accessToken</code>,
+<code>role</code>, <code>organization_uuid</code>,
+<code>isAuthenticated</code>, <code>isNewUser</code>, seeded from
+<code>localStorage</code> (<code>subasa_access_token</code>,
+<code>subasa_role</code>, <code>subasa_organization</code>,
+<code>subasa_is_new_user</code>). <code>login()</code> posts credentials
+and stores the response; <code>logout()</code> clears it. There is no
+expiry handling: after the JWT expires the app still believes it is
+signed in, and every authenticated call returns 401 (shown as a toast)
+until the user logs out manually.</p>
+<p><code>AuthGuard</code> / <code>AdminGuard</code> decide by the role
+string in <code>localStorage</code>. They are UI conveniences; the
+server is the authority.</p>
+<h3 id="145-api-layer">14.5 API layer</h3>
+<p><code>api/axios.ts</code>: one instance with
+<code>baseURL = VITE_API_BASE_URL</code>,
+<code>withCredentials: true</code>, default JSON content type, a request
+interceptor that adds <code>Authorization: Bearer &lt;token&gt;</code>,
+and a response interceptor that turns
+<code>detail: [{field, message}]</code> into one error toast per entry
+(network errors and string <code>detail</code>s get generic messages).
+Multipart uploads override <code>Content-Type: undefined</code> so the
+browser sets the boundary. <code>api/documentChat.ts</code> uses raw XHR
+for upload progress; <code>utils/asrStream.ts</code> uses
+<code>fetch</code> to read the SSE body — neither goes through the
+interceptors.</p>
+<p><code>api/alertService.ts</code> bridges the interceptor (outside
+React) to the <code>AlertContext</code> via a registered handler.</p>
+<h3 id="146-speech-pipeline">14.6 Speech pipeline</h3>
+<p><code>hooks/useAsrRecorder.ts</code> — shared by <code>/p/asr</code>
+and custom chatbots:</p>
+<ol type="1">
+<li><code>useMicVAD</code> (VAD model + ONNX runtime WASM loaded from
+jsDelivr) detects an utterance and delivers 16 kHz mono Float32 when the
+speaker stops.</li>
+<li><code>encodeWav()</code> wraps it as 16-bit PCM WAV (the ASR service
+cannot read MediaRecorder&#39;s webm/opus).</li>
+<li><code>transcribeStream()</code> POSTs to
+<code>/asr/transcribe/stream</code> and parses SSE frames, calling
+<code>onDelta</code> for partial text.</li>
+<li><code>stop()</code> uses <code>vad.pause()</code> so the in-progress
+utterance is flushed; <code>cancel()</code> aborts the fetch and ignores
+late results.</li>
+</ol>
+<h3 id="147-tts">14.7 TTS</h3>
+<p><code>api/tts.ts</code> lists the six voices
+(<code>TTS_VOICES</code>) with Sinhala/English labels, keyed the way the
+service keys checkpoints, and <code>generateTtsAudio()</code> returns
+the gateway&#39;s <code>audioUrl</code>. Custom chatbots always speak with
+<code>mettananda / single / male / sinhala</code>.</p>
+<h3 id="148-chatbot-access-decision">14.8 Chatbot access decision</h3>
+<p><code>useChatbotAccess(chatbot, {role, organization_uuid, isAuthenticated})</code>:</p>
+<pre><code>admin                          → allowed
+!is_publish                    → not_published
+is_public                      → allowed
+chatbot has organization_uuid  → no user org → org_required
+                                 different org → org_mismatch
+                                 same org → allowed
+!isAuthenticated               → login_required
+otherwise                      → allowed</code></pre>
+<h3 id="149-build-and-deployment">14.9 Build and deployment</h3>
+<p>Multi-stage <code>Dockerfile</code>: <code>node:24.12.0-alpine</code>
+runs <code>npm ci &amp;&amp; npm run build</code>;
+<code>nginxinc/nginx-unprivileged</code> serves <code>dist/</code> on
+<strong>7007</strong> with SPA fallback
+(<code>try_files $uri /index.html</code>), gzip, and one-year immutable
+caching for static assets.</p>
+<p>When built with <code>VITE_BASE_PATH=/voc-si</code>, asset URLs are
+prefixed with <code>/voc-si/</code>, but this nginx serves from
+<code>/</code>. That only works if the reverse proxy in front of
+<code>subasa.lk</code> strips <code>/voc-si</code> before forwarding.
+That proxy config is not in this repository.</p>
+<p><code>frontend/new-chat-app/compose.yaml</code> is a leftover
+template (maps 8080, which nginx does not listen on); the root
+<code>docker-compose.yml</code> is what is used.</p>
+<hr />
+<h2 id="15-voicebot--the-deprecated-spa">15. voicebot — the deprecated
+SPA</h2>
+<p><code>frontend/voicebot/</code> — hand-written HTML/CSS/JS served by
+nginx on 7005, still built and deployed because nothing has confirmed it
+is unused (issue #44). <code>script.js</code> hard-codes
+<code>baseURL = &quot;https://subasa.lk/voc-si/&quot;</code> and calls
+<code>api/framework/*</code>,
+<code>api/&lt;tts&gt;/voicebot-generate-audio</code> and
+<code>api/chatbot/chat</code>. The <code>api/...</code> paths are the
+metered proxy, which needs an <code>X-Api-Key</code> this app never
+sends, so they only work if the production reverse proxy injects one.
+<code>pages/chatbot.html</code> is already broken — the chatbot service
+it called was removed (#14).</p>
+<p>Removal checklist (from <code>DEPRECATED.md</code>): confirm nothing
+points at port 7005; delete the directory and the
+<code>voicebot-frontend</code> compose service; close #44. The one
+capability not yet ported is <strong>chatting with an uploaded
+document</strong> (new-chat-app uploads but has no chat screen for
+it).</p>
+<hr />
+<h2 id="16-subasa-app--the-mobile-scaffold">16. subasa-app — the mobile
+scaffold</h2>
+<p><code>mobile-app/subasa-app/</code> is an unmodified Expo starter
+(Expo SDK 56, React Native 0.85, expo-router, TypeScript):
+<code>index</code> and <code>explore</code> screens, themed components,
+tab bar. No Subasa feature is implemented and nothing reads the API. A
+local <code>.env</code> defines <code>EXPO_PUBLIC_API_BASE_URL</code>,
+<code>EXPO_PUBLIC_CHATBOT_PATH</code>,
+<code>EXPO_PUBLIC_ASR_TRANSCRIBE_URL</code>,
+<code>EXPO_PUBLIC_TTS_STREAMING</code>,
+<code>EXPO_PUBLIC_USE_RN_FETCH</code>, all unused. Tracked by issues
+#47–#51. Run with
+<code>npm install &amp;&amp; npx expo start</code>.</p>
+<hr />
+<h2 id="17-monitoring">17. Monitoring</h2>
+<ul>
+<li>Every FastAPI service mounts
+<code>prometheus-fastapi-instrumentator</code> at <code>/metrics</code>:
+<code>http_requests_total</code>,
+<code>http_request_duration_seconds</code>,
+<code>http_requests_in_progress</code>, labelled by handler, method,
+status.</li>
+<li><code>prometheus.yml</code> scrapes every 15 s:
+<code>asr-be:6000</code>, <code>tts-be:6002</code>,
+<code>framework-be:6003</code>, <code>chatbot-mod:7006</code>,
+<code>host.docker.internal:7010</code>, and relabels each to a
+<code>service</code> label (<code>asr</code>, <code>tts</code>,
+<code>framework</code>, <code>chatbot-modified</code>,
+<code>api-gateway</code>). The static config assigns
+<code>service: api-gateway</code> to all targets as a fallback, so a new
+target without a relabel rule shows up as <code>api-gateway</code>.</li>
+<li>Grafana provisions a Prometheus datasource
+(<code>grafana/provisioning/datasources/prometheus.yml</code>) and one
+dashboard, &quot;Backend Services Overview&quot;: service up/down, request rate by
+service, 5xx rate, p95 latency, in-progress requests, status-code rate,
+top endpoints.</li>
+</ul>
+<p><strong>The dashboard does not load as provisioned.</strong>
+<code>dashboards.yml</code> tells Grafana to read dashboards from
+<code>/var/lib/grafana/dashboards</code>, but compose mounts the JSON at
+<code>/etc/grafana/provisioning/dashboards/backend-services.json</code>.
+Change the provider <code>path</code> to
+<code>/etc/grafana/provisioning/dashboards</code> (or mount the JSON
+where the provider looks). <em>(Found by reading; not reproduced on a
+running Grafana.)</em></p>
+<p>Gaps: no alerting rules or Alertmanager; default Prometheus retention
+in a named volume, not backed up; no model-level metrics (queue depth,
+inference time); business usage lives in MySQL (<code>usage_logs</code>)
+and the admin dashboard, not Prometheus.</p>
+<hr />
+<h2 id="18-testing-and-ci">18. Testing and CI</h2>
+<h3 id="181-ci-githubworkflowsciyml">18.1 CI
+(<code>.github/workflows/ci.yml</code>)</h3>
+<p>Runs on pushes and PRs to <code>main</code>, with concurrency
+cancellation per ref.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Job</th>
+<th>Steps</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>backend</code></td>
+<td>Python 3.13; <code>ruff check .</code>;
+<code>ruff format --check .</code>; <code>pytest -q</code> with SQLite
+and throwaway secrets</td>
+</tr>
+<tr class="even">
+<td><code>services-lint</code></td>
+<td>Python 3.10; ruff 0.15.4 over ASR, TTS, chatbot-modified, framework,
+shared, tests (vendored Coqui excluded)</td>
+</tr>
+<tr class="odd">
+<td><code>frontend</code></td>
+<td>Node 22; <code>npm ci</code>; lint; typecheck; build</td>
+</tr>
+<tr class="even">
+<td><code>compose</code></td>
+<td><code>docker compose --env-file .env.example config --quiet</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="182-unit-tests">18.2 Unit tests</h3>
+<p>See §8.11. Only the gateway has unit tests. The model services cannot
+be imported without downloading checkpoints, so they are linted, not
+tested, in CI.</p>
+<h3 id="183-smoke-tests">18.3 Smoke tests</h3>
+<p><code>backend/tests/smoke/</code> — HTTP tests against a running
+stack; each test <strong>skips itself</strong> if its service&#39;s
+<code>/health</code> is unreachable.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose up <span class="at">-d</span> asr-be tts-be chatbot-mod framework-be api-gateway</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> backend <span class="kw">&amp;&amp;</span> <span class="ex">pytest</span> tests/smoke <span class="at">-m</span> smoke</span></code></pre></div>
+<p>Override with <code>ASR_URL</code>, <code>TTS_URL</code>,
+<code>CHATBOT_URL</code>, <code>FRAMEWORK_URL</code>,
+<code>GATEWAY_URL</code>, <code>SMOKE_TIMEOUT</code> (default 120 s).
+Coverage: <code>/health</code> on all five; ASR transcribe + SSE; TTS
+generate + validation; framework upload→chat + validation; chatbot-mod
+input validation and path traversal; gateway unknown key.
+<code>sample_speech.py</code> generates a synthetic WAV.</p>
+<h3 id="184-load-tests">18.4 Load tests</h3>
+<p><code>loadtests/</code> (k6):</p>
+<ul>
+<li><code>gateway.js</code> — ramps 1→10→50→0 VUs over 2 min against
+<code>/api/{SERVICE_KEY}/{SERVICE_PATH}</code>; counts 429s separately
+as <code>gateway_rate_limited</code> vs
+<code>gateway_quota_exhausted</code>; thresholds p50&lt;300 ms,
+p95&lt;1.5 s on successes, &lt;10 upstream 5xx. Needs a real key and
+allocation; raise <code>RATE_LIMIT_REQUESTS</code> first.</li>
+<li><code>asr_tts.js</code> — 3 constant VUs each against ASR
+<code>/transcribe</code> and TTS <code>/generate</code> for 2 min; p95
+&lt; 20 s.</li>
+</ul>
+<p><strong>No baselines have ever been recorded</strong>; the table in
+<code>loadtests/README.md</code> is empty.</p>
+<hr />
+<h2 id="19-security-posture">19. Security posture</h2>
+<h3 id="191-what-is-in-place">19.1 What is in place</h3>
+<ul>
+<li>The gateway refuses to start without a strong
+<code>JWT_SECRET</code>.</li>
+<li>No service accepts wildcard or empty CORS.</li>
+<li><code>.env</code> files are excluded from every Docker build
+context; secrets come from compose <code>environment:</code>. Images
+built before that change contained secrets and must be deleted (see
+<code>docs/SECURITY-AUDIT.md</code>).</li>
+<li>Git history audited 2026-09-07: no <code>.env</code> or real
+credential ever committed.</li>
+<li>Passwords hashed with argon2; password strength enforced at
+registration.</li>
+<li>Google ID tokens verified server-side, with
+<code>email_verified</code> required.</li>
+<li>Blocked users refused at both password and Google login.</li>
+<li>chatbot-mod rejects path traversal in <code>file_path</code>;
+framework-be and the gateway never use client filenames on disk.</li>
+<li>API keys are not forwarded to upstreams; the rate limiter cannot be
+used to probe for valid keys.</li>
+<li>Model services log exceptions rather than returning them (except
+ASR, which still returns exception text in 500s).</li>
+</ul>
+<h3 id="192-secrets-to-rotate-at-handover">19.2 Secrets to rotate at
+handover</h3>
+<p>From <code>docs/SECURITY-AUDIT.md</code>: <code>GROQ_API_KEY</code>,
+<code>GOOGLE_CLIENT_SECRET</code> (no longer used, still exists),
+<code>JWT_SECRET</code> (rotating logs everyone out), MySQL password,
+<code>GRAFANA_ADMIN_PASSWORD</code>, the Hugging Face tokens.</p>
+<h3 id="193-what-is-missing">19.3 What is missing</h3>
+<p>See §20 S1–S9. In one sentence: <strong>authorization is almost
+entirely unenforced on the server</strong> — the role and visibility
+model exists in the frontend and in a handful of endpoints, and nowhere
+else.</p>
+<hr />
+<h2 id="20-known-issues--the-complete-list">20. Known issues — the
+complete list</h2>
+<p>Severity: <strong>S</strong> = security, <strong>P</strong> =
+correctness/production bug, <strong>F</strong> = frontend,
+<strong>O</strong> = operations. Within each group, worst first. &quot;New&quot;
+marks issues not listed in the existing READMEs.</p>
+<h3 id="security">Security</h3>
+<table>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Issue</th>
+<th>Where</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>S1</td>
+<td><strong>Anyone can make any account a system admin.</strong>
+<code>PUT /users/{uuid}</code> has no auth dependency and
+<code>UserUpdate</code> accepts <code>role</code>.</td>
+<td><code>routers/users.py</code> <code>update_user</code></td>
+<td><strong>[verified]</strong> — unauthenticated request returned 200
+with <code>role: admin_user</code></td>
+</tr>
+<tr class="even">
+<td>S2</td>
+<td><strong>Most write endpoints are unauthenticated</strong>: all of
+<code>/orgs</code> (create, activate, deactivate, assign admin, add
+users), <code>PUT /users/{uuid}/organization</code>, and
+<code>/custom-chatbots</code> create / publish / unpublish / make-public
+/ make-private / upload-image / upload-file.</td>
+<td><code>routers/organizations.py</code>, <code>users.py</code>,
+<code>custom_chatbots.py</code></td>
+<td>known</td>
+</tr>
+<tr class="odd">
+<td>S3</td>
+<td><strong>Chatbot visibility enforced only in the browser.</strong>
+<code>POST /custom-chatbots/api/{url_path}</code> checks only
+<code>is_publish</code>. <code>GET /custom-chatbots/{uuid}</code>,
+<code>/by-url-path/…</code> and <code>/by-url-organization/…</code> are
+also open and reveal <code>file_path</code> and
+<code>retrieval_key</code>. The correct <code>/api/private/…</code>
+exists but is unused.</td>
+<td><code>custom_chatbots.py</code></td>
+<td>known</td>
+</tr>
+<tr class="even">
+<td>S4</td>
+<td><strong>API keys stored and compared in plaintext</strong>, in a
+column named <code>key_hash</code>; the client supplies the key value on
+creation.</td>
+<td><code>models.py</code>, <code>api_keys.py</code>,
+<code>api_key_validator.py</code></td>
+<td>known</td>
+</tr>
+<tr class="odd">
+<td>S5</td>
+<td><strong>Blocking and role changes don&#39;t revoke sessions.</strong>
+<code>get_current_user</code> trusts the JWT&#39;s claims without checking
+the database, so a blocked or demoted user keeps full access until the
+token expires (24 h).</td>
+<td><code>auth.py</code></td>
+<td>new</td>
+</tr>
+<tr class="even">
+<td>S6</td>
+<td><strong><code>POST /orgs/{uuid}/users</code> demotes</strong> —
+forces <code>org_user</code>, stripping
+<code>admin_user</code>/<code>org_admin</code>. Combined with S2, anyone
+can demote every admin.</td>
+<td><code>organizations.py</code></td>
+<td>known</td>
+</tr>
+<tr class="odd">
+<td>S7</td>
+<td><strong>Any signed-in user can rewrite anyone&#39;s quota.</strong>
+<code>POST /usage/logs</code> needs only a valid token, and
+<code>tokens_used</code> accepts negative numbers — a large negative row
+resets a key&#39;s consumption.</td>
+<td><code>routers/usage.py</code>,
+<code>schemas.UsageLogCreate</code></td>
+<td>new; <strong>[verified]</strong> schema accepts
+<code>-1000</code></td>
+</tr>
+<tr class="even">
+<td>S8</td>
+<td><strong>Cross-tenant reads for any signed-in user</strong>:
+<code>GET /users/{uuid}</code>, <code>GET /api-keys/{uuid}</code>,
+<code>GET /usage/current/…</code>, <code>GET /services</code> (exposes
+internal <code>base_url</code>s).</td>
+<td>several routers</td>
+<td>new</td>
+</tr>
+<tr class="odd">
+<td>S9</td>
+<td><strong>Account enumeration at login</strong> — unknown email and
+wrong password return different messages (&quot;Invalid email or password.&quot;
+vs &quot;Incorrect password.&quot;).</td>
+<td><code>users.py</code> <code>login</code></td>
+<td>new</td>
+</tr>
+<tr class="even">
+<td>S10</td>
+<td>First-party model routes (<code>/asr</code>, <code>/tts</code>,
+<code>/framework</code>, <code>/custom-chatbots/api</code>) have no
+auth, no rate limit and no size limit, so the metered API can be
+bypassed entirely and the GPU/CPU and Groq budget spent by anyone.</td>
+<td>gateway routers</td>
+<td>new (implied by design, never written down)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="production-correctness">Production correctness</h3>
+<table>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Issue</th>
+<th>Where</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>P1</td>
+<td><strong>Custom chatbots re-embed their whole document on every
+message, and leak a new Redis entry each time.</strong> The gateway
+sends the chatbot&#39;s <code>retrieval_key</code> (a random uuid generated
+at creation, never present in Redis) and discards the
+<code>retrieval_key</code> chatbot-mod returns. So every message is a
+cache miss: the full file (≈1 MB for the Constitution) is split and
+embedded on CPU, and a new serialised index is written to Redis with no
+TTL. Fix: persist the returned key on the chatbot row (and clear it when
+a new file is uploaded).</td>
+<td><code>custom_chatbots.py</code>
+<code>chat_with_custom_chatbot</code>; <code>chatbot_api.py</code></td>
+<td>new; found by reading, high confidence. The chatbot-mod README says
+the gateway persists the key — it does not.</td>
+</tr>
+<tr class="even">
+<td>P2</td>
+<td><strong>Uploading a hero image before the first knowledge file makes
+the file upload 500.</strong> The &quot;delete the old file&quot; branch checks
+<code>hero_image</code> instead of <code>file_path</code>; with
+<code>file_path == &quot;&quot;</code> it calls <code>os.remove()</code> on the
+upload directory itself → <code>IsADirectoryError</code>. The admin
+detail page shows the image upload first. Conversely, when there is no
+hero image, replaced knowledge files are never deleted.</td>
+<td><code>custom_chatbots.py</code>
+<code>upload_chatbot_file</code></td>
+<td>new; <strong>[verified]</strong></td>
+</tr>
+<tr class="odd">
+<td>P3</td>
+<td><strong>Block/unblock guards are swapped.</strong>
+<code>block</code> has no guards beyond org scoping (an org admin can
+block a system admin in their org, and anyone can block themselves);
+<code>unblock</code> carries the &quot;cannot block self / admins / org
+admins&quot; checks, so <strong>a blocked admin or org admin can never be
+unblocked through the API</strong>.</td>
+<td><code>users.py</code></td>
+<td>new</td>
+</tr>
+<tr class="even">
+<td>P4</td>
+<td><strong>Proxy routes let httpx exceptions escape.</strong> With an
+upstream down or slow, <code>/api/*</code>, <code>/asr/*</code>,
+<code>/tts/*</code>, <code>/framework/*</code>,
+<code>/custom-chatbots/api/*</code> return an unhandled 500 (or drop
+streaming connections) instead of 502/503/504. Happens on every deploy
+while models load.</td>
+<td>gateway routers</td>
+<td>known</td>
+</tr>
+<tr class="odd">
+<td>P5</td>
+<td><strong>A second allocation for the same key+service breaks that
+key.</strong> No uniqueness on
+<code>service_usages(api_key_id, service_id)</code>;
+<code>validate_api_key</code> uses <code>scalar_one_or_none()</code>,
+which raises <code>MultipleResultsFound</code> → every call with that
+key to that service 500s.</td>
+<td><code>usage.py</code>, <code>api_key_validator.py</code></td>
+<td>new</td>
+</tr>
+<tr class="even">
+<td>P6</td>
+<td>PDF knowledge files are accepted by the gateway but chatbot-mod only
+loads UTF-8 text, so a chatbot backed by a PDF errors on every
+message.</td>
+<td><code>custom_chatbots.py</code>, <code>chatbot_api.py</code></td>
+<td>known</td>
+</tr>
+<tr class="odd">
+<td>P7</td>
+<td><code>POST /services</code> with a duplicate
+<code>service_key</code>/<code>service_name</code> → unhandled
+<code>IntegrityError</code> 500.</td>
+<td><code>services.py</code></td>
+<td>new</td>
+</tr>
+<tr class="even">
+<td>P8</td>
+<td><code>GET /usage/current/…</code> for a pair with no logs →
+<code>SUM</code> is NULL → response validation fails → 500 (the &quot;no
+data&quot; 404 branch is unreachable).</td>
+<td><code>usage.py</code></td>
+<td>new</td>
+</tr>
+<tr class="odd">
+<td>P9</td>
+<td>ASR and chatbot-mod run blocking inference inside
+<code>async def</code> handlers, blocking the event loop —
+<code>/health</code> and <code>/metrics</code> stall during every
+request. TTS uses sync <code>def</code> handlers (thread pool) but loads
+one model set, so throughput is still ~1.</td>
+<td><code>ASR/run.py</code>, <code>chatbot_api.py</code></td>
+<td>partly known</td>
+</tr>
+<tr class="even">
+<td>P10</td>
+<td>Pending tasks are lost on gateway restart (in-memory queue; nothing
+re-enqueues <code>pending</code> rows). Tasks run one at a time.</td>
+<td><code>task_worker.py</code></td>
+<td>new</td>
+</tr>
+<tr class="odd">
+<td>P11</td>
+<td><code>/tasks/*</code> applies the quota check, so once a key hits
+its limit it cannot even fetch results it already paid for.
+<code>/tasks/*</code> also accepts any key with access to the task&#39;s
+service, not only the key that created it.</td>
+<td><code>tasks.py</code></td>
+<td>new</td>
+</tr>
+<tr class="even">
+<td>P12</td>
+<td>Rate limiter is per process; replicas multiply the limit.</td>
+<td><code>rate_limit.py</code></td>
+<td>known</td>
+</tr>
+<tr class="odd">
+<td>P13</td>
+<td>Alembic is unusable; schema changes must be applied by hand.</td>
+<td><code>alembic/</code></td>
+<td>known</td>
+</tr>
+<tr class="even">
+<td>P14</td>
+<td>framework-be constructs a new embedding model on every upload.</td>
+<td><code>framework/chatbot.py</code></td>
+<td>new</td>
+</tr>
+<tr class="odd">
+<td>P15</td>
+<td>TTS <code>/generate</code> writes the WAV header at a fixed 22 050
+Hz rather than the model&#39;s rate (the stream path uses the model&#39;s).
+Harmless while all six models are 22 050 Hz.</td>
+<td><code>voicebot_tts.py</code></td>
+<td>new</td>
+</tr>
+<tr class="even">
+<td>P16</td>
+<td>TTS loads the multi-speaker checkpoint twice
+(<code>multi_male</code> and <code>multi_female</code> are the same
+model).</td>
+<td><code>voicebot_tts.py</code></td>
+<td>new</td>
+</tr>
+<tr class="odd">
+<td>P17</td>
+<td><code>/voicebot-generate-audio</code> writes one fixed path, so
+concurrent callers overwrite each other.</td>
+<td><code>voicebot_tts.py</code></td>
+<td>known</td>
+</tr>
+<tr class="even">
+<td>P18</td>
+<td>Unbounded disk growth: gateway TTS audio, framework uploads,
+replaced hero images; unbounded Redis growth (made much worse by
+P1).</td>
+<td>several</td>
+<td>partly known</td>
+</tr>
+<tr class="odd">
+<td>P19</td>
+<td>ASR punctuation marks a sentence as a question if
+<strong>any</strong> word is a question word, and re-reads its 1
+947-line word list on every request.</td>
+<td><code>post_processing.py</code></td>
+<td>new</td>
+</tr>
+<tr class="even">
+<td>P20</td>
+<td><code>POST /orgs/{uuid}/users</code> is partially applied in-session
+if a later UUID is missing (aborted before commit, so no data change —
+but the loop is not validated up front).</td>
+<td><code>organizations.py</code></td>
+<td>new, minor</td>
+</tr>
+</tbody>
+</table>
+<h3 id="frontend">Frontend</h3>
+<table>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Issue</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>F1</td>
+<td>No token-expiry handling: after 24 h the app still shows the user as
+signed in and every call 401s until they log out manually. (Likely the
+&quot;known auth problem&quot; referenced in the READMEs.)</td>
+<td>new detail</td>
+</tr>
+<tr class="even">
+<td>F2</td>
+<td><code>Sidebar</code> calls <code>useUser()</code> unguarded, so
+logged-out visitors hit <code>GET /users/me</code> → 401 → error toast
+on every public page.</td>
+<td>known</td>
+</tr>
+<tr class="odd">
+<td>F3</td>
+<td><code>CustomChatbotPage</code> has its loading/error returns
+commented out; while loading and on 404 it shows &quot;Chatbot is not
+published.&quot;</td>
+<td>known</td>
+</tr>
+<tr class="even">
+<td>F4</td>
+<td><code>/p/make-chatbot</code> uploads a document but offers no way to
+chat with it (<code>MakeChatbot</code> does not pass
+<code>onUploaded</code>).</td>
+<td>new detail (implied in <code>DEPRECATED.md</code>)</td>
+</tr>
+<tr class="odd">
+<td>F5</td>
+<td>Nav contains <code>/p/chatbot</code> and
+<code>/p/voice-stream</code>, which have no routes.</td>
+<td>known</td>
+</tr>
+<tr class="even">
+<td>F6</td>
+<td><code>&lt;GlobalAlert /&gt;</code> is rendered twice (in
+<code>App.tsx</code> and <code>RootLayout.tsx</code>), so every toast is
+drawn twice, stacked in the same spot.</td>
+<td>new</td>
+</tr>
+<tr class="odd">
+<td>F7</td>
+<td>In custom chats, a failed request leaves the &quot;processing...&quot;
+placeholder bubble forever.</td>
+<td>new</td>
+</tr>
+<tr class="even">
+<td>F8</td>
+<td><code>createCustomChatbot</code> sends <code>is_public</code> as the
+string <code>&quot;true&quot;</code>/<code>&quot;false&quot;</code>.</td>
+<td>known</td>
+</tr>
+<tr class="odd">
+<td>F9</td>
+<td><strong>The Docker-built web app cannot receive its
+configuration.</strong> <code>.env</code> is excluded from the build
+context and no build args exist, so the image uses code defaults: API at
+<code>http://localhost:8000</code> (the gateway is on 7010), no Google
+client ID, base path <code>/</code>. How production gets correct values
+is not recorded in the repo.</td>
+<td>new</td>
+</tr>
+<tr class="even">
+<td>F10</td>
+<td>Single ~1.3 MB bundle; no code splitting. VAD model and ONNX WASM
+come from jsDelivr at runtime.</td>
+<td>known / new</td>
+</tr>
+</tbody>
+</table>
+<h3 id="operations">Operations</h3>
+<table>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Issue</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>O1</td>
+<td>Grafana dashboard provider path does not match the mount, so the
+dashboard is not provisioned (§17). New.</td>
+</tr>
+<tr class="even">
+<td>O2</td>
+<td>No alerting; no backups of Prometheus, Redis or MySQL are defined
+here.</td>
+</tr>
+<tr class="odd">
+<td>O3</td>
+<td>The production reverse proxy (base-path stripping, possible API-key
+injection for the legacy app, TLS) is not in the repo.</td>
+</tr>
+<tr class="even">
+<td>O4</td>
+<td>Model containers take minutes to start and have no readiness gating;
+compose has no healthchecks, so the gateway proxies to not-yet-ready
+services (see P4).</td>
+</tr>
+<tr class="odd">
+<td>O5</td>
+<td>Heavy images: CUDA wheels are installed even on CPU hosts; builder
+and runtime stages copy all of site-packages.</td>
+</tr>
+<tr class="even">
+<td>O6</td>
+<td>Legacy <code>voicebot-frontend</code> still deployed; one of its
+pages is broken.</td>
+</tr>
+<tr class="odd">
+<td>O7</td>
+<td>The root <code>Dockerfile</code> is an unrelated personal dev shell
+and could confuse newcomers.</td>
+</tr>
+<tr class="even">
+<td>O8</td>
+<td>Load-test baselines never recorded.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="21-documentation-drift">21. Documentation drift</h2>
+<p>Places where existing docs disagree with the code, so readers know
+which to trust:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Doc</th>
+<th>Says</th>
+<th>Reality</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>backend/api-gateway/AGENTS.md</code></td>
+<td>run <code>alembic upgrade head</code>; serve on port 8000</td>
+<td>Alembic is broken; the service runs on 7010</td>
+</tr>
+<tr class="even">
+<td><code>docs/TESTING.md</code></td>
+<td>55 tests</td>
+<td>64 tests (verified)</td>
+</tr>
+<tr class="odd">
+<td><code>backend/chatbot-modified/README.md</code></td>
+<td>&quot;The gateway does this: <code>CustomChatbot.retrieval_key</code> is
+persisted&quot;</td>
+<td>The returned key is discarded (P1)</td>
+</tr>
+<tr class="even">
+<td><code>backend/ASR/README.md</code></td>
+<td>punctuation matches &quot;the first words&quot;</td>
+<td>matches any word (P19)</td>
+</tr>
+<tr class="odd">
+<td><code>grafana/README.md</code></td>
+<td>the committed example sets the Grafana password to
+<code>admin</code></td>
+<td><code>.env.example</code> leaves it blank</td>
+</tr>
+<tr class="even">
+<td><code>frontend/new-chat-app/README.md</code></td>
+<td><code>typecheck</code> runs <code>tsc -b</code>, &quot;not
+<code>tsc --noEmit</code>&quot;</td>
+<td>the script is <code>tsc -b --noEmit</code> (still correct in spirit:
+it builds project references)</td>
+</tr>
+<tr class="odd">
+<td>root <code>README.md</code></td>
+<td>&quot;35 of the 41 open issues are fixed&quot;</td>
+<td>not re-verified here; the branch history in §23 is consistent with
+it</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="22-operational-runbooks">22. Operational runbooks</h2>
+<p>All examples assume the gateway at
+<code>http://localhost:7010</code>.</p>
+<h3 id="221-create-the-first-system-admin">22.1 Create the first system
+admin</h3>
+<p>There is no safe API for this. Register normally, then promote in SQL
+using the <strong>DB enum name</strong>:</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-X</span> POST localhost:7010/users/register <span class="at">-H</span> <span class="st">&#39;Content-Type: application/json&#39;</span> <span class="dt">\</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-d</span> <span class="st">&#39;{&quot;name&quot;:&quot;Admin&quot;,&quot;email&quot;:&quot;admin@example.com&quot;,&quot;password&quot;:&quot;ChangeMe123&quot;}&#39;</span></span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">UPDATE</span> users <span class="kw">SET</span> <span class="kw">role</span> <span class="op">=</span> <span class="st">&#39;admin&#39;</span> <span class="kw">WHERE</span> email <span class="op">=</span> <span class="st">&#39;admin@example.com&#39;</span>;</span></code></pre></div>
+<p>Log in again to get a token carrying <code>admin_user</code>:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="va">TOKEN</span><span class="op">=</span><span class="va">$(</span><span class="ex">curl</span> <span class="at">-s</span> <span class="at">-X</span> POST localhost:7010/users/login <span class="at">-H</span> <span class="st">&#39;Content-Type: application/json&#39;</span> <span class="dt">\</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-d</span> <span class="st">&#39;{&quot;email&quot;:&quot;admin@example.com&quot;,&quot;password&quot;:&quot;ChangeMe123&quot;}&#39;</span> <span class="kw">|</span> <span class="ex">jq</span> <span class="at">-r</span> .access_token<span class="va">)</span></span></code></pre></div>
+<p>(<code>PUT /users/{uuid}</code> would also do it, without auth — that
+is bug S1, not a feature.)</p>
+<h3 id="222-set-up-the-government-chatbot">22.2 Set up the government
+chatbot</h3>
+<div class="sourceCode" id="cb27"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="va">CB</span><span class="op">=</span><span class="va">$(</span><span class="ex">curl</span> <span class="at">-s</span> <span class="at">-X</span> POST localhost:7010/custom-chatbots <span class="at">-H</span> <span class="st">&#39;Content-Type: application/json&#39;</span> <span class="dt">\</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-d</span> <span class="st">&#39;{&quot;chatbot_name&quot;:&quot;Constitution&quot;,&quot;description&quot;:&quot;ශ්‍රී ලංකා ආණ්ඩුක්‍රම ව්‍යවස්ථාව&quot;,</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="st">       &quot;url_path&quot;:&quot;gov-chatbot&quot;,&quot;organization_uuid&quot;:null,&quot;is_public&quot;:true}&#39;</span> <span class="kw">|</span> <span class="ex">jq</span> <span class="at">-r</span> .uuid<span class="va">)</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="co"># upload the knowledge file BEFORE any hero image (see P2)</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-X</span> POST localhost:7010/custom-chatbots/<span class="va">$CB</span>/upload-file <span class="dt">\</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">-F</span> <span class="st">&quot;file=@backend/chatbot-modified/Sri Lanka Constitution-Sinhala.txt;type=text/plain&quot;</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="co"># publish and make public</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-X</span> POST localhost:7010/custom-chatbots/publish/<span class="va">$CB</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-X</span> POST localhost:7010/custom-chatbots/make-public/<span class="va">$CB</span></span></code></pre></div>
+<p>Or do the same through <code>/admin/custom-chatbot</code> in the web
+app. Until P1 is fixed, each message re-embeds the 1 MB corpus; expect
+slow answers.</p>
+<h3 id="223-open-the-metered-api-for-a-client">22.3 Open the metered API
+for a client</h3>
+<div class="sourceCode" id="cb28"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. register the service (base_url as seen from the gateway: host network)</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="va">SVC</span><span class="op">=</span><span class="va">$(</span><span class="ex">curl</span> <span class="at">-s</span> <span class="at">-X</span> POST localhost:7010/services <span class="at">-H</span> <span class="st">&quot;Authorization: Bearer </span><span class="va">$TOKEN</span><span class="st">&quot;</span> <span class="dt">\</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">&#39;Content-Type: application/json&#39;</span> <span class="dt">\</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-d</span> <span class="st">&#39;{&quot;service_key&quot;:&quot;asr&quot;,&quot;service_name&quot;:&quot;Sinhala ASR&quot;,&quot;base_url&quot;:&quot;http://localhost:7000&quot;,&quot;response_type&quot;:&quot;short&quot;}&#39;</span> <span class="dt">\</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">|</span> <span class="ex">jq</span> <span class="at">-r</span> .uuid<span class="va">)</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. create a key for a user (generate the secret yourself; it is stored verbatim)</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="va">KEY</span><span class="op">=</span><span class="va">$(</span><span class="ex">python</span> <span class="at">-c</span> <span class="st">&#39;import secrets; print(secrets.token_urlsafe(32))&#39;</span><span class="va">)</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="va">AK</span><span class="op">=</span><span class="va">$(</span><span class="ex">curl</span> <span class="at">-s</span> <span class="at">-X</span> POST localhost:7010/api-keys/users/<span class="op">&lt;</span>USER_UUID<span class="op">&gt;</span>/api-keys <span class="dt">\</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">&quot;Authorization: Bearer </span><span class="va">$TOKEN</span><span class="st">&quot;</span> <span class="at">-H</span> <span class="st">&#39;Content-Type: application/json&#39;</span> <span class="dt">\</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">-d</span> <span class="st">&quot;{</span><span class="dt">\&quot;</span><span class="st">key_hash</span><span class="dt">\&quot;</span><span class="st">:</span><span class="dt">\&quot;</span><span class="va">$KEY</span><span class="dt">\&quot;</span><span class="st">,</span><span class="dt">\&quot;</span><span class="st">label</span><span class="dt">\&quot;</span><span class="st">:</span><span class="dt">\&quot;</span><span class="st">client-x</span><span class="dt">\&quot;</span><span class="st">}&quot;</span> <span class="kw">|</span> <span class="ex">jq</span> <span class="at">-r</span> .uuid<span class="va">)</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. give it an allocation (units: seconds for ASR, characters for TTS, LLM tokens for chat)</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-X</span> POST localhost:7010/usage/service-usage <span class="at">-H</span> <span class="st">&quot;Authorization: Bearer </span><span class="va">$TOKEN</span><span class="st">&quot;</span> <span class="dt">\</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">&#39;Content-Type: application/json&#39;</span> <span class="dt">\</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">-d</span> <span class="st">&quot;{</span><span class="dt">\&quot;</span><span class="st">api_key_uuid</span><span class="dt">\&quot;</span><span class="st">:</span><span class="dt">\&quot;</span><span class="va">$AK</span><span class="dt">\&quot;</span><span class="st">,</span><span class="dt">\&quot;</span><span class="st">service_uuid</span><span class="dt">\&quot;</span><span class="st">:</span><span class="dt">\&quot;</span><span class="va">$SVC</span><span class="dt">\&quot;</span><span class="st">,</span><span class="dt">\&quot;</span><span class="st">usage_limit</span><span class="dt">\&quot;</span><span class="st">:36000}&quot;</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. the client calls</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-X</span> POST localhost:7010/api/asr/transcribe <span class="at">-H</span> <span class="st">&quot;X-Api-Key: </span><span class="va">$KEY</span><span class="st">&quot;</span> <span class="at">-F</span> file=@speech.wav</span></code></pre></div>
+<p>Create only <strong>one</strong> allocation per key+service (P5). For
+a slow service, use <code>&quot;response_type&quot;:&quot;long&quot;</code> and have the
+client poll <code>/tasks/{uuid}/status</code>.</p>
+<h3 id="224-deactivate-or-rotate-an-api-key">22.4 Deactivate or rotate
+an API key</h3>
+<p>No endpoint exists.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">UPDATE</span> api_keys <span class="kw">SET</span> is_active <span class="op">=</span> <span class="dv">0</span> <span class="kw">WHERE</span> uuid <span class="op">=</span> <span class="st">&#39;&lt;uuid&gt;&#39;</span>;</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- rotate: deactivate, then create a new key with runbook 22.3 step 2</span></span></code></pre></div>
+<h3 id="225-deactivate-a-metered-service">22.5 Deactivate a metered
+service</h3>
+<div class="sourceCode" id="cb30"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">UPDATE</span> services <span class="kw">SET</span> is_active <span class="op">=</span> <span class="dv">0</span> <span class="kw">WHERE</span> service_key <span class="op">=</span> <span class="st">&#39;asr&#39;</span>;   <span class="co">-- /api/asr → 503</span></span></code></pre></div>
+<h3 id="226-rotate-jwt_secret">22.6 Rotate <code>JWT_SECRET</code></h3>
+<p>Generate, update <code>.env</code>,
+<code>docker compose up -d api-gateway</code>. All existing tokens
+become invalid; users must sign in again (and, because of F1, may need
+to click &quot;log out&quot; first).</p>
+<h3 id="227-add-a-new-model-service">22.7 Add a new model service</h3>
+<ol type="1">
+<li>Write a FastAPI app with <code>/health</code>, <code>/metrics</code>
+(instrumentator), the shared CORS guard, and an
+<code>X-Tokens-Used</code> header on billable responses.</li>
+<li>Add it to <code>docker-compose.yml</code>; add
+<code>.env.example</code> and a README.</li>
+<li>Add it to <code>prometheus.yml</code> in <strong>both</strong>
+<code>targets</code> and <code>relabel_configs</code>.</li>
+<li>Add a smoke test in
+<code>backend/tests/smoke/test_services.py</code>.</li>
+<li>Add its directory to the <code>services-lint</code> step in CI.</li>
+<li>For the metered API, register it (runbook 22.3). For the web app,
+add a first-party proxy router in the gateway and an entry in
+<code>utils/api.ts</code>.</li>
+</ol>
+<h3 id="228-apply-a-schema-change">22.8 Apply a schema change</h3>
+<p>Because <code>create_all</code> never alters tables: write the
+<code>ALTER TABLE</code> by hand, apply it to every environment, and
+update <code>models.py</code> in the same change. New tables are created
+automatically on the next gateway start.</p>
+<h3 id="229-clear-the-chatbot-index-cache">22.9 Clear the chatbot index
+cache</h3>
+<div class="sourceCode" id="cb31"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> exec redis redis-cli FLUSHDB</span></code></pre></div>
+<p>Safe: chatbot-mod rebuilds indexes from the files on the next message
+(and, because of P1, would have done so anyway).</p>
+<hr />
+<h2 id="23-project-history-and-state">23. Project history and state</h2>
+<ul>
+<li><strong>2026-06 → 2026-08:</strong> feature development on
+<code>main</code> — Google login, new TTS, ASR streaming experiments,
+mobile scaffold, a series of bug-fix PRs (#1–#7, #52, #53). Alembic
+history was deleted in this period.</li>
+<li><strong>2026-09-07 → 2026-09-08:</strong> the
+<code>chore/handover-fixes</code> branch (11 commits ahead of
+<code>main</code>, 80 commits total in the repo): repository cleanup
+(dead services and prototypes removed); secret hygiene (no
+<code>.env</code> in images, JWT secret enforcement, no wildcard CORS);
+the shared RAG module; real ASR/TTS/ upload wiring and SSE streaming in
+the web app; rate limiting, token metering and a working long-task path;
+the admin usage dashboard; Google sign-in end to end; the 64-test suite,
+smoke tests, load-test scenarios and CI; and per-service READMEs.</li>
+</ul>
+<p><strong>This branch is not merged.</strong> Its fixes are not in
+<code>main</code>, and the GitHub issues they close are still open
+there.</p>
+<p>Deliberately left open: the mobile app (#47–#51) and removal of the
+legacy voicebot (#44).</p>
+<p>The biggest piece of remaining work is not started: <strong>enforcing
+the roles and chatbot-visibility model on the server</strong> (S1–S3,
+S5–S8).</p>
+<hr />
+<h2 id="24-recommended-next-steps">24. Recommended next steps</h2>
+<p>In order. Items 1–3 are one job: move authorization to the
+server.</p>
+<ol type="1">
+<li><strong>Lock down writes.</strong> Add <code>AdminUser</code> /
+<code>AdminOrOrgAdminUser</code> dependencies to every mutating endpoint
+in <code>/orgs</code>, <code>/custom-chatbots</code> and
+<code>PUT /users/{uuid}*</code>; drop <code>role</code> from
+<code>UserUpdate</code> (or allow it only for admins); scope org admins
+to their own organization; restrict <code>POST /usage/logs</code> to
+admins (or delete it) and reject negative values.</li>
+<li><strong>Enforce chatbot visibility server-side.</strong> One chat
+endpoint that applies the §2.3 table using an optional bearer token;
+make the frontend call it; stop returning <code>file_path</code> /
+<code>retrieval_key</code> to non-admins.</li>
+<li><strong>Check the database in <code>get_current_user</code></strong>
+(or keep tokens short-lived with refresh) so blocks and role changes
+take effect immediately.</li>
+<li><strong>Fix P1</strong> — persist chatbot-mod&#39;s returned
+<code>retrieval_key</code>, reset it on file upload, and add a Redis
+TTL. Probably the largest single performance win.</li>
+<li><strong>Fix P2 and P3</strong> — both are small and
+user-visible.</li>
+<li><strong>Wrap every upstream call</strong> in the gateway (P4): map
+connect errors to 503, timeouts to 504, upstream 5xx to 502, with the
+<code>[{field, message}]</code> shape.</li>
+<li><strong>Hash API keys</strong> (S4): generate server-side, show
+once, store SHA-256, look up by hash; add deactivate/rotate endpoints;
+add a unique constraint on allocations (P5).</li>
+<li><strong>Rebuild the Alembic baseline</strong> (P13).</li>
+<li><strong>Fix the Grafana provider path</strong> (O1); add compose
+healthchecks (O4).</li>
+<li><strong>Frontend auth</strong>: handle 401 globally (log out,
+redirect), guard <code>useUser</code>, restore the chatbot page&#39;s
+loading/error states, remove the duplicate <code>GlobalAlert</code>, add
+a chat screen to make-chatbot, then retire the voicebot.</li>
+<li><strong>Throughput</strong>: move ASR/TTS inference off the event
+loop, register them as <code>long</code> services, move the task queue
+to Redis with multiple workers, record load-test baselines.</li>
+<li>Merge <code>chore/handover-fixes</code> to <code>main</code> and
+close the issues it fixes.</li>
+</ol>
+<hr />
+<h2 id="25-glossary">25. Glossary</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Subasa / VocSi</strong></td>
+<td>Product name / repository name</td>
+</tr>
+<tr class="even">
+<td><strong>ASR</strong></td>
+<td>Automatic speech recognition (speech → text)</td>
+</tr>
+<tr class="odd">
+<td><strong>TTS</strong></td>
+<td>Text-to-speech</td>
+</tr>
+<tr class="even">
+<td><strong>VITS</strong></td>
+<td>The end-to-end TTS model architecture used by all six voices</td>
+</tr>
+<tr class="odd">
+<td><strong>CTC</strong></td>
+<td>Connectionist temporal classification — how the Wav2Vec2 models
+decode</td>
+</tr>
+<tr class="even">
+<td><strong>VAD</strong></td>
+<td>Voice activity detection; decides when the user has stopped
+speaking</td>
+</tr>
+<tr class="odd">
+<td><strong>SSE</strong></td>
+<td>Server-sent events, <code>text/event-stream</code>; used for
+streaming transcripts</td>
+</tr>
+<tr class="even">
+<td><strong>RAG</strong></td>
+<td>Retrieval-augmented generation: find relevant chunks, then ask the
+LLM with them as context</td>
+</tr>
+<tr class="odd">
+<td><strong>FAISS</strong></td>
+<td>The vector index library used for retrieval</td>
+</tr>
+<tr class="even">
+<td><strong>Groq</strong></td>
+<td>The hosted LLM provider (<code>llama-3.3-70b-versatile</code>)</td>
+</tr>
+<tr class="odd">
+<td><strong>First-party routes</strong></td>
+<td>Keyless gateway routes the web app uses (<code>/asr</code>,
+<code>/tts</code>, <code>/framework</code>,
+<code>/custom-chatbots</code>)</td>
+</tr>
+<tr class="even">
+<td><strong>Metered path</strong></td>
+<td><code>/api/{service_key}/…</code>, requiring
+<code>X-Api-Key</code></td>
+</tr>
+<tr class="odd">
+<td><strong>Service</strong></td>
+<td>A row in <code>services</code>: a named upstream reachable through
+the metered path</td>
+</tr>
+<tr class="even">
+<td><strong>Allocation</strong></td>
+<td>A <code>service_usages</code> row: how many units a key may consume
+on a service</td>
+</tr>
+<tr class="odd">
+<td><strong>Units / tokens</strong></td>
+<td>What <code>X-Tokens-Used</code> reports: audio seconds (ASR),
+characters (TTS), LLM tokens (chat)</td>
+</tr>
+<tr class="even">
+<td><strong>Short / long service</strong></td>
+<td>Proxied synchronously / queued as an async task</td>
+</tr>
+<tr class="odd">
+<td><strong><code>retrieval_key</code></strong></td>
+<td>chatbot-mod&#39;s Redis key for a cached FAISS index</td>
+</tr>
+<tr class="even">
+<td><strong><code>document_key</code></strong></td>
+<td>framework-be&#39;s key for a cached chain (the stored filename)</td>
+</tr>
+<tr class="odd">
+<td><strong><code>url_path</code></strong></td>
+<td>A custom chatbot&#39;s slug; its page is <code>/p/{url_path}</code></td>
+</tr>
+<tr class="even">
+<td><strong>Gov chatbot</strong></td>
+<td>The custom chatbot over the Sinhala Constitution, shown at
+<code>/p/gov-chatbot</code></td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>

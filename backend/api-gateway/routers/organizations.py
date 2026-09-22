@@ -1,5 +1,3 @@
-from typing import List
-
 from fastapi import Depends, HTTPException
 from fastapi.routing import APIRouter
 from sqlalchemy import select
@@ -29,12 +27,8 @@ def _build_org_out(org: Organization) -> OrganizationOut:
 
 
 @router.post("", response_model=OrganizationOut, status_code=201)
-async def create_organization(
-    payload: OrganizationCreate, db: AsyncSession = Depends(get_db)
-):
-    existing = await db.scalar(
-        select(Organization).where(Organization.name == payload.name)
-    )
+async def create_organization(payload: OrganizationCreate, db: AsyncSession = Depends(get_db)):
+    existing = await db.scalar(select(Organization).where(Organization.name == payload.name))
 
     if existing:
         raise HTTPException(
@@ -49,9 +43,7 @@ async def create_organization(
     return _build_org_out(org)
 
 
-@router.post(
-    "/{organization_uuid}/users", response_model=AssignUsersToOrgOut, status_code=201
-)
+@router.post("/{organization_uuid}/users", response_model=AssignUsersToOrgOut, status_code=201)
 async def add_users_to_an_organization(
     organization_uuid: str, payload: AssignUsersToOrg, db: AsyncSession = Depends(get_db)
 ):
@@ -95,9 +87,7 @@ async def get_organization(organization_uuid: str, db: AsyncSession = Depends(ge
 
 @router.get("", response_model=list[OrganizationOut], status_code=200)
 async def get_all_organizations(db: AsyncSession = Depends(get_db)):
-    results = await db.execute(
-        select(Organization).order_by(Organization.created_at.desc())
-    )
+    results = await db.execute(select(Organization).order_by(Organization.created_at.desc()))
     orgs = results.scalars().all()
     return [_build_org_out(org) for org in orgs]
 
@@ -169,9 +159,7 @@ async def assign_admin_to_organization(
 
 
 @router.get("/{organization_uuid}/admin", response_model=UserOut, status_code=200)
-async def get_organization_admin(
-    organization_uuid: str, db: AsyncSession = Depends(get_db)
-):
+async def get_organization_admin(organization_uuid: str, db: AsyncSession = Depends(get_db)):
     org = await db.scalar(select(Organization).where(Organization.uuid == organization_uuid))
     if not org:
         raise HTTPException(
@@ -182,7 +170,9 @@ async def get_organization_admin(
     from sqlalchemy.orm import selectinload
 
     admin_user = await db.scalar(
-        select(User).options(selectinload(User.organization)).where(
+        select(User)
+        .options(selectinload(User.organization))
+        .where(
             User.organization_id == org.id,
             User.role == UserRole.organization_admin,
         )
@@ -199,4 +189,5 @@ async def get_organization_admin(
         )
 
     from routers.users import _build_user_out
+
     return _build_user_out(admin_user)

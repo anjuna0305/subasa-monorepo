@@ -1,16 +1,16 @@
 from datetime import datetime
-from typing import List
+
+from pydantic import BaseModel, EmailStr, field_validator
 
 from models import ResponseType, TaskStatus, UserRole
-from pydantic import BaseModel, EmailStr, field_validator
 
 
 class UserCreate(BaseModel):
     name: str
     email: EmailStr
-    # organization_uuid: str
     password: str
-    role: UserRole = UserRole.general_user
+    # No role field: self-registration always creates a general_user, and
+    # accepting one here would imply a caller can choose their own.
 
     @field_validator("name")
     @classmethod
@@ -114,24 +114,15 @@ class GoogleAuthRequest(BaseModel):
     id_token: str
 
 
-class GoogleLoginRequest(BaseModel):
-    code: str
-    redirect_uri: str | None = None
-
-
-class GoogleLoginOut(BaseModel):
-    access_token: str
-    organization_uuid: str | None
-    token_type: str = "bearer"
-    role: UserRole
-    is_new_user: bool
-
-
 class TokenOut(BaseModel):
     access_token: str
     organization_uuid: str | None
     token_type: str = "bearer"
     role: UserRole
+    # True only when this sign-in created the account, so the client can send
+    # the user through onboarding. Always False for password login, which is
+    # separate from registration.
+    is_new_user: bool = False
 
 
 class ApiKeyCreate(BaseModel):
@@ -361,15 +352,15 @@ class AssignOrgAdmin(BaseModel):
 
 
 class AssignUsersToOrg(BaseModel):
-    user_uuids: List[str]
+    user_uuids: list[str]
 
 
 class AssignUsersToOrgOut(BaseModel):
-    user_uuids: List[str]
+    user_uuids: list[str]
 
 
 class OrganizationUserIdsOut(BaseModel):
-    user_uuids: List[str]
+    user_uuids: list[str]
 
 
 class TtsGenerateRequest(BaseModel):
@@ -389,3 +380,26 @@ class TtsGenerateRequest(BaseModel):
 
 class TtsGenerateResponse(BaseModel):
     audioUrl: str
+
+
+class UsageSummaryRow(BaseModel):
+    api_key_uuid: str
+    api_key_label: str | None
+    user_uuid: str
+    user_name: str
+    user_email: str
+    organization_name: str | None
+    service_uuid: str
+    service_key: str
+    service_name: str
+    total_tokens_used: int
+    request_count: int
+    error_count: int
+    usage_limit: int | None
+    last_request_at: datetime | None
+
+
+class UsageSummaryOut(BaseModel):
+    items: list[UsageSummaryRow]
+    total_tokens_used: int
+    total_requests: int

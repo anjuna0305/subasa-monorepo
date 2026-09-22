@@ -1,30 +1,51 @@
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
-from fastapi.middleware.cors import CORSMiddleware
-from prometheus_fastapi_instrumentator import Instrumentator
-from pydantic import BaseModel
-from huggingface_hub import hf_hub_download, login
-from TTS.api import TTS
-import os
-from text.cleaners import sinhala_cleaners
-import uvicorn
 import io
+import logging
+import os
 import re
 import struct
 import time
 import uuid
 from threading import Lock
+
 import numpy as np
 import soundfile as sf
+import uvicorn
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from huggingface_hub import hf_hub_download, login
+from prometheus_fastapi_instrumentator import Instrumentator
+from pydantic import BaseModel
+from text.cleaners import sinhala_cleaners
+from TTS.api import TTS
+
+logger = logging.getLogger("tts")
 
 app = FastAPI()
 
 Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
+# CORS origins come from the environment so a deployment cannot fall back to a
+# wildcard. Comma-separated; '*' is rejected outright.
+_DEFAULT_DEV_ORIGINS = "http://localhost:7007,http://localhost:5173"
+
+
+def _cors_origins() -> list[str]:
+    raw = os.environ.get("CORS_ALLOW_ORIGINS", _DEFAULT_DEV_ORIGINS)
+    origins = [origin.strip() for origin in raw.split(",") if origin.strip()]
+    if "*" in origins:
+        raise RuntimeError(
+            "CORS_ALLOW_ORIGINS must list explicit origins; '*' is not accepted."
+        )
+    if not origins:
+        raise RuntimeError("CORS_ALLOW_ORIGINS is empty; list at least one origin.")
+    return origins
+
+
 # Enable CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -76,9 +97,16 @@ def preprocess_text(input_text: str):
     try:
         return sinhala_cleaners(input_text)
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Text preprocessing failed: {e}")
+        raise HTTPException(
+            status_code=400, detail=f"Text preprocessing failed: {e}"
+        ) from e
 
 SENTENCE_END = re.compile(r"(?<=[.!?෴])\s+")
+
+
+def billed_characters(text: str) -> int:
+    """Characters synthesised — the unit TTS usage is metered in."""
+    return max(1, len(text.strip()))
 
 
 def split_sentences(text: str):
@@ -185,6 +213,8 @@ def build_audio_stream(
         audio_stream(),
         media_type="audio/wav",
         headers={
+            # The gateway reads this header to meter the caller's usage.
+            "X-Tokens-Used": str(billed_characters(text)),
             "Cache-Control": "no-cache",
             "X-Accel-Buffering": "no",
         },
@@ -273,15 +303,16 @@ def generate_audio(request_data: AudioRequest):
             model.tts_to_file(text=preprocessed_text, speaker=speaker, file_path=output_path)
 
         return JSONResponse(content={"audioUrl": f"/output/{os.path.basename(output_path)}"})
-    except HTTPException as e:
-        raise e
+    except HTTPException:
+        raise
     except Exception as e:
-        print(f"Internal Server Error: {e}")
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        # Logged, not returned: the client gets a fixed message.
+        logger.exception("Synthesis failed")
+        raise HTTPException(status_code=500, detail="Internal Server Error") from e
 
 # generate audio and return audio
 @app.post("/generate")
-def generate_audio(request_data: AudioRequest):
+def generate_audio_file(request_data: AudioRequest):
     try:
         text = request_data.text.strip()
         speaker = request_data.speaker.lower()
@@ -311,15 +342,21 @@ def generate_audio(request_data: AudioRequest):
         sf.write(buffer, result, samplerate=22050, format="WAV")
         buffer.seek(0)
 
-        return StreamingResponse(buffer, media_type="audio/wav")
+        return StreamingResponse(
+            buffer,
+            media_type="audio/wav",
+            # The gateway reads this header to meter the caller's usage.
+            headers={"X-Tokens-Used": str(billed_characters(text))},
+        )
 
         # return JSONResponse(content={"audioUrl": result})
 
-    except HTTPException as e:
-        raise e
+    except HTTPException:
+        raise
     except Exception as e:
-        print(f"Internal Server Error: {e}")
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        # Logged, not returned: the client gets a fixed message.
+        logger.exception("Synthesis failed")
+        raise HTTPException(status_code=500, detail="Internal Server Error") from e
 
 @app.get("/")
 def index():

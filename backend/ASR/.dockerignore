@@ -7,8 +7,10 @@ venv/
 .venv/
 dist/
 build/
-audio.wav
-req2.txt
 models/
 *.wav
 *.mp3
+# Secrets are injected at run time, never baked into the image.
+.env
+.env.*
+!.env.example

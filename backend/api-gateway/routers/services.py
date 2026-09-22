@@ -62,9 +62,7 @@ async def list_services(
     current_user: AnyUser,
     db: AsyncSession = Depends(get_db),
 ):
-    result = await db.execute(
-        select(Service).order_by(Service.service_name.asc())
-    )
+    result = await db.execute(select(Service).order_by(Service.service_name.asc()))
     services = result.scalars().all()
     return [
         ServiceOut(
