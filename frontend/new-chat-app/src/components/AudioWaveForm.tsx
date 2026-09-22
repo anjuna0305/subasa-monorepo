@@ -28,6 +28,7 @@ const AudioWaveform = forwardRef<AudioWaveformHandle, AudioWaveformProps>(
     { width = "100%", height = 80, barColor = "#2563eb", barCount = 48 },
     ref,
   ) => {
+    const [active, setActive] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const queueRef = useRef<Float32Array>(new Float32Array(barCount));
@@ -54,7 +55,7 @@ const AudioWaveform = forwardRef<AudioWaveformHandle, AudioWaveformProps>(
         bar.style.height = `${fullH}px`;
         bar.style.marginTop = `${-fullH / 2}px`;
       }
-    }, [height, barCount]);
+    }, [height]);
 
     const startRafLoop = useCallback(() => {
       const loop = (timestamp: number) => {
@@ -87,7 +88,7 @@ const AudioWaveform = forwardRef<AudioWaveformHandle, AudioWaveformProps>(
       const rms = Math.sqrt(sum / dataArr.length);
       queueRef.current[qHeadRef.current] = Math.min(1, rms * 4.5);
       qHeadRef.current = (qHeadRef.current + 1) % barCount;
-    }, [barCount]);
+    }, []);
 
     const start = useCallback(async () => {
       setError(null);
@@ -108,7 +109,8 @@ const AudioWaveform = forwardRef<AudioWaveformHandle, AudioWaveformProps>(
         audioCtx.createMediaStreamSource(stream).connect(analyser);
         intervalRef.current = setInterval(pushSample, SAMPLE_INTERVAL_MS);
         startRafLoop();
-        } catch {
+        setActive(true);
+      } catch {
         setError("Microphone access denied");
       }
     }, [pushSample, startRafLoop]);
@@ -120,6 +122,7 @@ const AudioWaveform = forwardRef<AudioWaveformHandle, AudioWaveformProps>(
       audioCtxRef.current?.close();
       queueRef.current.fill(0);
       qHeadRef.current = 0;
+      setActive(false);
       renderBars();
     }, [renderBars, stopRafLoop]);
 

@@ -1,58 +1,56 @@
-# subasa-app
+# Welcome to your Expo app 👋
 
-The Subasa mobile client. **Scaffold only — not built out.**
+This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-- **Stack**: Expo SDK 56 · React Native 0.85 · expo-router · TypeScript
-- **Status**: an unmodified Expo starter template. No Subasa feature exists yet.
+## Get started
 
-## What is actually here
+1. Install dependencies
 
-```
-src/
-  app/            _layout, index, explore — starter screens
-  components/     themed text/view, tabs, collapsible — starter components
-  constants/      theme
-  hooks/          colour scheme helpers
-```
+   ```bash
+   npm install
+   ```
 
-Nothing under `src/` reads the API, and nothing reads the `EXPO_PUBLIC_*`
-variables already present in `.env`.
+2. Start the app
 
-## Configuration (present, unused)
+   ```bash
+   npx expo start
+   ```
 
-```
-EXPO_PUBLIC_API_BASE_URL         gateway base URL
-EXPO_PUBLIC_CHATBOT_PATH         url_path of the chatbot to open
-EXPO_PUBLIC_ASR_TRANSCRIBE_URL   ASR endpoint
-EXPO_PUBLIC_TTS_STREAMING        stream vs. one-shot synthesis
-EXPO_PUBLIC_USE_RN_FETCH         upload strategy toggle
-```
+In the output, you'll find options to open the app in a
 
-## Running it
+- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
+- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
+- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
+- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+
+You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+
+## Get a fresh project
+
+When you're ready, run:
 
 ```bash
-npm install
-npx expo start          # then i / a / w
+npm run reset-project
 ```
 
-## What is left to build
+This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
 
-Tracked as issues #47–#51, deliberately left open:
+### Other setup steps
 
-| Issue | Work |
-|---|---|
-| #51 | consume the `EXPO_PUBLIC_*` config; add `.env.example` |
-| #47 | Google OAuth against `POST /users/auth/google`, token in expo-secure-store |
-| #48 | chat screen against `POST /custom-chatbots/api/{url_path}` |
-| #49 | record audio, upload to ASR, show the transcript |
-| #50 | text → `POST /tts/generate`, play the result |
+- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
+- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
+- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
 
-The web app is the reference for all five: `useAsrRecorder` and
-`utils/asrStream.ts` show the audio format the ASR service requires (16 kHz mono
-WAV — it cannot read webm/opus), and `api/tts.ts` lists the six voice keys.
+## Learn more
 
-## Note on Expo version
+To learn more about developing your project with Expo, look at the following resources:
 
-`AGENTS.md` in this directory is emphatic: Expo 56 changed a lot. Check the
-versioned docs at <https://docs.expo.dev/versions/v56.0.0/> rather than
-older tutorials.
+- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
+- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+
+## Join the community
+
+Join our community of developers creating universal apps.
+
+- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
+- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.

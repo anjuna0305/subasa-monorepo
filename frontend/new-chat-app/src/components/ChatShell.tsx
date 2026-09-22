@@ -1,49 +1,37 @@
 
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import SendIcon from "@mui/icons-material/Send";
 import { ChangeEvent, ReactNode, useEffect, useRef, useState } from "react";
+import { Typography } from "@mui/material";
 import LiteCard from "./LiteCard";
 import InvisibleInput from "./InvisibleInput";
 import { Message } from "@/types/message";
+import { VoiceChat } from "@mui/icons-material";
 import MessageBox from "./MessageBox";
-import { API_ENDPOINTS, GOV_CHATBOT_PATH } from "@/utils/api";
+import { API_ENDPOINTS } from "@/utils/api";
 import axiosInstance from "@/api/axios";
 
 interface Props {
   heading?: ReactNode;
-  /**
-   * url_path of the custom chatbot backing this page.
-   *
-   * This used to post to a dedicated `chatbot` service with the Constitution
-   * text baked in. That service is gone; the same corpus is now served as an
-   * ordinary custom chatbot, so the page just needs to know which one.
-   */
-  urlPath?: string;
 }
 
 type ChatResponse = {
   response: string;
 };
 
-const sendMessage = async (
-  message: string,
-  urlPath: string,
-): Promise<string> => {
+const sendMessage = async (message: string): Promise<string> => {
   const response = await axiosInstance.post<ChatResponse>(
-    API_ENDPOINTS.CUSTOM_CHATBOT_API(urlPath),
+    API_ENDPOINTS.CHATBOT_CHAT,
     { message },
   );
   return response.data.response;
 };
 
-export default function ChatShell({
-  heading,
-  urlPath = GOV_CHATBOT_PATH,
-}: Props) {
+export default function ChatShell({ heading }: Props) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const typingAllowed = true;
+  const [typingAllowed, setTypingAllowed] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
   const [isSending, setIsSending] = useState<boolean>(false);
 
@@ -59,9 +47,9 @@ export default function ChatShell({
   };
 
   const handleSend = async () => {
-    const sendingMessage = message.trim();
-    if (!sendingMessage || isSending) return;
     setIsSending(true);
+    const sendingMessage = message.trim();
+    if (!sendingMessage) return;
     setMessages((prev) => [
       ...prev,
       { id: Date.now(), text: sendingMessage, role: "user" },
@@ -69,7 +57,7 @@ export default function ChatShell({
     setMessage("");
 
     try {
-      const response = await sendMessage(sendingMessage, urlPath);
+      const response = await sendMessage(sendingMessage);
       if (response) displayResponse(response);
     } catch (err) {
       console.error(err);
@@ -103,6 +91,7 @@ export default function ChatShell({
         mx: "auto",
       }}
     >
+      {/*TODO add a rate limiter*/}
       {/* headed area */}
       {messages.length == 0 && (
         <Box
@@ -176,13 +165,19 @@ export default function ChatShell({
         >
           {/* send icon */}
           <Box sx={{ height: "3rem", display: "flex" }}>
-            <IconButton
-              color="primary"
-              onClick={handleSend}
-              disabled={isSending || message.trim() === ""}
-            >
-              <SendIcon />
-            </IconButton>
+            {message === "" ? (
+              <IconButton sx={{ ml: 1 }} color="primary" onClick={handleSend}>
+                <VoiceChat />
+              </IconButton>
+            ) : (
+              <IconButton
+                color="primary"
+                onClick={handleSend}
+                disabled={isSending ? true : false}
+              >
+                <SendIcon />
+              </IconButton>
+            )}
           </Box>
         </Box>
       </LiteCard>

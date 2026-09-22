@@ -1,43 +1,24 @@
 import json
 
 from fastapi import APIRouter, Depends, Header, Request
-from fastapi.responses import StreamingResponse
+from fastapi.responses import Response, StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api_key_validator import validate_api_key
 from database import get_db
 from models import ResponseType, Task, UsageLog
-from rate_limit import check_rate_limit
-from routers._http import get_http_client
 from schemas import TaskSubmitOut
 from task_worker import get_queue
 
 router = APIRouter(prefix="/api", tags=["gateway"])
 
 
-def _tokens_from_headers(headers) -> int:
-    """Read the upstream's reported usage.
-
-    Services that do not report usage, or report something unparseable, are
-    billed one unit rather than zero, so an unmetered service can never be
-    used for free.
-    """
-    raw = headers.get("X-Tokens-Used")
-    try:
-        return max(0, int(raw))
-    except (TypeError, ValueError):
-        return 1
-
-
-# Hop-by-hop and gateway-only headers that must not reach the upstream service:
-# `host` would point at the gateway, `content-length` is recomputed by httpx from
-# the body we pass, and `x-api-key` is a gateway credential the upstream has no
-# business seeing.
-_STRIPPED_HEADERS = frozenset({"host", "x-api-key", "content-length"})
-
-
 def _build_forward_headers(request: Request) -> str:
-    headers = {k: v for k, v in request.headers.items() if k.lower() not in _STRIPPED_HEADERS}
+    headers = {
+        k: v
+        for k, v in request.headers.items()
+        # if k.lower() not in ("host", "x-api-key", "content-length")
+    }
     return json.dumps(headers)
 
 
@@ -54,10 +35,6 @@ async def gateway_proxy(
 ):
     validation = await validate_api_key(db, x_api_key, service_key)
     service = validation.service
-
-    # Checked after validation so an unknown key cannot use the limiter as an
-    # oracle, and keyed per API key rather than per IP.
-    check_rate_limit(validation.api_key.uuid)
 
     if service.response_type == ResponseType.long:
         body = await request.body()
@@ -79,6 +56,10 @@ async def gateway_proxy(
 
         return TaskSubmitOut(task_uuid=task.uuid, status=task.status)
 
+    import httpx
+
+    from routers._http import get_http_client
+
     client = get_http_client()
 
     target_url = f"{service.base_url.rstrip('/')}/{path}"
@@ -95,7 +76,7 @@ async def gateway_proxy(
         headers=headers,
     )
 
-    tokens_used = _tokens_from_headers(upstream_resp.headers)
+    tokens_used = int(upstream_resp.headers.get("X-Tokens-Used", 1))
 
     log = UsageLog(
         api_key_id=validation.api_key.id,

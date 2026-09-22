@@ -1,16 +1,16 @@
-from collections.abc import AsyncGenerator
+from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from config import DATABASE_URL
 
-# SQLite (used by the test suite) is served by StaticPool/NullPool, which
-# reject the connection-pool sizing MySQL wants.
-_engine_kwargs = {"pool_pre_ping": True, "echo": False}
-if not DATABASE_URL.startswith("sqlite"):
-    _engine_kwargs.update(pool_size=10, max_overflow=20)
-
-engine = create_async_engine(DATABASE_URL, **_engine_kwargs)
+engine = create_async_engine(
+    DATABASE_URL,
+    pool_size=10,
+    max_overflow=20,
+    pool_pre_ping=True,
+    echo=False,
+)
 
 AsyncSessionLocal = async_sessionmaker(
     engine,
@@ -19,6 +19,6 @@ AsyncSessionLocal = async_sessionmaker(
 )
 
 
-async def get_db() -> AsyncGenerator[AsyncSession]:
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with AsyncSessionLocal() as session:
         yield session

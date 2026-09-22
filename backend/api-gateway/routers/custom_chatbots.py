@@ -2,15 +2,11 @@ import math
 import os
 import uuid
 
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
-from fastapi.responses import FileResponse
-from sqlalchemy import desc, func, select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
-
 from auth import AdminUser, AnyUser
 from config import CUSTOM_CHATBOT_SERVICE_URL, FILE_UPLOAD_DIR, IMAGE_UPLOAD_DIR
 from database import get_db
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
+from fastapi.responses import FileResponse
 from models import CustomChatbot, Organization, User, UserRole
 from schemas import (
     CustomChatbotCreate,
@@ -19,6 +15,9 @@ from schemas import (
     CustomChatbotMessageResponse,
     CustomChatbotOut,
 )
+from sqlalchemy import desc, func, select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 ALLOWED_IMAGE_EXTENSIONS = {".jpeg", ".jpg", ".png"}
 ALLOWED_FILE_EXTENSIONS = {".txt", ".pdf"}
@@ -53,7 +52,9 @@ async def chat_with_custom_chatbot(
     payload: CustomChatbotMessageRequest,
     db: AsyncSession = Depends(get_db),
 ):
-    result = await db.execute(select(CustomChatbot).where(CustomChatbot.url_path == url_path))
+    result = await db.execute(
+        select(CustomChatbot).where(CustomChatbot.url_path == url_path)
+    )
     custom_chatbot = result.scalar_one_or_none()
     if not custom_chatbot:
         raise HTTPException(
@@ -85,7 +86,9 @@ async def chat_with_custom_chatbot(
     upstream_resp.raise_for_status()
 
     data = upstream_resp.json()
-    return CustomChatbotMessageResponse(response=data.get("response", data.get("message", "")))
+    return CustomChatbotMessageResponse(
+        response=data.get("response", data.get("message", ""))
+    )
 
 
 @router.post("/api/private/{url_path}", response_model=CustomChatbotMessageResponse)
@@ -95,7 +98,9 @@ async def chat_with_private_custom_chatbot(
     payload: CustomChatbotMessageRequest,
     db: AsyncSession = Depends(get_db),
 ):
-    result = await db.execute(select(CustomChatbot).where(CustomChatbot.url_path == url_path))
+    result = await db.execute(
+        select(CustomChatbot).where(CustomChatbot.url_path == url_path)
+    )
     custom_chatbot = result.scalar_one_or_none()
     if not custom_chatbot:
         raise HTTPException(
@@ -110,7 +115,9 @@ async def chat_with_private_custom_chatbot(
         )
 
     user = await db.scalar(
-        select(User).options(selectinload(User.organization)).where(User.uuid == current_user.uuid)
+        select(User)
+        .options(selectinload(User.organization))
+        .where(User.uuid == current_user.uuid)
     )
     if (
         current_user.role != UserRole.admin
@@ -139,7 +146,9 @@ async def chat_with_private_custom_chatbot(
     upstream_resp.raise_for_status()
 
     data = upstream_resp.json()
-    return CustomChatbotMessageResponse(response=data.get("response", data.get("message", "")))
+    return CustomChatbotMessageResponse(
+        response=data.get("response", data.get("message", ""))
+    )
 
 
 def _validate_image_extension(filename: str) -> str:
@@ -186,7 +195,9 @@ async def create_custom_chatbot(
     if existing:
         raise HTTPException(
             status_code=409,
-            detail=[{"field": "chatbot_name", "message": "Chatbot name already exists"}],
+            detail=[
+                {"field": "chatbot_name", "message": "Chatbot name already exists"}
+            ],
         )
 
     existing_url = await db.scalar(
@@ -209,7 +220,9 @@ async def create_custom_chatbot(
         if not org:
             raise HTTPException(
                 status_code=404,
-                detail=[{"field": "organization_uuid", "message": "Organization not found."}],
+                detail=[
+                    {"field": "organization_uuid", "message": "Organization not found."}
+                ],
             )
 
     custom_chatbot = CustomChatbot(
@@ -273,16 +286,22 @@ async def get_chabot_by_url_path(
     return _build_chatbot_out(custom_chatbot)
 
 
-@router.get("/by-url-organization/{organization_uuid}", response_model=list[CustomChatbotOut])
+@router.get(
+    "/by-url-organization/{organization_uuid}", response_model=list[CustomChatbotOut]
+)
 async def get_chabot_by_organization_uuid(
     organization_uuid: str,
     db: AsyncSession = Depends(get_db),
 ):
-    org = await db.scalar(select(Organization).where(Organization.uuid == organization_uuid))
+    org = await db.scalar(
+        select(Organization).where(Organization.uuid == organization_uuid)
+    )
     if not org:
         raise HTTPException(
             status_code=404,
-            detail=[{"field": "organization_uuid", "message": "Organization not found."}],
+            detail=[
+                {"field": "organization_uuid", "message": "Organization not found."}
+            ],
         )
 
     result = await db.execute(
@@ -324,11 +343,15 @@ async def list_custom_chatbot(
         )
 
     if organization_uuid is not None:
-        org = await db.scalar(select(Organization).where(Organization.uuid == organization_uuid))
+        org = await db.scalar(
+            select(Organization).where(Organization.uuid == organization_uuid)
+        )
         if not org:
             raise HTTPException(
                 status_code=404,
-                detail=[{"field": "organization_uuid", "message": "Organization not found."}],
+                detail=[
+                    {"field": "organization_uuid", "message": "Organization not found."}
+                ],
             )
 
     query = select(CustomChatbot).options(selectinload(CustomChatbot.organization))
@@ -346,7 +369,9 @@ async def list_custom_chatbot(
     total = (await db.execute(count_query)).scalar_one()
 
     sort_column = (
-        CustomChatbot.chatbot_name if sort_by == "chatbot_name" else CustomChatbot.created_at
+        CustomChatbot.chatbot_name
+        if sort_by == "chatbot_name"
+        else CustomChatbot.created_at
     )
     order_func = desc(sort_column) if sort_order == "desc" else sort_column.asc()
     query = query.order_by(order_func)

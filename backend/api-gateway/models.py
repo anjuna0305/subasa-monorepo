@@ -1,6 +1,6 @@
 import enum
 import uuid as _uuid
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import Enum, ForeignKey, LargeBinary, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -30,7 +30,7 @@ class TaskStatus(str, enum.Enum):
 
 
 def _utcnow() -> datetime:
-    return datetime.now(UTC)
+    return datetime.now(timezone.utc)
 
 
 def _new_uuid() -> str:
@@ -50,7 +50,9 @@ class User(Base):
     role: Mapped[UserRole] = mapped_column(
         Enum(UserRole), nullable=False, default=UserRole.general_user
     )
-    organization_id: Mapped[int] = mapped_column(ForeignKey("organizations.id"), nullable=True)
+    organization_id: Mapped[int] = mapped_column(
+        ForeignKey("organizations.id"), nullable=True
+    )
     is_active: Mapped[bool] = mapped_column(default=True)
     created_at: Mapped[datetime] = mapped_column(default=_utcnow)
 
@@ -71,7 +73,9 @@ class ApiKey(Base):
     is_active: Mapped[bool] = mapped_column(default=True)
 
     user: Mapped["User"] = relationship(back_populates="api_keys")
-    service_usages: Mapped[list["ServiceUsage"]] = relationship(back_populates="api_key")
+    service_usages: Mapped[list["ServiceUsage"]] = relationship(
+        back_populates="api_key"
+    )
     usage_logs: Mapped[list["UsageLog"]] = relationship(back_populates="api_key")
 
 
@@ -88,7 +92,9 @@ class Service(Base):
     )
     is_active: Mapped[bool] = mapped_column(default=True)
 
-    service_usages: Mapped[list["ServiceUsage"]] = relationship(back_populates="service")
+    service_usages: Mapped[list["ServiceUsage"]] = relationship(
+        back_populates="service"
+    )
     usage_logs: Mapped[list["UsageLog"]] = relationship(back_populates="service")
 
 
@@ -138,7 +144,9 @@ class Task(Base):
     request_body: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True)
     response_status_code: Mapped[int | None] = mapped_column(nullable=True)
     response_body: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True)
-    response_content_type: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    response_content_type: Mapped[str | None] = mapped_column(
+        String(200), nullable=True
+    )
     tokens_used: Mapped[int] = mapped_column(nullable=False, default=0)
     error_message: Mapped[str | None] = mapped_column(String(1000), nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=_utcnow)
@@ -154,7 +162,9 @@ class CustomChatbot(Base):
     uuid: Mapped[str] = mapped_column(String(36), unique=True, default=_new_uuid)
     chatbot_name: Mapped[str] = mapped_column(String(100), nullable=False)
     file_path: Mapped[str] = mapped_column(String(200), nullable=False)
-    organization_id: Mapped[int] = mapped_column(ForeignKey("organizations.id"), nullable=True)
+    organization_id: Mapped[int] = mapped_column(
+        ForeignKey("organizations.id"), nullable=True
+    )
     description: Mapped[str | None] = mapped_column(String(300), nullable=True)
     hero_image: Mapped[str | None] = mapped_column(String(200), nullable=True)
     url_path: Mapped[str] = mapped_column(String(200), nullable=False)
@@ -176,4 +186,6 @@ class Organization(Base):
     created_at: Mapped[datetime] = mapped_column(default=_utcnow)
 
     users: Mapped[list["User"]] = relationship(back_populates="organization")
-    chat_bots: Mapped[list["CustomChatbot"]] = relationship(back_populates="organization")
+    chat_bots: Mapped[list["CustomChatbot"]] = relationship(
+        back_populates="organization"
+    )

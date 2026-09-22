@@ -14,17 +14,25 @@ services:
         container_name: asr-be
         environment:
             HF_TOKEN: ${ASR_HF_TOKEN}
-            CORS_ALLOW_ORIGINS: ${CORS_ALLOW_ORIGINS}
         restart: unless-stopped
         ports:
             - "7000:6000"
         volumes:
             - $HOME/.cache/huggingface:/root/.cache/huggingface
+    chatbot-be:
+        build:
+            context: ./backend/chatbot
+            dockerfile: Dockerfile
+        container_name: chatbot-be
+        restart: unless-stopped
+        ports:
+            - "7001:6001"
+        volumes:
+            - $HOME/.cache/huggingface:/root/.cache/huggingface
     chatbot-mod:
         build:
-            # ./backend so the image can COPY the shared RAG module
-            context: ./backend
-            dockerfile: chatbot-modified/Dockerfile
+            context: ./backend/chatbot-modified
+            dockerfile: Dockerfile
         container_name: chatbot-mod
         restart: unless-stopped
         ports:
@@ -34,19 +42,14 @@ services:
             - ./backend/framework/uploaded_files/chatbot_files:/usr/src/app/uploaded_files
         environment:
             REDIS_HOST: redis
-            GROQ_API_KEY: ${GROQ_API_KEY}
-            CORS_ALLOW_ORIGINS: ${CORS_ALLOW_ORIGINS}
         depends_on:
             - redis
     framework-be:
         build:
-            context: ./backend
-            dockerfile: framework/Dockerfile
+            context: ./backend/framework
+            dockerfile: Dockerfile
         container_name: framework-be
         restart: unless-stopped
-        environment:
-            GROQ_API_KEY: ${GROQ_API_KEY}
-            CORS_ALLOW_ORIGINS: ${CORS_ALLOW_ORIGINS}
         ports:
             - "7003:6003"
         volumes:
@@ -58,9 +61,6 @@ services:
             dockerfile: Dockerfile
         container_name: tts-be
         restart: unless-stopped
-        environment:
-            HF_TOKEN: ${TTS_HF_TOKEN}
-            CORS_ALLOW_ORIGINS: ${CORS_ALLOW_ORIGINS}
         ports:
             - "7002:6002"
         volumes:
@@ -86,19 +86,11 @@ services:
         network_mode: host
         environment:
             DATABASE_URL: ${DATABASE_URL}
-            UPLOAD_DIR: /app/uploads
+            UPLOAD_BASE_DIR: /app/uploads
             JWT_SECRET: ${JWT_SECRET}
-            APP_ENV: ${APP_ENV:-development}
-            CORS_ALLOW_ORIGINS: ${CORS_ALLOW_ORIGINS}
-            CUSTOM_CHATBOT_SERVICE_URL: http://localhost:7006/chat
             TTS_SERVICE_URL: http://localhost:7002
-            ASR_SERVICE_URL: http://localhost:7000
-            FRAMEWORK_SERVICE_URL: http://localhost:7003
-            RATE_LIMIT_REQUESTS: ${RATE_LIMIT_REQUESTS:-60}
-            RATE_LIMIT_WINDOW_SECONDS: ${RATE_LIMIT_WINDOW_SECONDS:-60}
             FILE_STORE_DIR: /app/uploads/tts
             PUBLIC_BASE_URL: ${PUBLIC_BASE_URL}
-            GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
         volumes:
             - ./backend/framework/uploaded_files:/app/uploads
 

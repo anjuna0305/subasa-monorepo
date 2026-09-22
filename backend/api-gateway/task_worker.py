@@ -1,32 +1,17 @@
 import asyncio
 import json
 import logging
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 import httpx
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 
 from database import AsyncSessionLocal
-from models import Task, TaskStatus, UsageLog
+from models import ResponseType, Task, TaskStatus, UsageLog
 
 logger = logging.getLogger("task_worker")
 
 _queue: asyncio.Queue[int] | None = None
-
-
-def _tokens_from_headers(headers) -> int:
-    """Read the upstream's reported usage.
-
-    Services that do not report usage, or report something unparseable, are
-    billed one unit rather than zero, so an unmetered service can never be
-    used for free.
-    """
-    raw = headers.get("X-Tokens-Used")
-    try:
-        return max(0, int(raw))
-    except (TypeError, ValueError):
-        return 1
 
 
 def get_queue() -> asyncio.Queue[int]:
@@ -38,11 +23,7 @@ def get_queue() -> asyncio.Queue[int]:
 
 async def _process_task(task_id: int, client: httpx.AsyncClient) -> None:
     async with AsyncSessionLocal() as db:
-        # task.service is read below; a lazy load on an async session raises
-        # MissingGreenlet, so the relationship is eager-loaded up front.
-        task = await db.scalar(
-            select(Task).options(selectinload(Task.service)).where(Task.id == task_id)
-        )
+        task = await db.get(Task, task_id)
         if not task:
             logger.error("Task %s not found", task_id)
             return
@@ -63,14 +44,14 @@ async def _process_task(task_id: int, client: httpx.AsyncClient) -> None:
                 headers=headers,
             )
 
-            tokens_used = _tokens_from_headers(resp.headers)
+            tokens_used = int(resp.headers.get("X-Tokens-Used", 1))
 
             task.status = TaskStatus.completed
             task.response_status_code = resp.status_code
             task.response_body = resp.content
             task.response_content_type = resp.headers.get("content-type")
             task.tokens_used = tokens_used
-            task.completed_at = datetime.now(UTC)
+            task.completed_at = datetime.now(timezone.utc)
 
             log = UsageLog(
                 api_key_id=task.api_key_id,
@@ -85,7 +66,7 @@ async def _process_task(task_id: int, client: httpx.AsyncClient) -> None:
             logger.exception("Task %s failed", task_id)
             task.status = TaskStatus.failed
             task.error_message = str(exc)[:1000]
-            task.completed_at = datetime.now(UTC)
+            task.completed_at = datetime.now(timezone.utc)
 
             log = UsageLog(
                 api_key_id=task.api_key_id,
@@ -101,14 +82,14 @@ async def start_worker() -> asyncio.Task:
     async def _worker():
         client = httpx.AsyncClient(timeout=httpx.Timeout(300.0))
         try:
-            while True:
-                task_id = await get_queue().get()
+            while True and _queue:
+                task_id = await _queue.get()
                 try:
                     await _process_task(task_id, client)
                 except Exception:
                     logger.exception("Unhandled error processing task %s", task_id)
                 finally:
-                    get_queue().task_done()
+                    _queue.task_done()
         finally:
             await client.aclose()
 

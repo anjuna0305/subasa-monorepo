@@ -49,9 +49,9 @@ def converter(n):
   skip = False
 
   last = len(sum_list) - 1
-
+  
   for i, num in enumerate(sum_list):
-    if num != '000':
+    if num != '000': 
       skip = False
     for _ in range(len(num)):
       num = num.lstrip('0')
@@ -68,10 +68,10 @@ def converter(n):
         if num[0] != '0':
           if num.startswith('1'):
             if i != last:
-              number = teen_numbers[num][1]
+              number = teen_numbers[num][1]             
               word.append(number)
             else:
-              number = teen_numbers[num][0]
+              number = teen_numbers[num][0]             
               word.append(number)
 
           else:
